@@ -43,6 +43,7 @@
 //   return context
 // }
 
+
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
 type Theme = 'light' | 'dark'
@@ -55,22 +56,29 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Check localStorage or system preference
-    const saved = localStorage.getItem('theme')
-    if (saved === 'light' || saved === 'dark') return saved
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  })
+  const [theme, setTheme] = useState<Theme>('light')
 
+  // 🔥 Force light mode on mount
   useEffect(() => {
-    const root = window.document.documentElement
+    const root = document.documentElement
+
+    setTheme('light') // force state
+    root.classList.remove('dark')
+    root.classList.add('light')
+
+    localStorage.setItem('theme', 'light') // override any stored value
+  }, [])
+
+  // Keep DOM in sync if theme changes (optional now)
+  useEffect(() => {
+    const root = document.documentElement
     root.classList.remove('light', 'dark')
     root.classList.add(theme)
     localStorage.setItem('theme', theme)
   }, [theme])
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
+    setTheme('light') // prevent dark switching
   }
 
   return (
@@ -82,7 +90,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export function useTheme() {
   const context = useContext(ThemeContext)
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useTheme must be used within a ThemeProvider')
   }
   return context
