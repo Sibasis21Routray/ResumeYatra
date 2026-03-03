@@ -93,7 +93,7 @@ export default function RegisterPage({ onSuccess }: { onSuccess: () => void }) {
             >
               <Link to="/" className="block">
                 <img 
-                  src="../../../public/logo.png"
+                  src="logo.png"
                   alt="Logo" 
                   className="h-12 sm:h-14 md:h-16 w-auto transition-all duration-300 hover:scale-105" 
                 />
