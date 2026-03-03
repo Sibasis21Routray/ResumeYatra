@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font Faces */
+@font-face {
+  font-family: head;
+  src: url("./fonts/AsapLatin.woff2");
+}
+
+@font-face {
+  font-family: content;
+  src: url("./fonts/PoppinsNormal400Latin.woff2");
+}
+
+@font-face {
+  font-family: nav;
+  src: url("./fonts/PoppinsNormal600Latin.woff2");
+}
+
+/* Body - semantic Tailwind colors */
+body {
+  @apply bg-bg-primary dark:bg-dark-bg-primary text-text-primary dark:text-dark-text-primary;
+}
+
+/* Global spellcheck styles */
+[contenteditable][spellcheck="true"] {
+  spellcheck: true !important;
+  -webkit-spell-checker-type: en-US !important;
+}
+
+[contenteditable][spellcheck="true"]:focus {
+  outline: none !important;
+}
+
+
+/* Responsive forms for mobile */
+@media (max-width: 640px) {
+  .editor-form-container {
+    max-width: 100% !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .form-field {
+    width: 100% !important;
+  }
+}
