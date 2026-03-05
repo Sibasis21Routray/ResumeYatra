@@ -316,7 +316,7 @@ const navigate = useNavigate();
           }}>
             {sidebarOpen ? (
               <>
-                 <img src="../../../public/logo.png" alt="Logo" onClick={()=>{navigate("/")}}
+                 <img src="../../../public/logo.png" onClick={()=>{navigate("/")}}
               style={{ height: 68, width: "auto", filter: "brightness(0) invert(1)" }} />
                 <button
                   style={iconBtnStyle()}
