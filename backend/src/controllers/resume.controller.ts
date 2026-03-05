@@ -460,13 +460,14 @@ export async function getResume(req: Request, res: Response) {
           })
         );
 
-        (latestVersion.data as any).portfolio = portfolio.map((p: any) => ({
-          id: p._id.toString(),
-          title: p.title,
-          description: p.description,
-          url: p.url,
-          imageUrl: p.imageUrl,
-        }));
+       (latestVersion.data as any).portfolio = portfolio.map((p: any) => ({
+  id: p._id.toString(),
+  name: p.name,
+  type: p.type,
+  platform: p.platform,
+  description: p.description,
+  url: p.url
+}));
 
         (latestVersion.data as any).volunteering = volunteering.map(
           (v: any) => ({
@@ -979,19 +980,23 @@ export async function updateResume(req: Request, res: Response) {
       }
 
       // Handle portfolio if provided
-      if (data.portfolio && Array.isArray(data.portfolio)) {
-        await Portfolio.deleteMany({ resumeId: version._id });
-        if (data.portfolio.length > 0) {
-          const docs = data.portfolio.map((item: any) => ({
-            resumeId: version._id,
-            title: item.title,
-            description: item.description,
-            url: item.url,
-            imageUrl: item.imageUrl,
-          }));
-          await Portfolio.insertMany(docs);
-        }
-      }
+     // Handle portfolio if provided
+if (data.portfolio && Array.isArray(data.portfolio)) {
+  await Portfolio.deleteMany({ resumeId: version._id });
+
+  if (data.portfolio.length > 0) {
+    const docs = data.portfolio.map((item: any) => ({
+      resumeId: version._id,
+      name: item.name,
+      type: item.type,
+      platform: item.platform,
+      description: item.description,
+      url: item.url
+    }));
+
+    await Portfolio.insertMany(docs);
+  }
+}
 
       // Handle volunteering if provided
       if (data.volunteering && Array.isArray(data.volunteering)) {
