@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useParams, useNavigate } from 'react-router-dom'
 import { 
-  FileText, File, Palette, Type, Minus, Plus, 
+  FileText, File, Palette, Type, Minus, Plus, Pen,
   Layout, Download, X, Menu, ChevronRight,
   Eye, ZoomIn, ZoomOut, Check,
   AlertCircle, Sparkles, Settings,
@@ -15,7 +15,8 @@ import {
   Building, Star, Award,
   Mail,
   List,
-  Grid
+  Grid,
+  Pencil
 } from 'lucide-react'
 import { resumeAPI } from '../services/apiClient'
 import { useTemplateStore, useUIStore, useResumeStore } from '../stores'
@@ -67,7 +68,7 @@ const getSectionIcon = (iconName: string) => {
         </svg>
       );
     default:
-      return null;
+      return (<Pencil size={16} />);
   }
 };
 
@@ -217,7 +218,7 @@ export default function PreviewPage() {
       { id: 'experience', label: 'Work Experience', iconName: 'briefcase' },
       { id: 'skills', label: 'Skills', iconName: 'lightbulb' },
       { id: 'summary', label: 'Summary', iconName: 'document' },
-      { id: 'customSections', label: 'Custom Sections', iconName: 'plus' },
+      { id: 'customSections', label: 'Custom Sections', iconName: 'pen' },
     ];
     return sections;
   };
@@ -561,11 +562,18 @@ export default function PreviewPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 w-full overflow-hidden">
       {/* Top Bar with Logo and Logout */}
-      <div className="bg-[#055597] w-full fixed top-0 left-0 right-0 z-[70]" style={{ height: '48px' }}>
+      <div
+        className="bg-[#055597] w-full fixed top-0 left-0 right-0 z-[70]"
+        style={{ height: "48px" }}
+      >
         <div className="flex items-center justify-between h-full px-4 sm:px-6">
           <div className="flex items-center h-8 w-28">
             <Link to="/">
-              <img src="/white_logo.png" alt="Logo" className='h-full object-contain' />
+              <img
+                src="/white_logo.png"
+                alt="Logo"
+                className="h-full object-contain"
+              />
             </Link>
           </div>
           <div className="flex items-center gap-3">
@@ -573,8 +581,18 @@ export default function PreviewPage() {
               onClick={handleLogout}
               className="flex items-center gap-1.5 text-white hover:text-gray-200 transition-colors text-sm font-medium"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
               </svg>
               Logout
             </button>
@@ -582,8 +600,9 @@ export default function PreviewPage() {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{
-        __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
           .template-scroll::-webkit-scrollbar,
           .preview-scroll::-webkit-scrollbar,
           .section-scroll::-webkit-scrollbar {
@@ -618,14 +637,18 @@ export default function PreviewPage() {
               opacity: 1;
             }
           }
-        `
-      }} />
+        `,
+        }}
+      />
 
-      <header className="bg-white w-full fixed top-[48px] left-0 right-0 z-[60] border-b border-gray-200" style={{ height: '64px' }}>
+      <header
+        className="bg-white w-full fixed top-[48px] left-0 right-0 z-[60] border-b border-gray-200"
+        style={{ height: "64px" }}
+      >
         <div className="flex items-center justify-between h-full px-3 sm:px-4">
           <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate("/dashboard")}
               className="flex items-center gap-1 text-slate-600 hover:text-[#04477E] transition-colors text-xs sm:text-sm whitespace-nowrap"
             >
               <ChevronRight className="w-4 h-4 rotate-180" />
@@ -642,8 +665,8 @@ export default function PreviewPage() {
               onClick={() => setShowTemplates(!showTemplates)}
               className={`p-1.5 sm:p-2 rounded-lg transition-all duration-200 ${
                 showTemplates
-                  ? 'text-[#04477E] bg-slate-100 border border-[#04477E]/30'
-                  : 'text-slate-600 hover:text-[#04477E] hover:bg-slate-100'
+                  ? "text-[#04477E] bg-slate-100 border border-[#04477E]/30"
+                  : "text-slate-600 hover:text-[#04477E] hover:bg-slate-100"
               }`}
               title="Templates"
             >
@@ -654,8 +677,8 @@ export default function PreviewPage() {
               onClick={() => setShowSettings(!showSettings)}
               className={`p-1.5 sm:p-2 rounded-lg transition-all duration-200 ${
                 showSettings
-                  ? 'text-[#04477E] bg-slate-100 border border-[#04477E]/30'
-                  : 'text-slate-600 hover:text-[#04477E] hover:bg-slate-100'
+                  ? "text-[#04477E] bg-slate-100 border border-[#04477E]/30"
+                  : "text-slate-600 hover:text-[#04477E] hover:bg-slate-100"
               }`}
               title="Colors & Fonts"
             >
@@ -677,20 +700,28 @@ export default function PreviewPage() {
                 style={{ fontFamily: selectedFontFamily }}
               >
                 {fontFamilies.map((font) => (
-                  <option key={font.name} value={font.value}>{font.name}</option>
+                  <option key={font.name} value={font.value}>
+                    {font.name}
+                  </option>
                 ))}
               </select>
 
               <div className="flex items-center border border-gray-300 rounded h-8">
                 <button
-                  onClick={() => setBodyFontSize(Math.max(10, bodyFontSize - 1))}
+                  onClick={() =>
+                    setBodyFontSize(Math.max(10, bodyFontSize - 1))
+                  }
                   className="w-7 h-full flex items-center justify-center text-xs hover:bg-gray-50 border-r border-gray-300"
                 >
                   -
                 </button>
-                <span className="w-8 text-center text-xs font-medium">{bodyFontSize}</span>
+                <span className="w-8 text-center text-xs font-medium">
+                  {bodyFontSize}
+                </span>
                 <button
-                  onClick={() => setBodyFontSize(Math.min(24, bodyFontSize + 1))}
+                  onClick={() =>
+                    setBodyFontSize(Math.min(24, bodyFontSize + 1))
+                  }
                   className="w-7 h-full flex items-center justify-center text-xs hover:bg-gray-50 border-l border-gray-300"
                 >
                   +
@@ -704,7 +735,9 @@ export default function PreviewPage() {
                 >
                   <ZoomOut className="w-3 h-3" />
                 </button>
-                <span className="w-12 text-center text-xs font-medium">{zoomLevel}%</span>
+                <span className="w-12 text-center text-xs font-medium">
+                  {zoomLevel}%
+                </span>
                 <button
                   onClick={() => setZoomLevel(Math.min(200, zoomLevel + 10))}
                   className="p-1.5 rounded hover:bg-white text-slate-600"
@@ -726,27 +759,33 @@ export default function PreviewPage() {
               {showExportModal && (
                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 z-50">
                   <div className="p-3 border-b border-gray-100">
-                    <h3 className="font-semibold text-gray-900">Export Resume</h3>
+                    <h3 className="font-semibold text-gray-900">
+                      Export Resume
+                    </h3>
                   </div>
                   <div className="p-2">
-                    {exportFormats.map(({ format, label, icon: Icon, description }) => (
-                      <button
-                        key={format}
-                        onClick={() => handleExport(format)}
-                        disabled={exporting === format}
-                        className="w-full px-3 py-2 flex items-center gap-3 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 text-left"
-                      >
-                        <div className="p-1.5 bg-[#04477E]/10 rounded">
-                          <Icon className="w-4 h-4 text-[#04477E]" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {exporting === format ? 'Exporting...' : label}
-                          </p>
-                          <p className="text-xs text-gray-500">{description}</p>
-                        </div>
-                      </button>
-                    ))}
+                    {exportFormats.map(
+                      ({ format, label, icon: Icon, description }) => (
+                        <button
+                          key={format}
+                          onClick={() => handleExport(format)}
+                          disabled={exporting === format}
+                          className="w-full px-3 py-2 flex items-center gap-3 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 text-left"
+                        >
+                          <div className="p-1.5 bg-[#04477E]/10 rounded">
+                            <Icon className="w-4 h-4 text-[#04477E]" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              {exporting === format ? "Exporting..." : label}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {description}
+                            </p>
+                          </div>
+                        </button>
+                      ),
+                    )}
                   </div>
                 </div>
               )}
@@ -755,7 +794,7 @@ export default function PreviewPage() {
         </div>
       </header>
 
-      <main className="w-full" style={{ paddingTop: '112px' }}>
+      <main className="w-full" style={{ paddingTop: "112px" }}>
         {error && (
           <div className="w-full px-3 sm:px-4 pt-2">
             <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 flex items-start gap-3">
@@ -774,111 +813,156 @@ export default function PreviewPage() {
             />
           )}
 
-          <div className="flex w-full px-2 sm:px-3">
+          <div className="flex w-full px-2 sm:px-3 ">
             {/* Left Sidebar - Sections Navigation */}
-            <div className={`
-              fixed top-[112px] left-0 h-[calc(100vh-112px)] w-72 max-w-[85vw] z-50
-              transform transition-transform duration-300 ease-out
-              sm:relative sm:top-0 sm:translate-x-0 sm:h-auto sm:w-56 sm:max-w-none sm:mr-3 sm:z-0
-              ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full sm:translate-x-0'}
-            `}>
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 h-full sm:h-auto overflow-hidden">
-                <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-slate-50 to-white">
-                  <h3 className="font-semibold text-gray-900 text-sm">Sections</h3>
-                  <button
-                    onClick={() => setIsSidebarOpen(false)}
-                    className="sm:hidden text-gray-500 hover:text-gray-700 p-1"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
+            <div
+  className={`
+    fixed top-[112px] left-0 h-[calc(100vh-112px)] w-72 max-w-[85vw] z-50
+    transform transition-transform duration-300 ease-out
+    sm:relative sm:top-0 sm:translate-x-0 sm:h-auto sm:w-64 sm:max-w-none sm:mr-4 sm:z-0
+    ${isSidebarOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"}
+  `}
+>
+  <div className="bg-white rounded-2xl shadow-xl border border-gray-100 h-full sm:h-auto overflow-hidden backdrop-blur-sm">
+    {/* Header with gradient and better spacing */}
+    <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gradient-to-br from-slate-50 via-white to-white">
+      <div className="flex items-center gap-2">
+        <div className="w-1.5 h-6 bg-gradient-to-b from-[#04477E] to-[#0660a9] rounded-full"></div>
+        <h3 className="font-semibold text-gray-900 text-sm tracking-wide">
+          Resume Sections
+        </h3>
+      </div>
+      <button
+        onClick={() => setIsSidebarOpen(false)}
+        className="sm:hidden text-gray-400 hover:text-gray-600 p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+        aria-label="Close sidebar"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </div>
 
-                <div className="flex-1 overflow-y-auto p-3 section-scroll max-h-[calc(100vh-180px)] sm:max-h-none">
-                  <div className="space-y-1 mb-6">
-                    {sections.map((section, index) => (
-                      <button
-                        key={section.id}
-                        onClick={() => handleSectionClick(section.id)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-left text-slate-700 hover:bg-slate-100 rounded-lg transition-all duration-200 group section-button text-xs sm:text-sm"
-                        style={{ animationDelay: `${index * 50}ms` }}
-                      >
-                        <div className="flex-shrink-0 w-4 h-4 text-slate-500">
-                          {getSectionIcon(section.iconName)}
-                        </div>
-                        <span className="font-medium truncate">{section.label}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Download Options */}
-                  <div className="pt-4 border-t border-gray-200">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Download className="w-4 h-4 text-slate-600" />
-                      <h4 className="font-semibold text-slate-900 text-xs">Download Resume</h4>
-                    </div>
-                    <div className="space-y-1.5">
-                      <button
-                        onClick={() => handleExport('pdf')}
-                        className="w-full px-3 py-2 bg-gradient-to-r from-[#04477E] to-[#0660a9] text-white rounded-lg hover:shadow-md transition-all flex items-center justify-center gap-1.5 text-xs font-medium"
-                        disabled={exporting === 'pdf'}
-                      >
-                        {exporting === 'pdf' ? (
-                          <>
-                            <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
-                            Exporting PDF...
-                          </>
-                        ) : (
-                          <>Export PDF</>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => handleExport('docx')}
-                        className="w-full px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center gap-1.5 text-xs font-medium"
-                        disabled={exporting === 'docx'}
-                      >
-                        {exporting === 'docx' ? (
-                          <>
-                            <div className="w-3 h-3 border border-gray-700 border-t-transparent rounded-full animate-spin"></div>
-                            Exporting DOCX...
-                          </>
-                        ) : (
-                          <>Export DOCX</>
-                        )}
-                      </button>
-
-                      <button
-                        onClick={() => handleExport('txt')}
-                        className="w-full px-3 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center gap-1.5 text-xs font-medium"
-                        disabled={exporting === 'txt'}
-                      >
-                        {exporting === 'txt' ? (
-                          <>
-                            <div className="w-3 h-3 border border-gray-700 border-t-transparent rounded-full animate-spin"></div>
-                            Exporting TXT...
-                          </>
-                        ) : (
-                          <>Export TXT</>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Logout for mobile */}
-                  <div className="mt-4 pt-4 border-t border-gray-200 sm:hidden">
-                    <button
-                      onClick={handleLogout}
-                      className="w-full px-3 py-2 bg-slate-100 text-slate-900 rounded-lg hover:bg-slate-200 transition-all flex items-center justify-center gap-1.5 text-xs font-medium"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                      </svg>
-                      Logout
-                    </button>
-                  </div>
-                </div>
-              </div>
+    <div className="flex-1 overflow-y-auto p-4 section-scroll max-h-[calc(100vh-180px)] sm:max-h-none">
+      {/* Sections with improved styling */}
+      <div className="space-y-1 mb-6">
+        {sections.map((section, index) => (
+          <button
+            key={section.id}
+            onClick={() => handleSectionClick(section.id)}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-slate-600 hover:text-[#04477E] hover:bg-blue-50/50 rounded-xl transition-all duration-200 group section-button text-sm"
+            style={{ animationDelay: `${index * 50}ms` }}
+          >
+            <div className="flex-shrink-0 w-5 h-5 text-slate-400 group-hover:text-[#04477E] transition-colors">
+              {getSectionIcon(section.iconName)}
             </div>
+            <span className="font-medium truncate group-hover:translate-x-0.5 transition-transform">
+              {section.label}
+            </span>
+            <span className="ml-auto opacity-0 group-hover:opacity-100 text-[#04477E] text-xs transition-opacity">
+              →
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Download Options with improved cards */}
+      <div className="pt-4 border-t border-gray-100">
+        <div className="flex items-center gap-2 mb-4 px-1">
+          <div className="p-1.5 bg-blue-50 rounded-lg">
+            <Download className="w-4 h-4 text-[#04477E]" />
+          </div>
+          <h4 className="font-semibold text-gray-700 text-xs uppercase tracking-wider">
+            Export Options
+          </h4>
+        </div>
+        
+        <div className="space-y-2.5">
+          {/* PDF Button - Primary */}
+          <button
+            onClick={() => handleExport("pdf")}
+            className="w-full px-4 py-3 bg-gradient-to-r from-[#04477E] to-[#0660a9] text-white rounded-xl hover:shadow-lg hover:shadow-blue-200/50 transition-all flex items-center justify-between gap-2 text-sm font-medium group disabled:opacity-70 disabled:cursor-not-allowed"
+            disabled={exporting === "pdf"}
+          >
+            <span className="flex items-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              <span>PDF Document</span>
+            </span>
+            {exporting === "pdf" ? (
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <span className="text-xs opacity-70 group-hover:opacity-100">↓</span>
+            )}
+          </button>
+
+          {/* DOCX Button - Secondary */}
+          <button
+            onClick={() => handleExport("docx")}
+            className="w-full px-4 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-[#04477E] hover:shadow-md transition-all flex items-center justify-between gap-2 text-sm font-medium group disabled:opacity-70 disabled:cursor-not-allowed"
+            disabled={exporting === "docx"}
+          >
+            <span className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Word Document</span>
+            </span>
+            {exporting === "docx" ? (
+              <div className="w-4 h-4 border-2 border-gray-700 border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <span className="text-xs text-gray-400 group-hover:text-[#04477E]">↓</span>
+            )}
+          </button>
+
+          {/* TXT Button - Tertiary */}
+          <button
+            onClick={() => handleExport("txt")}
+            className="w-full px-4 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl hover:border-[#04477E] hover:shadow-md transition-all flex items-center justify-between gap-2 text-sm font-medium group disabled:opacity-70 disabled:cursor-not-allowed"
+            disabled={exporting === "txt"}
+          >
+            <span className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+              </svg>
+              <span>Plain Text</span>
+            </span>
+            {exporting === "txt" ? (
+              <div className="w-4 h-4 border-2 border-gray-700 border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <span className="text-xs text-gray-400 group-hover:text-[#04477E]">↓</span>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Logout for mobile with improved styling */}
+      <div className="mt-6 pt-4 border-t border-gray-100 sm:hidden">
+        <button
+          onClick={handleLogout}
+          className="w-full px-4 py-3 bg-slate-50 text-slate-700 rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center gap-2.5 text-sm font-medium group"
+        >
+          <svg
+            className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+            />
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    {/* Subtle gradient overlay at bottom for scroll indication */}
+    <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none sm:hidden"></div>
+  </div>
+</div>
 
             {/* Resume Preview */}
             <div className="flex-1 min-w-0">
@@ -891,7 +975,9 @@ export default function PreviewPage() {
                         <div className="w-12 h-12 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
                       </div>
                       <p className="text-gray-600 mt-4 text-sm">
-                        {exporting ? `Exporting as ${exporting.toUpperCase()}...` : 'Rendering preview...'}
+                        {exporting
+                          ? `Exporting as ${exporting.toUpperCase()}...`
+                          : "Rendering preview..."}
                       </p>
                     </div>
                   </div>
@@ -905,7 +991,7 @@ export default function PreviewPage() {
                         width: `${210 * (zoomLevel / 100)}mm`,
                         minHeight: `${297 * (zoomLevel / 100)}mm`,
                         transform: `scale(${zoomLevel / 100})`,
-                        transformOrigin: 'top center'
+                        transformOrigin: "top center",
                       }}
                     >
                       <iframe
@@ -916,7 +1002,9 @@ export default function PreviewPage() {
                         sandbox="allow-same-origin allow-scripts"
                         onLoad={() => {
                           if (mainPreviewIframeRef.current) {
-                            injectSectionDetectionScript(mainPreviewIframeRef.current);
+                            injectSectionDetectionScript(
+                              mainPreviewIframeRef.current,
+                            );
                           }
                         }}
                       />
@@ -928,515 +1016,607 @@ export default function PreviewPage() {
 
             {/* Right Panel - Templates & Colors Panel */}
             {/* Right Panel - Templates & Colors Panel */}
-<div className={`
-  fixed top-[112px] right-0 h-[calc(100vh-112px)] w-80 max-w-[90vw] z-50
-  transform transition-transform duration-300 ease-out
-  sm:relative sm:top-0 sm:translate-x-0 sm:h-auto sm:w-80 sm:max-w-none sm:ml-3 sm:z-0
-  ${showTemplates || showSettings ? 'translate-x-0' : 'translate-x-full sm:translate-x-0'}
-`}>
-  <div className="bg-white rounded-xl shadow-lg border border-gray-200 h-full sm:h-auto overflow-hidden">
-    <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-      <h3 className="font-semibold text-gray-900">
-        {showSettings && showTemplates ? 'Templates & Colors' : (showSettings ? 'Colors & Fonts' : 'Templates')}
-      </h3>
-      <button
-        onClick={() => {
-          setShowTemplates(false)
-          setShowSettings(false)
-        }}
-        className="sm:hidden text-gray-500 hover:text-gray-700 p-1"
-      >
-        <X className="w-4 h-4" />
-      </button>
-    </div>
-
-    <div className="p-4 overflow-y-auto max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-180px)]">
-      {/* Show both when both are toggled on */}
-      {showSettings && showTemplates && (
-        <div>
-          {/* Template View Toggle */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-gray-700">Templates View</span>
-              <div className="flex gap-1 p-1 bg-gray-100 rounded-lg">
-                <button
-                  onClick={() => setTemplateView('grid')}
-                  className={`p-1.5 rounded ${templateView === 'grid' ? 'bg-white shadow' : ''}`}
-                >
-                  <Grid className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setTemplateView('list')}
-                  className={`p-1.5 rounded ${templateView === 'list' ? 'bg-white shadow' : ''}`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Color Categories */}
-          <div className="mb-6">
-            <label className="block text-xs font-medium text-gray-700 mb-2">Color Categories</label>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`px-2 py-1 text-xs rounded-full border ${
-                  selectedCategory === 'all'
-                    ? 'bg-[#04477E] text-white border-[#04477E]'
-                    : 'border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                All ({categoryCounts.all})
-              </button>
-              {Object.entries(categoryIcons).map(([cat, Icon]) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-2 py-1 text-xs rounded-full border flex items-center gap-1 ${
-                    selectedCategory === cat
-                      ? 'bg-[#04477E] text-white border-[#04477E]'
-                      : 'border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <Icon className="w-3 h-3" />
-                  <span className="capitalize">{cat} ({categoryCounts[cat] || 0})</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Color Themes */}
-          <div className="mb-6">
-            <label className="block text-xs font-medium text-gray-700 mb-2">Color Themes</label>
-            <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1">
-              {filteredPalettes.map((palette) => (
-                <button
-                  key={palette.name}
-                  onClick={() => {
-                    setSelectedColor(palette.primary)
-                    setSelectedTheme(palette)
-                  }}
-                  className={`relative aspect-square rounded-lg border-2 transition-all ${
-                    selectedColor === palette.primary
-                      ? 'border-[#04477E] ring-2 ring-[#04477E]/20 scale-105'
-                      : 'border-transparent hover:border-gray-300'
-                  }`}
-                  style={{ backgroundColor: palette.primary }}
-                  title={palette.name}
-                >
-                  {selectedColor === palette.primary && (
-                    <Check className="w-3 h-3 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-                  )}
-                  {palette.background === '#0f172a' && (
-                    <Moon className="w-2 h-2 text-white absolute bottom-0.5 right-0.5 opacity-50" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Font Family */}
-          <div className="mb-6">
-            <label className="block text-xs font-medium text-gray-700 mb-2">Font Family</label>
-            <select
-              value={selectedFontFamily}
-              onChange={(e) => setSelectedFontFamily(e.target.value)}
-              className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#04477E]"
-              style={{ fontFamily: selectedFontFamily }}
-            >
-              {fontFamilies.map((font) => (
-                <option key={font.name} value={font.value} style={{ fontFamily: font.value }}>
-                  {font.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Font Size */}
-          <div className="mb-6">
-            <label className="block text-xs font-medium text-gray-700 mb-2">
-              Font Size: {bodyFontSize}px
-            </label>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setBodyFontSize(Math.max(10, bodyFontSize - 1))}
-                className="p-1 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <Minus className="w-3 h-3" />
-              </button>
-              <input
-                type="range"
-                min="10"
-                max="24"
-                value={bodyFontSize}
-                onChange={(e) => setBodyFontSize(parseInt(e.target.value))}
-                className="flex-1"
-              />
-              <button
-                onClick={() => setBodyFontSize(Math.min(24, bodyFontSize + 1))}
-                className="p-1 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <Plus className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-
-          {/* Templates */}
-          <div className="mb-6 pt-4 border-t border-gray-200">
-            <h4 className="text-xs font-medium text-gray-700 mb-3">Choose Template</h4>
-            {templates.length === 0 ? (
-              <div className="text-center py-4">
-                <div className="relative inline-block">
-                  <div className="w-8 h-8 border-4 border-gray-200 rounded-full"></div>
-                  <div className="w-8 h-8 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
-                </div>
-                <p className="text-gray-500 text-xs mt-2">Loading templates...</p>
-              </div>
-            ) : (
-              <div className={templateView === 'grid' ? 'grid grid-cols-2 gap-3' : 'space-y-2'}>
-                {templates.map((templateOption: any) => (
+            <div
+                className={`
+              fixed top-[112px] right-0 h-[calc(100vh-112px)] w-80 max-w-[90vw] z-50
+              transform transition-transform duration-300 ease-out
+              sm:relative sm:top-0 sm:translate-x-0 sm:h-auto sm:w-80 sm:max-w-none sm:ml-3 sm:z-0
+              ${showTemplates || showSettings ? "translate-x-0" : "translate-x-full sm:translate-x-0"}
+            `}
+                        >
+              <div className="bg-white rounded-xl shadow-lg border border-gray-200 h-full sm:h-auto overflow-hidden">
+                <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                  <h3 className="font-semibold text-gray-900">
+                    {showSettings && showTemplates
+                      ? "Templates & Colors"
+                      : showSettings
+                        ? "Colors & Fonts"
+                        : "Templates"}
+                  </h3>
                   <button
-                    key={templateOption.id}
-                    onClick={async () => {
-                      try {
-                        await resumeAPI.update(id!, { template: templateOption.id })
-                        setTemplate(templateOption.id)
-                        setSelectedTemplate(templateOption.id)
-                      } catch (error) {
-                        console.error('Failed to update template:', error)
-                        alert('Failed to update template. Please try again.')
-                      }
+                    onClick={() => {
+                      setShowTemplates(false);
+                      setShowSettings(false);
                     }}
-                    className={`
-                      relative group overflow-hidden rounded-lg border-2 transition-all
-                      ${template === templateOption.id
-                        ? 'border-[#04477E] shadow-md'
-                        : 'border-transparent hover:border-slate-300'
-                      }
-                      ${templateView === 'list' ? 'flex items-center gap-3 p-2' : ''}
-                    `}
+                    className="sm:hidden text-gray-500 hover:text-gray-700 p-1"
                   >
-                    {templateView === 'grid' ? (
-                      <>
-                        <div className="aspect-[210/297] w-full bg-gray-100">
-                          {templatePreviews[templateOption.id] ? (
-                            <div className="w-full h-full relative">
-                              <iframe
-                                srcDoc={templatePreviews[templateOption.id]}
-                                className="absolute inset-0 w-full h-full pointer-events-none"
-                                style={{
-                                  transform: 'scale(0.25)',
-                                  transformOrigin: '0 0',
-                                  width: '400%',
-                                  height: '400%'
-                                }}
-                                title={templateOption.name}
-                              />
-                            </div>
-                          ) : (
-                            <div className="flex items-center justify-center h-full">
-                              <File className="w-6 h-6 text-gray-400" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                          <p className="text-xs text-white font-medium truncate">
-                            {templateOption.name}
-                          </p>
-                        </div>
-                        {template === templateOption.id && (
-                          <div className="absolute top-1 right-1 bg-[#04477E] rounded-full p-0.5">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
-                          {templatePreviews[templateOption.id] ? (
-                            <div className="w-6 h-6 bg-white rounded shadow-sm" />
-                          ) : (
-                            <File className="w-4 h-4 text-gray-400" />
-                          )}
-                        </div>
-                        <div className="flex-1 text-left">
-                          <p className="text-sm font-medium text-gray-900">
-                            {templateOption.name}
-                          </p>
-                        </div>
-                        {template === templateOption.id && (
-                          <Check className="w-4 h-4 text-[#04477E]" />
-                        )}
-                      </>
-                    )}
+                    <X className="w-4 h-4" />
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
 
-          {/* Reset Button */}
-          <button
-            onClick={() => {
-              setSelectedColor('#04477E')
-              setSelectedFontFamily('Arial, sans-serif')
-              setBodyFontSize(14)
-              setSelectedTheme(colorPalettes[1])
-            }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-xs font-medium flex items-center justify-center gap-2"
-          >
-            <RotateCcw className="w-3 h-3" />
-            Reset to Defaults
-          </button>
-        </div>
-      )}
+                <div className="p-4 overflow-y-auto max-h-[calc(100vh-200px)] sm:max-h-[calc(100vh-180px)]">
+                  {/* Show both when both are toggled on */}
+                  {showSettings && showTemplates && (
+                    <div>
+                      {/* Template View Toggle */}
+                      <div className="mb-6">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-xs font-medium text-gray-700">
+                            Templates View
+                          </span>
+                          <div className="flex gap-1 p-1 bg-gray-100 rounded-lg">
+                            <button
+                              onClick={() => setTemplateView("grid")}
+                              className={`p-1.5 rounded ${templateView === "grid" ? "bg-white shadow" : ""}`}
+                            >
+                              <Grid className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setTemplateView("list")}
+                              className={`p-1.5 rounded ${templateView === "list" ? "bg-white shadow" : ""}`}
+                            >
+                              <List className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
 
-      {/* Settings Panel Only */}
-      {showSettings && !showTemplates && (
-        <div>
-          {/* Color Categories */}
-          <div className="mb-4">
-            <label className="block text-xs font-medium text-gray-700 mb-2">Color Categories</label>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`px-2 py-1 text-xs rounded-full border ${
-                  selectedCategory === 'all'
-                    ? 'bg-[#04477E] text-white border-[#04477E]'
-                    : 'border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                All ({categoryCounts.all})
-              </button>
-              {Object.entries(categoryIcons).map(([cat, Icon]) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-2 py-1 text-xs rounded-full border flex items-center gap-1 ${
-                    selectedCategory === cat
-                      ? 'bg-[#04477E] text-white border-[#04477E]'
-                      : 'border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <Icon className="w-3 h-3" />
-                  <span className="capitalize">{cat} ({categoryCounts[cat] || 0})</span>
-                </button>
-              ))}
-            </div>
-          </div>
+                      {/* Color Categories */}
+                      <div className="mb-6">
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          Color Categories
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            onClick={() => setSelectedCategory("all")}
+                            className={`px-2 py-1 text-xs rounded-full border ${
+                              selectedCategory === "all"
+                                ? "bg-[#04477E] text-white border-[#04477E]"
+                                : "border-gray-300 hover:bg-gray-50"
+                            }`}
+                          >
+                            All ({categoryCounts.all})
+                          </button>
+                          {Object.entries(categoryIcons).map(([cat, Icon]) => (
+                            <button
+                              key={cat}
+                              onClick={() => setSelectedCategory(cat)}
+                              className={`px-2 py-1 text-xs rounded-full border flex items-center gap-1 ${
+                                selectedCategory === cat
+                                  ? "bg-[#04477E] text-white border-[#04477E]"
+                                  : "border-gray-300 hover:bg-gray-50"
+                              }`}
+                            >
+                              <Icon className="w-3 h-3" />
+                              <span className="capitalize">
+                                {cat} ({categoryCounts[cat] || 0})
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
 
-          {/* Color Themes */}
-          <div className="mb-4">
-            <label className="block text-xs font-medium text-gray-700 mb-2">Color Themes</label>
-            <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1">
-              {filteredPalettes.map((palette) => (
-                <button
-                  key={palette.name}
-                  onClick={() => {
-                    setSelectedColor(palette.primary)
-                    setSelectedTheme(palette)
-                  }}
-                  className={`relative aspect-square rounded-lg border-2 transition-all ${
-                    selectedColor === palette.primary
-                      ? 'border-[#04477E] ring-2 ring-[#04477E]/20 scale-105'
-                      : 'border-transparent hover:border-gray-300'
-                  }`}
-                  style={{ backgroundColor: palette.primary }}
-                  title={palette.name}
-                >
-                  {selectedColor === palette.primary && (
-                    <Check className="w-3 h-3 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-                  )}
-                  {palette.background === '#0f172a' && (
-                    <Moon className="w-2 h-2 text-white absolute bottom-0.5 right-0.5 opacity-50" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Font Family */}
-          <div className="mb-4">
-            <label className="block text-xs font-medium text-gray-700 mb-2">Font Family</label>
-            <select
-              value={selectedFontFamily}
-              onChange={(e) => setSelectedFontFamily(e.target.value)}
-              className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#04477E]"
-              style={{ fontFamily: selectedFontFamily }}
-            >
-              {fontFamilies.map((font) => (
-                <option key={font.name} value={font.value} style={{ fontFamily: font.value }}>
-                  {font.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Font Size */}
-          <div className="mb-4">
-            <label className="block text-xs font-medium text-gray-700 mb-2">
-              Font Size: {bodyFontSize}px
-            </label>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setBodyFontSize(Math.max(10, bodyFontSize - 1))}
-                className="p-1 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <Minus className="w-3 h-3" />
-              </button>
-              <input
-                type="range"
-                min="10"
-                max="24"
-                value={bodyFontSize}
-                onChange={(e) => setBodyFontSize(parseInt(e.target.value))}
-                className="flex-1"
-              />
-              <button
-                onClick={() => setBodyFontSize(Math.min(24, bodyFontSize + 1))}
-                className="p-1 border border-gray-300 rounded hover:bg-gray-50"
-              >
-                <Plus className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-
-          {/* Reset Button */}
-          <button
-            onClick={() => {
-              setSelectedColor('#04477E')
-              setSelectedFontFamily('Arial, sans-serif')
-              setBodyFontSize(14)
-              setSelectedTheme(colorPalettes[1])
-            }}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-xs font-medium flex items-center justify-center gap-2"
-          >
-            <RotateCcw className="w-3 h-3" />
-            Reset to Defaults
-          </button>
-        </div>
-      )}
-
-      {/* Templates Panel Only */}
-      {showTemplates && !showSettings && (
-        <div>
-          {/* Template View Toggle */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-600">View mode</span>
-              <div className="flex gap-1 p-1 bg-gray-100 rounded-lg">
-                <button
-                  onClick={() => setTemplateView('grid')}
-                  className={`p-1.5 rounded ${templateView === 'grid' ? 'bg-white shadow' : ''}`}
-                >
-                  <Grid className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setTemplateView('list')}
-                  className={`p-1.5 rounded ${templateView === 'list' ? 'bg-white shadow' : ''}`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <h4 className="text-xs font-medium text-gray-700 mb-3">Choose Template</h4>
-          {templates.length === 0 ? (
-            <div className="text-center py-4">
-              <div className="relative inline-block">
-                <div className="w-8 h-8 border-4 border-gray-200 rounded-full"></div>
-                <div className="w-8 h-8 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
-              </div>
-              <p className="text-gray-500 text-xs mt-2">Loading templates...</p>
-            </div>
-          ) : (
-            <div className={templateView === 'grid' ? 'grid grid-cols-2 gap-3' : 'space-y-2'}>
-              {templates.map((templateOption: any) => (
-                <button
-                  key={templateOption.id}
-                  onClick={async () => {
-                    try {
-                      await resumeAPI.update(id!, { template: templateOption.id })
-                      setTemplate(templateOption.id)
-                      setSelectedTemplate(templateOption.id)
-                    } catch (error) {
-                      console.error('Failed to update template:', error)
-                      alert('Failed to update template. Please try again.')
-                    }
-                  }}
-                  className={`
-                    relative group overflow-hidden rounded-lg border-2 transition-all
-                    ${template === templateOption.id
-                      ? 'border-[#04477E] shadow-md'
-                      : 'border-transparent hover:border-slate-300'
-                    }
-                    ${templateView === 'list' ? 'flex items-center gap-3 p-2' : ''}
-                  `}
-                >
-                  {templateView === 'grid' ? (
-                    <>
-                      <div className="aspect-[210/297] w-full bg-gray-100">
-                        {templatePreviews[templateOption.id] ? (
-                          <div className="w-full h-full relative">
-                            <iframe
-                              srcDoc={templatePreviews[templateOption.id]}
-                              className="absolute inset-0 w-full h-full pointer-events-none"
-                              style={{
-                                transform: 'scale(0.25)',
-                                transformOrigin: '0 0',
-                                width: '400%',
-                                height: '400%'
+                      {/* Color Themes */}
+                      <div className="mb-6">
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          Color Themes
+                        </label>
+                        <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1">
+                          {filteredPalettes.map((palette) => (
+                            <button
+                              key={palette.name}
+                              onClick={() => {
+                                setSelectedColor(palette.primary);
+                                setSelectedTheme(palette);
                               }}
-                              title={templateOption.name}
-                            />
+                              className={`relative aspect-square rounded-lg border-2 transition-all ${
+                                selectedColor === palette.primary
+                                  ? "border-[#04477E] ring-2 ring-[#04477E]/20 scale-105"
+                                  : "border-transparent hover:border-gray-300"
+                              }`}
+                              style={{ backgroundColor: palette.primary }}
+                              title={palette.name}
+                            >
+                              {selectedColor === palette.primary && (
+                                <Check className="w-3 h-3 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                              )}
+                              {palette.background === "#0f172a" && (
+                                <Moon className="w-2 h-2 text-white absolute bottom-0.5 right-0.5 opacity-50" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Font Family */}
+                      <div className="mb-6">
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          Font Family
+                        </label>
+                        <select
+                          value={selectedFontFamily}
+                          onChange={(e) =>
+                            setSelectedFontFamily(e.target.value)
+                          }
+                          className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#04477E]"
+                          style={{ fontFamily: selectedFontFamily }}
+                        >
+                          {fontFamilies.map((font) => (
+                            <option
+                              key={font.name}
+                              value={font.value}
+                              style={{ fontFamily: font.value }}
+                            >
+                              {font.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Font Size */}
+                      <div className="mb-6">
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          Font Size: {bodyFontSize}px
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() =>
+                              setBodyFontSize(Math.max(10, bodyFontSize - 1))
+                            }
+                            className="p-1 border border-gray-300 rounded hover:bg-gray-50"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <input
+                            type="range"
+                            min="10"
+                            max="24"
+                            value={bodyFontSize}
+                            onChange={(e) =>
+                              setBodyFontSize(parseInt(e.target.value))
+                            }
+                            className="flex-1"
+                          />
+                          <button
+                            onClick={() =>
+                              setBodyFontSize(Math.min(24, bodyFontSize + 1))
+                            }
+                            className="p-1 border border-gray-300 rounded hover:bg-gray-50"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Templates */}
+                      <div className="mb-6 pt-4 border-t border-gray-200">
+                        <h4 className="text-xs font-medium text-gray-700 mb-3">
+                          Choose Template
+                        </h4>
+                        {templates.length === 0 ? (
+                          <div className="text-center py-4">
+                            <div className="relative inline-block">
+                              <div className="w-8 h-8 border-4 border-gray-200 rounded-full"></div>
+                              <div className="w-8 h-8 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+                            </div>
+                            <p className="text-gray-500 text-xs mt-2">
+                              Loading templates...
+                            </p>
                           </div>
                         ) : (
-                          <div className="flex items-center justify-center h-full">
-                            <File className="w-6 h-6 text-gray-400" />
+                          <div
+                            className={
+                              templateView === "grid"
+                                ? "grid grid-cols-2 gap-3"
+                                : "space-y-2"
+                            }
+                          >
+                            {templates.map((templateOption: any) => (
+                              <button
+                                key={templateOption.id}
+                                onClick={async () => {
+                                  try {
+                                    await resumeAPI.update(id!, {
+                                      template: templateOption.id,
+                                    });
+                                    setTemplate(templateOption.id);
+                                    setSelectedTemplate(templateOption.id);
+                                  } catch (error) {
+                                    console.error(
+                                      "Failed to update template:",
+                                      error,
+                                    );
+                                    alert(
+                                      "Failed to update template. Please try again.",
+                                    );
+                                  }
+                                }}
+                                className={`
+                      relative group overflow-hidden rounded-lg border-2 transition-all
+                      ${
+                        template === templateOption.id
+                          ? "border-[#04477E] shadow-md"
+                          : "border-transparent hover:border-slate-300"
+                      }
+                      ${templateView === "list" ? "flex items-center gap-3 p-2" : ""}
+                    `}
+                              >
+                                {templateView === "grid" ? (
+                                  <>
+                                    <div className="aspect-[210/297] w-full bg-gray-100">
+                                      {templatePreviews[templateOption.id] ? (
+                                        <div className="w-full h-full relative">
+                                          <iframe
+                                            srcDoc={
+                                              templatePreviews[
+                                                templateOption.id
+                                              ]
+                                            }
+                                            className="absolute inset-0 w-full h-full pointer-events-none"
+                                            style={{
+                                              transform: "scale(0.25)",
+                                              transformOrigin: "0 0",
+                                              width: "400%",
+                                              height: "400%",
+                                            }}
+                                            title={templateOption.name}
+                                          />
+                                        </div>
+                                      ) : (
+                                        <div className="flex items-center justify-center h-full">
+                                          <File className="w-6 h-6 text-gray-400" />
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                                      <p className="text-xs text-white font-medium truncate">
+                                        {templateOption.name}
+                                      </p>
+                                    </div>
+                                    {template === templateOption.id && (
+                                      <div className="absolute top-1 right-1 bg-[#04477E] rounded-full p-0.5">
+                                        <Check className="w-3 h-3 text-white" />
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
+                                      {templatePreviews[templateOption.id] ? (
+                                        <div className="w-6 h-6 bg-white rounded shadow-sm" />
+                                      ) : (
+                                        <File className="w-4 h-4 text-gray-400" />
+                                      )}
+                                    </div>
+                                    <div className="flex-1 text-left">
+                                      <p className="text-sm font-medium text-gray-900">
+                                        {templateOption.name}
+                                      </p>
+                                    </div>
+                                    {template === templateOption.id && (
+                                      <Check className="w-4 h-4 text-[#04477E]" />
+                                    )}
+                                  </>
+                                )}
+                              </button>
+                            ))}
                           </div>
                         )}
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                        <p className="text-xs text-white font-medium truncate">
-                          {templateOption.name}
-                        </p>
+
+                      {/* Reset Button */}
+                      <button
+                        onClick={() => {
+                          setSelectedColor("#04477E");
+                          setSelectedFontFamily("Arial, sans-serif");
+                          setBodyFontSize(14);
+                          setSelectedTheme(colorPalettes[1]);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-xs font-medium flex items-center justify-center gap-2"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        Reset to Defaults
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Settings Panel Only */}
+                  {showSettings && !showTemplates && (
+                    <div>
+                      {/* Color Categories */}
+                      <div className="mb-4">
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          Color Categories
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          <button
+                            onClick={() => setSelectedCategory("all")}
+                            className={`px-2 py-1 text-xs rounded-full border ${
+                              selectedCategory === "all"
+                                ? "bg-[#04477E] text-white border-[#04477E]"
+                                : "border-gray-300 hover:bg-gray-50"
+                            }`}
+                          >
+                            All ({categoryCounts.all})
+                          </button>
+                          {Object.entries(categoryIcons).map(([cat, Icon]) => (
+                            <button
+                              key={cat}
+                              onClick={() => setSelectedCategory(cat)}
+                              className={`px-2 py-1 text-xs rounded-full border flex items-center gap-1 ${
+                                selectedCategory === cat
+                                  ? "bg-[#04477E] text-white border-[#04477E]"
+                                  : "border-gray-300 hover:bg-gray-50"
+                              }`}
+                            >
+                              <Icon className="w-3 h-3" />
+                              <span className="capitalize">
+                                {cat} ({categoryCounts[cat] || 0})
+                              </span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      {template === templateOption.id && (
-                        <div className="absolute top-1 right-1 bg-[#04477E] rounded-full p-0.5">
-                          <Check className="w-3 h-3 text-white" />
+
+                      {/* Color Themes */}
+                      <div className="mb-4">
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          Color Themes
+                        </label>
+                        <div className="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1">
+                          {filteredPalettes.map((palette) => (
+                            <button
+                              key={palette.name}
+                              onClick={() => {
+                                setSelectedColor(palette.primary);
+                                setSelectedTheme(palette);
+                              }}
+                              className={`relative aspect-square rounded-lg border-2 transition-all ${
+                                selectedColor === palette.primary
+                                  ? "border-[#04477E] ring-2 ring-[#04477E]/20 scale-105"
+                                  : "border-transparent hover:border-gray-300"
+                              }`}
+                              style={{ backgroundColor: palette.primary }}
+                              title={palette.name}
+                            >
+                              {selectedColor === palette.primary && (
+                                <Check className="w-3 h-3 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                              )}
+                              {palette.background === "#0f172a" && (
+                                <Moon className="w-2 h-2 text-white absolute bottom-0.5 right-0.5 opacity-50" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Font Family */}
+                      <div className="mb-4">
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          Font Family
+                        </label>
+                        <select
+                          value={selectedFontFamily}
+                          onChange={(e) =>
+                            setSelectedFontFamily(e.target.value)
+                          }
+                          className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#04477E]"
+                          style={{ fontFamily: selectedFontFamily }}
+                        >
+                          {fontFamilies.map((font) => (
+                            <option
+                              key={font.name}
+                              value={font.value}
+                              style={{ fontFamily: font.value }}
+                            >
+                              {font.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Font Size */}
+                      <div className="mb-4">
+                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                          Font Size: {bodyFontSize}px
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() =>
+                              setBodyFontSize(Math.max(10, bodyFontSize - 1))
+                            }
+                            className="p-1 border border-gray-300 rounded hover:bg-gray-50"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <input
+                            type="range"
+                            min="10"
+                            max="24"
+                            value={bodyFontSize}
+                            onChange={(e) =>
+                              setBodyFontSize(parseInt(e.target.value))
+                            }
+                            className="flex-1"
+                          />
+                          <button
+                            onClick={() =>
+                              setBodyFontSize(Math.min(24, bodyFontSize + 1))
+                            }
+                            className="p-1 border border-gray-300 rounded hover:bg-gray-50"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Reset Button */}
+                      <button
+                        onClick={() => {
+                          setSelectedColor("#04477E");
+                          setSelectedFontFamily("Arial, sans-serif");
+                          setBodyFontSize(14);
+                          setSelectedTheme(colorPalettes[1]);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-xs font-medium flex items-center justify-center gap-2"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        Reset to Defaults
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Templates Panel Only */}
+                  {showTemplates && !showSettings && (
+                    <div>
+                      {/* Template View Toggle */}
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-600">
+                            View mode
+                          </span>
+                          <div className="flex gap-1 p-1 bg-gray-100 rounded-lg">
+                            <button
+                              onClick={() => setTemplateView("grid")}
+                              className={`p-1.5 rounded ${templateView === "grid" ? "bg-white shadow" : ""}`}
+                            >
+                              <Grid className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => setTemplateView("list")}
+                              className={`p-1.5 rounded ${templateView === "list" ? "bg-white shadow" : ""}`}
+                            >
+                              <List className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <h4 className="text-xs font-medium text-gray-700 mb-3">
+                        Choose Template
+                      </h4>
+                      {templates.length === 0 ? (
+                        <div className="text-center py-4">
+                          <div className="relative inline-block">
+                            <div className="w-8 h-8 border-4 border-gray-200 rounded-full"></div>
+                            <div className="w-8 h-8 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+                          </div>
+                          <p className="text-gray-500 text-xs mt-2">
+                            Loading templates...
+                          </p>
+                        </div>
+                      ) : (
+                        <div
+                          className={
+                            templateView === "grid"
+                              ? "grid grid-cols-2 gap-3"
+                              : "space-y-2"
+                          }
+                        >
+                          {templates.map((templateOption: any) => (
+                            <button
+                              key={templateOption.id}
+                              onClick={async () => {
+                                try {
+                                  await resumeAPI.update(id!, {
+                                    template: templateOption.id,
+                                  });
+                                  setTemplate(templateOption.id);
+                                  setSelectedTemplate(templateOption.id);
+                                } catch (error) {
+                                  console.error(
+                                    "Failed to update template:",
+                                    error,
+                                  );
+                                  alert(
+                                    "Failed to update template. Please try again.",
+                                  );
+                                }
+                              }}
+                              className={`
+                    relative group overflow-hidden rounded-lg border-2 transition-all
+                    ${
+                      template === templateOption.id
+                        ? "border-[#04477E] shadow-md"
+                        : "border-transparent hover:border-slate-300"
+                    }
+                    ${templateView === "list" ? "flex items-center gap-3 p-2" : ""}
+                  `}
+                            >
+                              {templateView === "grid" ? (
+                                <>
+                                  <div className="aspect-[210/297] w-full bg-gray-100">
+                                    {templatePreviews[templateOption.id] ? (
+                                      <div className="w-full h-full relative">
+                                        <iframe
+                                          srcDoc={
+                                            templatePreviews[templateOption.id]
+                                          }
+                                          className="absolute inset-0 w-full h-full pointer-events-none"
+                                          style={{
+                                            transform: "scale(0.25)",
+                                            transformOrigin: "0 0",
+                                            width: "400%",
+                                            height: "400%",
+                                          }}
+                                          title={templateOption.name}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-center justify-center h-full">
+                                        <File className="w-6 h-6 text-gray-400" />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                                    <p className="text-xs text-white font-medium truncate">
+                                      {templateOption.name}
+                                    </p>
+                                  </div>
+                                  {template === templateOption.id && (
+                                    <div className="absolute top-1 right-1 bg-[#04477E] rounded-full p-0.5">
+                                      <Check className="w-3 h-3 text-white" />
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
+                                    {templatePreviews[templateOption.id] ? (
+                                      <div className="w-6 h-6 bg-white rounded shadow-sm" />
+                                    ) : (
+                                      <File className="w-4 h-4 text-gray-400" />
+                                    )}
+                                  </div>
+                                  <div className="flex-1 text-left">
+                                    <p className="text-sm font-medium text-gray-900">
+                                      {templateOption.name}
+                                    </p>
+                                  </div>
+                                  {template === templateOption.id && (
+                                    <Check className="w-4 h-4 text-[#04477E]" />
+                                  )}
+                                </>
+                              )}
+                            </button>
+                          ))}
                         </div>
                       )}
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
-                        {templatePreviews[templateOption.id] ? (
-                          <div className="w-6 h-6 bg-white rounded shadow-sm" />
-                        ) : (
-                          <File className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                      <div className="flex-1 text-left">
-                        <p className="text-sm font-medium text-gray-900">
-                          {templateOption.name}
-                        </p>
-                      </div>
-                      {template === templateOption.id && (
-                        <Check className="w-4 h-4 text-[#04477E]" />
-                      )}
-                    </>
+                    </div>
                   )}
-                </button>
-              ))}
+                </div>
+              </div>
             </div>
-          )}
-        </div>
-      )}
-    </div>
-  </div>
-</div>
           </div>
         </div>
       </main>
@@ -1449,5 +1629,5 @@ export default function PreviewPage() {
         </div>
       )}
     </div>
-  )
+  );
 }
