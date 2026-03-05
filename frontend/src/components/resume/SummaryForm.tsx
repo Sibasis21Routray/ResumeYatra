@@ -147,7 +147,7 @@ export function SummaryForm({
     <div className="w-full max-w-full">
       {/* Header */}
       <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-3 sm:mb-4">
-        Add your <span className="text-accent">summary</span>
+        <span className="text-accent">Add your summary</span>
       </h2>
 
       {/* Main Card */}

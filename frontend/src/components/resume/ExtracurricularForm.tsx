@@ -422,7 +422,7 @@ export function ExtracurricularForm({
         <div className="space-y-6">
             <div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
-                    Add <span className="text-accent dark:text-dark-accent">Extracurricular Activity</span>
+                    Add non-academic activities
                 </h2>
                 <p className="text-base text-text-muted dark:text-dark-text-muted">
                     Sports, cultural, or non-academic activities

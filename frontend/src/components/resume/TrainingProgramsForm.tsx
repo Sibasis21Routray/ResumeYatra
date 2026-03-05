@@ -422,14 +422,12 @@ export function TrainingProgramsForm({
         <div className="space-y-6">
             <div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
-                    Add <span className="text-accent dark:text-dark-accent">Training Program</span>
+                    List certifications
                 </h2>
                 <p className="text-base text-text-muted dark:text-dark-text-muted">
-                    Add certifications, workshops, or skill programs
+                    Courses or workshops that boosted your skills.
                 </p>
-                <p className="text-sm text-text-muted/70 dark:text-dark-text-muted/70 mt-2">
-                    Add formal training, bootcamps, or certification programs relevant to your career.
-                </p>
+               
             </div>
 
             {/* Program Details */}

@@ -426,10 +426,10 @@ export function AcademicProjectsForm({
         <div className="space-y-6">
             <div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
-                    Add <span className="text-accent dark:text-dark-accent">Academic Project</span>
+                    Highlight your projects
                 </h2>
                 <p className="text-sm text-text-muted dark:text-dark-text-muted max-w-xl">
-                    Include major academic or final-year projects
+                    Showcase technical skills through your best work.
                 </p>
             </div>
 
@@ -450,7 +450,7 @@ export function AcademicProjectsForm({
                         characterCount
                         icon={<Briefcase className="w-4 h-4" />}
                         error={errors.name}
-                        helperText="Name of academic project"
+                        
                     />
 
                     <StyledInput
@@ -461,7 +461,6 @@ export function AcademicProjectsForm({
                         maxLength={50}
                         characterCount
                         icon={<Calendar className="w-4 h-4" />}
-                        helperText="Example: Jan 2024 – Mar 2024"
                     />
                 </div>
             </SectionCard>

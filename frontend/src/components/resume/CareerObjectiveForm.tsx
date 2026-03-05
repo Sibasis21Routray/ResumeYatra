@@ -162,8 +162,8 @@ export function CareerObjectiveForm({
 
                 {/* Career Objective Card */}
                 <SectionCard 
-                    title="Career Objective" 
-                    description="Briefly state the role you are seeking and the skills you want to apply"
+                    title="Define your goal" 
+                    description="This will appear only if Profile Summary is not added."
                     icon={<Target className="w-5 h-5" />}
                 >
                     <div className="space-y-4">

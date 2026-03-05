@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Info } from "lucide-react";
 import { useResumeStore } from "../../stores";
 import toast from 'react-hot-toast';
 
@@ -24,11 +24,13 @@ interface SkillsFormProps {
 const StyledInput = ({
   value,
   onChange,
+  onKeyDown,
   placeholder,
   error,
 }: {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent) => void;
   placeholder?: string;
   error?: string;
 }) => {
@@ -49,6 +51,7 @@ const StyledInput = ({
       type="text"
       value={value}
       onChange={onChange}
+      onKeyDown={onKeyDown}
       placeholder={placeholder}
       onFocus={() => setIsFocused(true)}
       onBlur={() => setIsFocused(false)}
@@ -92,6 +95,17 @@ const SkillTag = ({ skill, onRemove }: { skill: string; onRemove: () => void }) 
     >
       <X className="w-4 h-4" />
     </button>
+  </div>
+);
+
+// Info Tooltip Component
+const InfoTooltip = ({ text }: { text: string }) => (
+  <div className="group relative inline-flex ml-1">
+    <Info className="w-4 h-4 text-text-muted cursor-help" />
+    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+      {text}
+      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900" />
+    </div>
   </div>
 );
 
@@ -210,60 +224,72 @@ export function SkillsForm({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
+    <div className="w-full mx-auto px-4 sm:px-6">
+      {/* Header with enhanced description */}
       <div className="mb-8">
         <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
           Add Your <span className="text-accent dark:text-dark-accent">Skills</span>
         </h2>
-        <p className="text-base text-text-muted dark:text-dark-text-muted">
-          Enter your skills one by one. Add up to {MAX_SKILLS} skills.
+        <p className="text-base text-text-muted dark:text-dark-text-muted max-w-2xl">
+          List your professional skills to showcase your expertise. 
+          Include technical skills, soft skills, and tools you're proficient in.
         </p>
+       
       </div>
 
-      {/* Skills Input Card */}
+      {/* Skills Input Card with enhanced description */}
       <SectionCard 
-        title="Skills" 
-        description={`${skills.length}/${MAX_SKILLS} skills added`}
+        title="Add Your Skills" 
+        description={`${skills.length}/${MAX_SKILLS} skills added. Type a skill and press Enter or click Add.`}
       >
         <div className="space-y-4">
-          {/* Input field */}
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <StyledInput
-                value={newSkill}
-                onChange={(e) => {
-                  setNewSkill(e.target.value);
-                  setError("");
-                }}
-                onKeyDown={handleKeyDown}
-                placeholder={`e.g., JavaScript, Project Management, Python`}
-                error={error}
-              />
-              {error && (
-                <p className="mt-1 text-xs text-red-500">{error}</p>
-              )}
+          {/* Input field with helper text */}
+          <div>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <StyledInput
+                  value={newSkill}
+                  onChange={(e) => {
+                    setNewSkill(e.target.value);
+                    setError("");
+                  }}
+                  onKeyDown={handleKeyDown}
+                  placeholder={`e.g., JavaScript, Project Management, Python, Figma`}
+                  error={error}
+                />
+                {error && (
+                  <p className="mt-1 text-xs text-red-500">{error}</p>
+                )}
+              </div>
+              <button
+                onClick={handleAddSkill}
+                disabled={skills.length >= MAX_SKILLS}
+                className={`px-4 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                  skills.length >= MAX_SKILLS
+                    ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                    : 'bg-accent hover:bg-accent-hover text-white'
+                }`}
+              >
+                <Plus className="w-5 h-5" />
+                Add Skill
+              </button>
             </div>
-            <button
-              onClick={handleAddSkill}
-              disabled={skills.length >= MAX_SKILLS}
-              className={`px-4 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                skills.length >= MAX_SKILLS
-                  ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                  : 'bg-accent hover:bg-accent-hover text-white'
-              }`}
-            >
-              <Plus className="w-5 h-5" />
-              Add
-            </button>
+            <p className="mt-1 text-xs text-text-muted">
+              Press Enter to quickly add your skill
+            </p>
           </div>
 
-          {/* Skills list */}
+          {/* Skills list with category hints */}
           {skills.length > 0 && (
             <div className="mt-4">
-              <label className="block text-sm font-medium text-text-primary dark:text-dark-text-primary mb-2">
-                Your Skills ({skills.length}/{MAX_SKILLS})
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-text-primary dark:text-dark-text-primary">
+                  Your Skills
+                </label>
+                <span className="text-xs text-text-muted">
+                  Click the <X className="w-3 h-3 inline" /> to remove
+                </span>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill, index) => (
                   <SkillTag
@@ -273,14 +299,29 @@ export function SkillsForm({
                   />
                 ))}
               </div>
+              
+             
             </div>
           )}
 
-          {/* Character limits info */}
-          <div className="mt-4 p-3 bg-bg-secondary dark:bg-dark-bg-secondary rounded-lg">
-            <p className="text-xs text-text-muted">
-              <span className="font-semibold">Skill requirements:</span> {MIN_SKILL_LENGTH}-{MAX_SKILL_LENGTH} characters, max {MAX_SKILLS} skills total.
-            </p>
+         
+
+          {/* Character limits info with visual progress */}
+          <div className="mt-2 p-3 bg-bg-secondary dark:bg-dark-bg-secondary rounded-lg">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-xs text-text-muted">
+                <span className="font-semibold">Progress:</span> {skills.length}/{MAX_SKILLS} skills
+              </p>
+              <p className="text-xs text-text-muted">
+                {MAX_SKILLS - skills.length} slots remaining
+              </p>
+            </div>
+            <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-accent to-accent-hover transition-all duration-300"
+                style={{ width: `${(skills.length / MAX_SKILLS) * 100}%` }}
+              />
+            </div>
           </div>
         </div>
       </SectionCard>
@@ -296,11 +337,25 @@ export function SkillsForm({
 
         <button
           onClick={handleContinue}
-          className="px-8 py-3 rounded-xl bg-accent hover:bg-accent-hover dark:bg-dark-accent dark:hover:bg-dark-accent-hover text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 text-base"
+          disabled={skills.length === 0}
+          className={`px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 text-base ${
+            skills.length > 0
+              ? 'bg-accent hover:bg-accent-hover dark:bg-dark-accent dark:hover:bg-dark-accent-hover text-white'
+              : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+          }`}
         >
-          Continue →
+          {skills.length === 0 ? 'Add at least one skill' : 'Continue →'}
         </button>
       </div>
+
+      {/* Empty state message */}
+      {skills.length === 0 && (
+        <div className="text-center mt-6">
+          <p className="text-sm text-text-muted">
+            Start typing a skill above and click Add or press Enter
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -422,10 +422,10 @@ export function CoCurricularForm({
         <div className="space-y-6">
             <div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
-                    Add <span className="text-accent dark:text-dark-accent">Co-curricular Activity</span>
+                    Add Academic activities
                 </h2>
                 <p className="text-base text-text-muted dark:text-dark-text-muted">
-                    Activities related to academics or skill development
+                    Competitions or clubs related to your field
                 </p>
                 <p className="text-sm text-text-muted/70 dark:text-dark-text-muted/70 mt-2">
                     Include activities that demonstrate teamwork, discipline, or leadership.

@@ -141,10 +141,10 @@ export function AcademicCampusExperienceForm({
     const renderSubOptions = () => (
         <div>
             <h2 className="text-3xl font-bold mb-2">
-                Add details from your academic journey, internships, campus leadership, and student activities.
+                For Student, Fresher & Early Career
             </h2>
              <p className="text-sm text-gray-600 mb-8 max-w-xl">
-              Recommended for students, fresh graduates, and early-career professionals.
+              Add academic wins, internships, and campus roles to stand out.
             </p>
 
             {/* Summary Stats */}

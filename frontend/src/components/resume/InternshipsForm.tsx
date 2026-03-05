@@ -460,10 +460,10 @@ export function InternshipsForm({
         <div className="space-y-6">
             <div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
-                    {editingId ? "Edit" : "Add"} <span className="text-accent dark:text-dark-accent">Internship</span>
+                    {editingId ? "Edit" : "Add internships, apprenticeships, or industrial training"} 
                 </h2>
                 <p className="text-base text-text-muted dark:text-dark-text-muted">
-                    Add internships, apprenticeships, or industrial training.
+                    Real-world experience is your strongest asset.
                 </p>
             </div>
 

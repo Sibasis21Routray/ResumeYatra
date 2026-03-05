@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { RichTextEditor } from "../editor/RichTextEditor";
 // import { MonthYearPicker } from "../resume/MonthYearPicker";
 import { useResumeStore } from "../../stores";
-import { Edit, Trash, ChevronDown, ChevronUp, GraduationCap, MapPin, BookOpen, Award, Calendar, AlertCircle } from "lucide-react";
+import { Edit, Trash, ChevronDown, ChevronUp, GraduationCap, MapPin, BookOpen, Award, Calendar, AlertCircle, X } from "lucide-react";
 import toast from 'react-hot-toast';
 
 // Toast configuration
@@ -293,12 +293,12 @@ const DropdownWithSearch = ({
   );
 };
 
-// MonthYearPicker Component - FIXED Z-INDEX
+// MonthYearPicker Component - UPDATED TO YEAR ONLY WITH AUTO-CLOSE
 const MonthYearPicker = ({ 
   value, 
   onChange, 
   className = "",
-  placeholder = "Select date",
+  placeholder = "Select year",
   onOpenChange
 }: { 
   value: string; 
@@ -308,23 +308,21 @@ const MonthYearPicker = ({
   onOpenChange?: (isOpen: boolean) => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
-
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 71 }, (_, i) => currentYear - 50 + i);
 
   useEffect(() => {
     if (value) {
-      const [month, year] = value.split('/');
-      setSelectedMonth(parseInt(month));
-      setSelectedYear(parseInt(year));
+      // Handle both MM/YYYY and YYYY formats
+      if (value.includes('/')) {
+        const [, year] = value.split('/');
+        setSelectedYear(parseInt(year));
+      } else {
+        setSelectedYear(parseInt(value));
+      }
     }
   }, [value]);
 
@@ -342,17 +340,24 @@ const MonthYearPicker = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSelect = (month: number, year: number) => {
-    const formattedValue = `${month.toString().padStart(2, '0')}/${year}`;
-    onChange(formattedValue);
+  const handleSelect = (year: number) => {
+    setSelectedYear(year);
+    // Store as YYYY format and close immediately
+    onChange(year.toString());
     setIsOpen(false);
   };
 
   const formatDisplayDate = () => {
-    if (selectedMonth && selectedYear) {
-      return `${months[selectedMonth - 1]} ${selectedYear}`;
+    if (selectedYear) {
+      return selectedYear.toString();
     }
     return '';
+  };
+
+  const handleClear = () => {
+    setSelectedYear(null);
+    onChange('');
+    setIsOpen(false);
   };
 
   return (
@@ -367,11 +372,20 @@ const MonthYearPicker = ({
           className="w-full pl-10 pr-4 py-2.5 bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all duration-200 text-text-primary dark:text-dark-text-primary placeholder-text-muted cursor-pointer"
         />
         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted dark:text-dark-text-muted" />
+        {selectedYear && (
+          <button
+            onClick={handleClear}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-accent transition-colors"
+            title="Clear"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {isOpen && (
         <div 
-          className="absolute z-[90] mt-1 w-72 bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl shadow-xl p-4"
+          className="absolute z-[90] mt-1 w-64 bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl shadow-xl p-4"
           style={{ 
             position: 'absolute',
             top: '100%',
@@ -381,35 +395,14 @@ const MonthYearPicker = ({
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-medium text-text-muted dark:text-dark-text-muted mb-2">
-                Month
+                Select Year
               </label>
-              <div className="grid grid-cols-3 gap-2">
-                {months.map((month, index) => (
-                  <button
-                    key={month}
-                    onClick={() => setSelectedMonth(index + 1)}
-                    className={`px-2 py-1.5 text-xs rounded-lg transition-colors ${
-                      selectedMonth === index + 1
-                        ? 'bg-accent text-white'
-                        : 'hover:bg-accent/10 text-text-primary dark:text-dark-text-primary'
-                    }`}
-                  >
-                    {month.slice(0, 3)}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-text-muted dark:text-dark-text-muted mb-2">
-                Year
-              </label>
-              <div className="max-h-40 overflow-y-auto grid grid-cols-4 gap-2">
+              <div className="max-h-60 overflow-y-auto grid grid-cols-3 gap-2">
                 {years.map((year) => (
                   <button
                     key={year}
-                    onClick={() => setSelectedYear(year)}
-                    className={`px-2 py-1.5 text-xs rounded-lg transition-colors ${
+                    onClick={() => handleSelect(year)}
+                    className={`px-3 py-2 text-sm rounded-lg transition-colors ${
                       selectedYear === year
                         ? 'bg-accent text-white'
                         : 'hover:bg-accent/10 text-text-primary dark:text-dark-text-primary'
@@ -419,31 +412,6 @@ const MonthYearPicker = ({
                   </button>
                 ))}
               </div>
-            </div>
-
-            <div className="flex justify-between pt-2 border-t border-light-border dark:border-dark-border">
-              <button
-                onClick={() => {
-                  setSelectedMonth(null);
-                  setSelectedYear(null);
-                  onChange('');
-                  setIsOpen(false);
-                }}
-                className="text-xs text-text-muted hover:text-accent transition-colors"
-              >
-                Clear
-              </button>
-              <button
-                onClick={() => {
-                  if (selectedMonth && selectedYear) {
-                    handleSelect(selectedMonth, selectedYear);
-                  }
-                }}
-                disabled={!selectedMonth || !selectedYear}
-                className="text-xs bg-accent hover:bg-accent-hover text-white px-3 py-1 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Done
-              </button>
             </div>
           </div>
         </div>
@@ -793,7 +761,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
             value={currentEducation.school || ""}
             onChange={(e) => updateField("school", e.target.value)}
             icon={<BookOpen className="w-4 h-4" />}
-            helperText="Optional"
+            // helperText="Optional"
           />
 
           <StyledInput
@@ -802,7 +770,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
             value={currentEducation.location || ""}
             onChange={(e) => updateField("location", e.target.value)}
             icon={<MapPin className="w-4 h-4" />}
-            helperText="Optional"
+            // helperText="Optional"
           />
         </div>
       </SectionCard>
@@ -835,7 +803,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
               value={currentEducation.field || ""}
               onChange={(e) => updateField("field", e.target.value)}
               icon={<BookOpen className="w-4 h-4" />}
-              helperText="Optional"
+              // helperText="Optional"
             />
           </div>
         </div>
@@ -995,7 +963,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
   );
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="w-full mx-auto px-4  ">
       {isSummaryView ? renderSummary() : renderForm()}
 
       {/* Footer */}

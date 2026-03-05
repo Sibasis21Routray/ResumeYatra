@@ -213,41 +213,13 @@ const SectionCard = ({ title, description, children, icon, required, isDropdownO
     </div>
 );
 
-// Tooltip Component
-const Tooltip = ({ content, children }: { content: string; children: React.ReactNode }) => {
-    const [show, setShow] = useState(false);
-    const tooltipRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (tooltipRef.current && !tooltipRef.current.contains(event.target as Node)) {
-                setShow(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    return (
-        <div className="relative inline-block" ref={tooltipRef}>
-            <div
-                onMouseEnter={() => setShow(true)}
-                onMouseLeave={() => setShow(false)}
-                className="cursor-help"
-            >
-                {children}
-            </div>
-            {show && (
-                <div className="absolute z-[10000] w-64 p-2 text-xs bg-gray-900 text-white rounded-lg shadow-lg bottom-full left-1/2 transform -translate-x-1/2 -translate-y-2 mb-1">
-                    <div className="relative">
-                        {content}
-                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900"></div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
+// Info Helper Component
+const InfoHelper = ({ text }: { text: string }) => (
+    <div className="flex items-start gap-1.5 mt-2 text-xs text-text-muted bg-bg-secondary/50 dark:bg-dark-bg-secondary/50 p-2 rounded-lg">
+        <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-accent" />
+        <span className="leading-relaxed">{text}</span>
+    </div>
+);
 
 // Industry Select Component with Search
 const IndustrySelect = ({
@@ -681,26 +653,24 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
     ];
 
     return (
-        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 ">
             {/* Header */}
             <div className="mb-8">
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
                     Professional <span className="text-accent dark:text-dark-accent">Context</span>
                 </h2>
                 <p className="text-base text-text-muted dark:text-dark-text-muted">
-                    Help us understand your role so we can generate accurate summaries and skills.
+                    This data stays behind the scenes to help our AI craft a high-impact leadership summary.
                 </p>
             </div>
-
-          
 
             {/* Form Grid */}
             <div className="space-y-6">
                 {/* Total Experience - Required */}
                 <SectionCard 
                     title="Total Experience" 
-                    description="Your total professional experience across all roles."
-                    icon={<Info className="w-5 h-5" />}
+                    // description="Required to calibrate your leadership level."
+                    // icon={<Info className="w-5 h-5" />}
                     required
                     isDropdownOpen={isAnyDropdownOpen}
                 >
@@ -726,14 +696,15 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
                                 {errors.totalExperience}
                             </p>
                         )}
+                        <InfoHelper text="Required to calibrate your leadership level." />
                     </div>
                 </SectionCard>
 
                 {/* Team Size */}
                 <SectionCard 
                     title="Team Size (People Led)" 
-                    description="Total number of people you were responsible for, directly or indirectly"
-                    icon={<Info className="w-5 h-5" />}
+                    // description="Total number of people you were responsible for, directly or indirectly"
+                    // icon={<Info className="w-5 h-5" />}
                     isDropdownOpen={isAnyDropdownOpen}
                 >
                     <div className="max-w-md">
@@ -747,14 +718,15 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
                                 <option key={opt} value={opt}>{opt}</option>
                             ))}
                         </select>
+                        <InfoHelper text="Used to define your leadership seniority." />
                     </div>
                 </SectionCard>
 
                 {/* Industry / Sector */}
                 <SectionCard 
                     title="Industry / Sector" 
-                    description="The industry your company operates in."
-                    icon={<Info className="w-5 h-5" />}
+                    // description="The industry your company operates in."
+                    // icon={<Info className="w-5 h-5" />}
                     isDropdownOpen={isAnyDropdownOpen}
                 >
                     <div className="space-y-3">
@@ -794,21 +766,15 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
                             </div>
                         )}
 
-                        {/* Tooltip */}
-                        <div className="flex items-center gap-2 text-xs text-text-muted">
-                            <Tooltip content="This describes the business sector of your employer (e.g., Insurance, Fintech, Healthcare)">
-                                <Info className="w-3.5 h-3.5 cursor-help" />
-                            </Tooltip>
-                            <span>Hover for more info</span>
-                        </div>
+                        <InfoHelper text="Different industries use different 'power words.' This ensures your profile sounds like an insider." />
                     </div>
                 </SectionCard>
 
                 {/* Functional Domain */}
                 <SectionCard 
                     title="Functional Domain" 
-                    description="Your primary area of work across roles."
-                    icon={<Info className="w-5 h-5" />}
+                    // description="Your primary area of work across roles."
+                    // icon={<Info className="w-5 h-5" />}
                     isDropdownOpen={isAnyDropdownOpen}
                 >
                     <div className="space-y-3">
@@ -851,20 +817,15 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
                             </div>
                         )}
 
-                        <div className="flex items-center gap-2 text-xs text-text-muted">
-                            <Tooltip content="This describes what you do (e.g., Business Development, Software Engineering), not the company's industry">
-                                <Info className="w-3.5 h-3.5 cursor-help" />
-                            </Tooltip>
-                            <span>Hover for more info</span>
-                        </div>
+                        <InfoHelper text="This helps the AI prioritize the most relevant skills for your specific career track." />
                     </div>
                 </SectionCard>
 
                 {/* Geographic Scope */}
                 <SectionCard 
                     title="Geographic Scope" 
-                    description="The geographic reach of your role"
-                    icon={<Info className="w-5 h-5" />}
+                    // description="The geographic reach of your role"
+                    // icon={<Info className="w-5 h-5" />}
                     isDropdownOpen={isAnyDropdownOpen}
                 >
                     <div className="max-w-md">
@@ -878,14 +839,15 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
                                 <option key={opt} value={opt}>{opt}</option>
                             ))}
                         </select>
+                        <InfoHelper text="Establishes role scale" />
                     </div>
                 </SectionCard>
 
                 {/* Revenue / Budget Responsibility */}
                 <SectionCard 
                     title="Revenue / Budget Responsibility" 
-                    description="Approximate annual revenue or budget you were responsible for."
-                    icon={<Info className="w-5 h-5" />}
+                    // description="Approximate annual revenue or budget you were responsible for."
+                    // icon={<Info className="w-5 h-5" />}
                     isDropdownOpen={isAnyDropdownOpen}
                 >
                     <div className="space-y-3">
@@ -902,12 +864,7 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
                             </select>
                         </div>
                         
-                        <div className="flex items-center gap-2 text-xs text-text-muted">
-                            <Tooltip content="This is used only to improve wording. Numbers are not shown on your resume">
-                                <Info className="w-3.5 h-3.5 cursor-help" />
-                            </Tooltip>
-                            <span>Hover for more info</span>
-                        </div>
+                        <InfoHelper text="Quantifiable results are the #1 thing recruiters look for in senior roles. This data creates impact-driven bullets." />
                     </div>
                 </SectionCard>
             </div>

@@ -625,10 +625,10 @@ export function Heading({
   }`;
 
   return (
-    <div className="w-fullmin-h-screen pb-8">
+    <div className="w-full min-h-screen pb-8">
   {/* Header */}
   <div className=" sticky top-0 z-10 backdrop-blur-sm bg-bg-primary/80">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="max-w-7xl mx-auto px-4 ">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl sm:text-3xl font-bold text-text-primary dark:text-dark-text-primary">
@@ -717,10 +717,7 @@ export function Heading({
       <div className="space-y-6">
         {/* Name Row - Required fields highlighted */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <h5 className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Name Information</h5>
-            <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">First Name Required</span>
-          </div>
+         
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StyledInput
               label="First Name"
@@ -770,11 +767,8 @@ export function Heading({
 
         {/* Contact Information - Required */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <h5 className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Contact Information</h5>
-            <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">Phone & Email Required</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
             <StyledInput
               label="Phone"
               placeholder="10-digit mobile number"
@@ -799,7 +793,7 @@ export function Heading({
               type="tel"
               maxLength={10}
               icon={<Phone className="w-4 h-4" />}
-              helperText="Optional - may be noise"
+              // helperText="Optional - may be noise"
             />
 
             <StyledInput
@@ -817,11 +811,8 @@ export function Heading({
           </div>
           {/* Demographics */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <h5 className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Demographics</h5>
-            <span className="text-xs bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-dark-text-muted px-2 py-0.5 rounded-full">All Optional</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+         
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
             <StyledSelect
               label="Gender"
               value={personal.gender || ""}
@@ -859,18 +850,15 @@ export function Heading({
 
         {/* Location Information */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <h5 className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Location</h5>
-            <span className="text-xs bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-dark-text-muted px-2 py-0.5 rounded-full">All Optional</span>
-          </div>
+          
           <div className="space-y-4">
             <StyledInput
-              label="Full Address"
+              label="Address / Locality"
               placeholder="Street address, locality"
               value={personal.fullAddress || ""}
               onChange={(e) => handleFieldChange("fullAddress", e.target.value)}
               icon={<MapPin className="w-4 h-4" />}
-              helperText="Not ATS relevant - optional"
+              // helperText="Not ATS relevant - optional"
             />
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -889,7 +877,7 @@ export function Heading({
                 onChange={(e) => handleFieldChange("pinCode", e.target.value.replace(/\D/g, ""))}
                 maxLength={6}
                 icon={<MapPin className="w-4 h-4" />}
-                helperText="Low recruiter value"
+                // helperText="Low recruiter value"
               />
 
               <StyledInput
@@ -904,7 +892,7 @@ export function Heading({
         </div>
 
         {/* Family & Nationality */}
-        <div>
+        {/* <div>
           <div className="flex items-center gap-2 mb-3">
             <h5 className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Family & Nationality</h5>
             <span className="text-xs bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-dark-text-muted px-2 py-0.5 rounded-full">All Optional</span>
@@ -926,7 +914,7 @@ export function Heading({
               icon={<Globe className="w-4 h-4" />}
             />
           </div>
-        </div>
+        </div> */}
 
         
       </div>
