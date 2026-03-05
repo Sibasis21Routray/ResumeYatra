@@ -8,6 +8,7 @@ import {
   Link, Plus, ChevronRight, Users, Building, Menu, X, ChevronLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import logo from "../../../public/logo.png";
 
 const ALL_SECTIONS = [
   { id: "personal",           label: "Professional & Contact",      iconName: "user" },
@@ -316,7 +317,7 @@ const navigate = useNavigate();
           }}>
             {sidebarOpen ? (
               <>
-                 <img src="../../../public/logo.png" onClick={()=>{navigate("/")}}
+                 <img src={logo} onClick={()=>{navigate("/")}}
               style={{ height: 68, width: "auto", filter: "brightness(0) invert(1)" }} />
                 <button
                   style={iconBtnStyle()}
