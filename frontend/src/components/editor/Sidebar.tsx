@@ -269,7 +269,7 @@ const navigate = useNavigate();
         <div style={{ ...BASE, position: "fixed", top: 0, left: 0, bottom: 0, width: "min(340px, 88vw)", zIndex: 50, animation: "slideIn 0.25s ease" }}>
           <div style={{ ...HEADER, padding: "0 18px", justifyContent: "space-between" }}>
             
-            <img src="logo.png" alt="Logo" onClick={()=>{navigate("/")}}
+            <img src="../../../public/logo.png" alt="Logo" onClick={()=>{navigate("/")}}
               style={{ height: 48, width: "auto", filter: "brightness(0) invert(1)" }} />
             <button
               style={iconBtnStyle()}
@@ -316,7 +316,7 @@ const navigate = useNavigate();
           }}>
             {sidebarOpen ? (
               <>
-                 <img src="logo.png" alt="Logo" onClick={()=>{navigate("/")}}
+                 <img src="../../../public/logo.png" alt="Logo" onClick={()=>{navigate("/")}}
               style={{ height: 68, width: "auto", filter: "brightness(0) invert(1)" }} />
                 <button
                   style={iconBtnStyle()}
