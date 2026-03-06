@@ -16,7 +16,7 @@ interface TeachingExperienceItem {
     subjectCourseTaught: string; // Subject/Course Taught (120 chars) - required
     institution: string; // Institution Name (120 chars) - required
     title: string; // Role/Position (120 chars) - required
-    duration: string; // Duration (50 chars) - optional, e.g., 2019 – 2023
+    duration: string; // Duration (50 chars) - optional,  2019 – 2023
     description: string; // Description (200 chars) - optional, Brief teaching responsibilities
 }
 
@@ -496,11 +496,11 @@ export function TeachingExperienceForm({
                 </p>
             </div>
 
-            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border p-6">
+            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl  pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <StyledInput
                         label="Subject / Course Taught"
-                        placeholder="e.g., Introduction to Computer Science"
+                        placeholder=" Introduction to Computer Science"
                         value={currentItem.subjectCourseTaught}
                         onChange={(e) => updateField("subjectCourseTaught", e.target.value)}
                         onBlur={() => handleBlur("subjectCourseTaught")}
@@ -513,7 +513,7 @@ export function TeachingExperienceForm({
 
                     <StyledInput
                         label="Institution Name"
-                        placeholder="e.g., Stanford University"
+                        placeholder=" Stanford University"
                         value={currentItem.institution}
                         onChange={(e) => updateField("institution", e.target.value)}
                         onBlur={() => handleBlur("institution")}
@@ -526,7 +526,7 @@ export function TeachingExperienceForm({
 
                     <StyledInput
                         label="Role / Position"
-                        placeholder="e.g., Lecturer, Assistant Professor, Trainer"
+                        placeholder=" Lecturer, Assistant Professor, Trainer"
                         value={currentItem.title}
                         onChange={(e) => updateField("title", e.target.value)}
                         onBlur={() => handleBlur("title")}
@@ -539,7 +539,7 @@ export function TeachingExperienceForm({
 
                     <StyledInput
                         label="Duration"
-                        placeholder="e.g., 2019 – 2023"
+                        placeholder=" 2019 – 2023"
                         value={currentItem.duration}
                         onChange={(e) => updateField("duration", e.target.value)}
                         maxLength={50}
@@ -592,7 +592,7 @@ export function TeachingExperienceForm({
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ">
             {isSummaryView ? renderSummary() : renderForm()}
         </div>
     );

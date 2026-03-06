@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plus, X, Info } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useResumeStore } from "../../stores";
 import toast from 'react-hot-toast';
 
@@ -60,28 +60,10 @@ const StyledInput = ({
   );
 };
 
-// Section Card Component
-const SectionCard = ({ title, description, children }: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) => (
-  <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border overflow-hidden shadow-sm">
-    <div className="px-5 py-4 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-bg-secondary/30 to-transparent">
-      <div>
-        <h4 className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
-          {title}
-        </h4>
-        {description && (
-          <p className="text-sm text-text-muted dark:text-dark-text-muted mt-0.5">
-            {description}
-          </p>
-        )}
-      </div>
-    </div>
-    <div className="p-5">
-      {children}
-    </div>
+// Simplified Section Card - no header
+const SectionCard = ({ children }: { children: React.ReactNode }) => (
+  <div className="bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 shadow-sm">
+    {children}
   </div>
 );
 
@@ -95,17 +77,6 @@ const SkillTag = ({ skill, onRemove }: { skill: string; onRemove: () => void }) 
     >
       <X className="w-4 h-4" />
     </button>
-  </div>
-);
-
-// Info Tooltip Component
-const InfoTooltip = ({ text }: { text: string }) => (
-  <div className="group relative inline-flex ml-1">
-    <Info className="w-4 h-4 text-text-muted cursor-help" />
-    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-      {text}
-      <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-gray-900" />
-    </div>
   </div>
 );
 
@@ -225,106 +196,78 @@ export function SkillsForm({
 
   return (
     <div className="w-full mx-auto px-4 sm:px-6">
-      {/* Header with enhanced description */}
+      {/* Header */}
       <div className="mb-8">
         <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
           Add Your <span className="text-accent dark:text-dark-accent">Skills</span>
         </h2>
         <p className="text-base text-text-muted dark:text-dark-text-muted max-w-2xl">
-          List your professional skills to showcase your expertise. 
-          Include technical skills, soft skills, and tools you're proficient in.
+          List your professional skills to showcase your expertise.
         </p>
-       
       </div>
 
-      {/* Skills Input Card with enhanced description */}
-      <SectionCard 
-        title="Add Your Skills" 
-        description={`${skills.length}/${MAX_SKILLS} skills added. Type a skill and press Enter or click Add.`}
-      >
-        <div className="space-y-4">
-          {/* Input field with helper text */}
-          <div>
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <StyledInput
-                  value={newSkill}
-                  onChange={(e) => {
-                    setNewSkill(e.target.value);
-                    setError("");
-                  }}
-                  onKeyDown={handleKeyDown}
-                  placeholder={`e.g., JavaScript, Project Management, Python, Figma`}
-                  error={error}
-                />
-                {error && (
-                  <p className="mt-1 text-xs text-red-500">{error}</p>
-                )}
-              </div>
-              <button
-                onClick={handleAddSkill}
-                disabled={skills.length >= MAX_SKILLS}
-                className={`px-4 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                  skills.length >= MAX_SKILLS
-                    ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-                    : 'bg-accent hover:bg-accent-hover text-white'
-                }`}
-              >
-                <Plus className="w-5 h-5" />
-                Add Skill
-              </button>
-            </div>
-            <p className="mt-1 text-xs text-text-muted">
-              Press Enter to quickly add your skill
-            </p>
+      {/* Skills Input */}
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <StyledInput
+              value={newSkill}
+              onChange={(e) => {
+                setNewSkill(e.target.value);
+                setError("");
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder="JavaScript, Project Management, Python, Figma"
+              error={error}
+            />
+            {error && (
+              <p className="mt-1 text-xs text-red-500">{error}</p>
+            )}
           </div>
+          <button
+            onClick={handleAddSkill}
+            disabled={skills.length >= MAX_SKILLS}
+            className={`px-4 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+              skills.length >= MAX_SKILLS
+                ? 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                : 'bg-accent hover:bg-accent-hover text-white'
+            }`}
+          >
+            <Plus className="w-5 h-5" />
+            Add
+          </button>
+        </div>
+       
 
-          {/* Skills list with category hints */}
-          {skills.length > 0 && (
-            <div className="mt-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-text-primary dark:text-dark-text-primary">
-                  Your Skills
-                </label>
-                <span className="text-xs text-text-muted">
-                  Click the <X className="w-3 h-3 inline" /> to remove
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {skills.map((skill, index) => (
-                  <SkillTag
-                    key={`${skill}-${index}`}
-                    skill={skill}
-                    onRemove={() => handleRemoveSkill(skill)}
-                  />
-                ))}
-              </div>
-              
-             
+        {/* Skills list */}
+        {skills.length > 0 && (
+          <div className="mt-4">
+            <div className="flex flex-wrap gap-2">
+              {skills.map((skill, index) => (
+                <SkillTag
+                  key={`${skill}-${index}`}
+                  skill={skill}
+                  onRemove={() => handleRemoveSkill(skill)}
+                />
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-         
-
-          {/* Character limits info with visual progress */}
-          <div className="mt-2 p-3 bg-bg-secondary dark:bg-dark-bg-secondary rounded-lg">
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs text-text-muted">
-                <span className="font-semibold">Progress:</span> {skills.length}/{MAX_SKILLS} skills
-              </p>
-              <p className="text-xs text-text-muted">
-                {MAX_SKILLS - skills.length} slots remaining
-              </p>
-            </div>
-            <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-accent to-accent-hover transition-all duration-300"
-                style={{ width: `${(skills.length / MAX_SKILLS) * 100}%` }}
-              />
-            </div>
+        {/* Progress bar */}
+        <div className="mt-4 p-3 bg-bg-secondary dark:bg-dark-bg-secondary rounded-lg">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-text-muted">{skills.length}/{MAX_SKILLS} skills</span>
+            <span className="text-xs text-text-muted">{MAX_SKILLS - skills.length} left</span>
+          </div>
+          <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-accent transition-all duration-300"
+              style={{ width: `${(skills.length / MAX_SKILLS) * 100}%` }}
+            />
           </div>
         </div>
-      </SectionCard>
+      </div>
 
       {/* Footer Buttons */}
       <div className="flex justify-between mt-8 pt-6 border-t border-light-border dark:border-dark-border">
@@ -344,18 +287,11 @@ export function SkillsForm({
               : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
           }`}
         >
-          {skills.length === 0 ? 'Add at least one skill' : 'Continue →'}
+          Continue →
         </button>
       </div>
 
-      {/* Empty state message */}
-      {skills.length === 0 && (
-        <div className="text-center mt-6">
-          <p className="text-sm text-text-muted">
-            Start typing a skill above and click Add or press Enter
-          </p>
-        </div>
-      )}
+      
     </div>
   );
 }

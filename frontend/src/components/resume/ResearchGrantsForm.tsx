@@ -495,11 +495,11 @@ export function ResearchGrantsForm({
                 </p>
             </div>
 
-            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border p-6">
+            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl  pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <StyledInput
                         label="Grant Title"
-                        placeholder="e.g., NSF Research Grant"
+                        placeholder=" NSF Research Grant"
                         value={currentItem.title}
                         onChange={(e) => updateField("title", e.target.value)}
                         onBlur={() => handleBlur("title")}
@@ -512,7 +512,7 @@ export function ResearchGrantsForm({
 
                     <StyledInput
                         label="Funding Agency"
-                        placeholder="e.g., UGC, DST, Private"
+                        placeholder=" UGC, DST, Private"
                         value={currentItem.agency}
                         onChange={(e) => updateField("agency", e.target.value)}
                         onBlur={() => handleBlur("agency")}
@@ -525,7 +525,7 @@ export function ResearchGrantsForm({
 
                     <StyledInput
                         label="Year"
-                        placeholder="e.g., 2023"
+                        placeholder=" 2023"
                         value={currentItem.year}
                         onChange={(e) => updateField("year", e.target.value)}
                         onBlur={() => handleBlur("year")}
@@ -538,7 +538,7 @@ export function ResearchGrantsForm({
 
                     <StyledInput
                         label="Amount (Optional)"
-                        placeholder="e.g., $500,000"
+                        placeholder=" $500,000"
                         value={currentItem.amount}
                         onChange={(e) => updateField("amount", e.target.value)}
                         maxLength={50}
@@ -591,7 +591,7 @@ export function ResearchGrantsForm({
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             {isSummaryView ? renderSummary() : renderForm()}
         </div>
     );

@@ -476,11 +476,11 @@ export function MentorshipExperienceForm({
                 </p>
             </div>
 
-            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border p-6">
+            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl  pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <StyledInput
                         label="Mentorship Area"
-                        placeholder="e.g., Career, Technical, Academic"
+                        placeholder=" Career, Technical, Academic"
                         value={currentItem.mentorshipArea}
                         onChange={(e) => updateField("mentorshipArea", e.target.value)}
                         onBlur={() => handleBlur("mentorshipArea")}
@@ -493,7 +493,7 @@ export function MentorshipExperienceForm({
 
                     <StyledInput
                         label="Organization / Platform"
-                        placeholder="e.g., University, NGO, LinkedIn"
+                        placeholder=" University, NGO, LinkedIn"
                         value={currentItem.organizationPlatform}
                         onChange={(e) => updateField("organizationPlatform", e.target.value)}
                         maxLength={120}
@@ -504,7 +504,7 @@ export function MentorshipExperienceForm({
 
                     <StyledInput
                         label="Mentee Level"
-                        placeholder="e.g., Students, Professionals"
+                        placeholder=" Students, Professionals"
                         value={currentItem.menteeLevel}
                         onChange={(e) => updateField("menteeLevel", e.target.value)}
                         maxLength={80}
@@ -515,7 +515,7 @@ export function MentorshipExperienceForm({
 
                     <StyledInput
                         label="Duration"
-                        placeholder="e.g., 2020 – 2022"
+                        placeholder=" 2020 – 2022"
                         value={currentItem.duration}
                         onChange={(e) => updateField("duration", e.target.value)}
                         maxLength={50}
@@ -568,7 +568,7 @@ export function MentorshipExperienceForm({
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ">
             {isSummaryView ? renderSummary() : renderForm()}
         </div>
     );

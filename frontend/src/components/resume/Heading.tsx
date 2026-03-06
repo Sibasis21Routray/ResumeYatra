@@ -4,7 +4,7 @@ import { useUIStore } from "../../stores";
 import { useResumeStore } from "../../stores/resumeStore";
 import { resumeAPI } from "../../services/apiClient";
 import PhotoEditorModal from "../editor/PhotoEditorModal";
-import { Edit2, Trash, Camera, User, Mail, Phone, MapPin, Globe, Calendar, Users, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
+import { Edit2, Trash, Camera, User, Mail, Phone, MapPin, Globe, Calendar, Users, ChevronLeft, ChevronRight, AlertCircle, ChevronDown } from "lucide-react";
 import toast from 'react-hot-toast';
 
 // Toast configuration
@@ -14,7 +14,7 @@ const toastStyle = {
   warning: { background: '#f59e0b', color: '#fff', icon: '⚠️' }
 };
 
-// Custom Date Picker Component
+// Custom Date Picker Component with improved navigation
 const DatePicker = ({
   label,
   value,
@@ -31,6 +31,7 @@ const DatePicker = ({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(value ? new Date(value) : null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [viewMode, setViewMode] = useState<'days' | 'months' | 'years'>('days');
   const pickerRef = useRef<HTMLDivElement>(null);
 
   // Close picker when clicking outside
@@ -38,6 +39,7 @@ const DatePicker = ({
     const handleClickOutside = (event: MouseEvent) => {
       if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setViewMode('days');
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -57,12 +59,24 @@ const DatePicker = ({
     return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
   };
 
-  const handlePrevMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+  const handlePrev = () => {
+    if (viewMode === 'days') {
+      setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+    } else if (viewMode === 'months') {
+      setCurrentMonth(new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth(), 1));
+    } else if (viewMode === 'years') {
+      setCurrentMonth(new Date(currentMonth.getFullYear() - 12, currentMonth.getMonth(), 1));
+    }
   };
 
-  const handleNextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  const handleNext = () => {
+    if (viewMode === 'days') {
+      setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+    } else if (viewMode === 'months') {
+      setCurrentMonth(new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth(), 1));
+    } else if (viewMode === 'years') {
+      setCurrentMonth(new Date(currentMonth.getFullYear() + 12, currentMonth.getMonth(), 1));
+    }
   };
 
   const handleDateSelect = (day: number) => {
@@ -71,6 +85,17 @@ const DatePicker = ({
     setSelectedDate(newDate);
     onChange(formattedDate);
     setIsOpen(false);
+    setViewMode('days');
+  };
+
+  const handleMonthSelect = (monthIndex: number) => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), monthIndex, 1));
+    setViewMode('days');
+  };
+
+  const handleYearSelect = (year: number) => {
+    setCurrentMonth(new Date(year, currentMonth.getMonth(), 1));
+    setViewMode('months');
   };
 
   const formatDisplayDate = (date: Date | null) => {
@@ -82,7 +107,7 @@ const DatePicker = ({
     });
   };
 
-  const renderCalendar = () => {
+  const renderDays = () => {
     const daysInMonth = getDaysInMonth(currentMonth);
     const firstDay = getFirstDayOfMonth(currentMonth);
     const days = [];
@@ -118,6 +143,65 @@ const DatePicker = ({
     return days;
   };
 
+  const renderMonths = () => {
+    return months.map((month, index) => {
+      const isCurrentMonth = index === currentMonth.getMonth();
+      return (
+        <button
+          key={month}
+          onClick={() => handleMonthSelect(index)}
+          className={`h-12 rounded-lg text-sm font-medium transition-all
+            ${isCurrentMonth 
+              ? 'bg-accent/10 text-accent dark:text-dark-accent border border-accent' 
+              : 'hover:bg-accent/10 dark:hover:bg-dark-accent/10 text-text-primary dark:text-dark-text-primary'
+            }`}
+        >
+          {month.slice(0, 3)}
+        </button>
+      );
+    });
+  };
+
+  const renderYears = () => {
+    const currentYear = currentMonth.getFullYear();
+    const startYear = Math.floor(currentYear / 12) * 12;
+    const years = [];
+
+    for (let i = 0; i < 12; i++) {
+      const year = startYear + i;
+      const isCurrentYear = year === new Date().getFullYear();
+      
+      years.push(
+        <button
+          key={year}
+          onClick={() => handleYearSelect(year)}
+          className={`h-12 rounded-lg text-sm font-medium transition-all
+            ${year === currentYear 
+              ? 'bg-accent/10 text-accent dark:text-dark-accent border border-accent' 
+              : isCurrentYear
+                ? 'border border-accent/30 text-accent dark:text-dark-accent'
+                : 'hover:bg-accent/10 dark:hover:bg-dark-accent/10 text-text-primary dark:text-dark-text-primary'
+            }`}
+        >
+          {year}
+        </button>
+      );
+    }
+
+    return years;
+  };
+
+  const getHeaderText = () => {
+    if (viewMode === 'days') {
+      return `${months[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
+    } else if (viewMode === 'months') {
+      return `${currentMonth.getFullYear()}`;
+    } else {
+      const startYear = Math.floor(currentMonth.getFullYear() / 12) * 12;
+      return `${startYear} - ${startYear + 11}`;
+    }
+  };
+
   return (
     <div className="w-full relative" ref={pickerRef}>
       <label className="block text-xs sm:text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5 sm:mb-2">
@@ -139,41 +223,67 @@ const DatePicker = ({
         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted dark:text-dark-text-muted" />
       </div>
 
-      {/* Calendar Dropdown */}
+      {/* Calendar Dropdown - Fixed z-index */}
       {isOpen && (
-        <div className="absolute z-50 mt-2 w-72 bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl shadow-xl p-4">
-          {/* Month/Year Header */}
+        <div className="absolute z-[100] mt-2 w-72 bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl shadow-xl p-4">
+          {/* Header with navigation */}
           <div className="flex items-center justify-between mb-4">
             <button
-              onClick={handlePrevMonth}
-              className="p-1 hover:bg-accent/10 dark:hover:bg-dark-accent/10 rounded-lg transition-colors"
+              onClick={handlePrev}
+              className="p-1.5 hover:bg-accent/10 dark:hover:bg-dark-accent/10 rounded-lg transition-colors"
             >
-              <ChevronLeft className="w-5 h-5 text-text-primary dark:text-dark-text-primary" />
+              <ChevronLeft className="w-4 h-4 text-text-primary dark:text-dark-text-primary" />
             </button>
-            <span className="text-sm font-semibold text-text-primary dark:text-dark-text-primary">
-              {months[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-            </span>
+            
             <button
-              onClick={handleNextMonth}
-              className="p-1 hover:bg-accent/10 dark:hover:bg-dark-accent/10 rounded-lg transition-colors"
+              onClick={() => {
+                if (viewMode === 'days') setViewMode('months');
+                else if (viewMode === 'months') setViewMode('years');
+              }}
+              className="px-3 py-1.5 text-sm font-semibold text-text-primary dark:text-dark-text-primary hover:bg-accent/10 dark:hover:bg-dark-accent/10 rounded-lg transition-colors"
             >
-              <ChevronRight className="w-5 h-5 text-text-primary dark:text-dark-text-primary" />
+              {getHeaderText()}
+              <ChevronDown className="w-3.5 h-3.5 inline-block ml-1 opacity-60" />
+            </button>
+
+            <button
+              onClick={handleNext}
+              className="p-1.5 hover:bg-accent/10 dark:hover:bg-dark-accent/10 rounded-lg transition-colors"
+            >
+              <ChevronRight className="w-4 h-4 text-text-primary dark:text-dark-text-primary" />
             </button>
           </div>
 
-          {/* Weekday Headers */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-              <div key={day} className="h-8 w-8 flex items-center justify-center text-xs font-medium text-text-muted dark:text-dark-text-muted">
-                {day}
+          {/* Calendar Grid */}
+          {viewMode === 'days' && (
+            <>
+              {/* Weekday Headers */}
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                  <div key={day} className="h-8 w-8 flex items-center justify-center text-xs font-medium text-text-muted dark:text-dark-text-muted">
+                    {day}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-1">
-            {renderCalendar()}
-          </div>
+              {/* Calendar Days */}
+              <div className="grid grid-cols-7 gap-1">
+                {renderDays()}
+              </div>
+            </>
+          )}
+
+          {viewMode === 'months' && (
+            <div className="grid grid-cols-3 gap-2">
+              {renderMonths()}
+            </div>
+          )}
+
+          {viewMode === 'years' && (
+            <div className="grid grid-cols-3 gap-2">
+              {renderYears()}
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex justify-between mt-4 pt-3 border-t border-light-border dark:border-dark-border">
@@ -182,13 +292,17 @@ const DatePicker = ({
                 setSelectedDate(null);
                 onChange('');
                 setIsOpen(false);
+                setViewMode('days');
               }}
-              className="text-xs text-text-muted dark:text-dark-text-muted hover:text-accent dark:hover:text-dark-accent transition-colors"
+              className="text-xs text-text-muted dark:text-dark-text-muted hover:text-accent dark:hover:text-dark-accent transition-colors px-2 py-1"
             >
               Clear
             </button>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                setViewMode('days');
+              }}
               className="text-xs bg-accent hover:bg-accent-hover dark:bg-dark-accent dark:hover:bg-dark-accent-hover text-white px-3 py-1 rounded-lg transition-colors"
             >
               Done
@@ -344,7 +458,7 @@ const StyledSelect = ({
           onBlur={() => setIsFocused(false)}
           className={`${baseSelectClass} ${className}`}
         >
-          <option value="">Select {label}</option>
+          <option value="">Select</option>
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -361,56 +475,6 @@ const StyledSelect = ({
         <p className="mt-1 text-xs text-text-muted dark:text-dark-text-muted">{helperText}</p>
       )}
     </div>
-  );
-};
-
-// Section Card Component
-const SectionCard = ({ title, description, children, icon, required }: { 
-  title: string; 
-  description?: string; 
-  children: React.ReactNode;
-  icon?: React.ReactNode;
-  required?: boolean;
-}) => (
-  <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border overflow-hidden shadow-sm">
-    <div className="px-4 sm:px-6 py-4 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-bg-secondary/30 to-transparent">
-      <div className="flex items-center gap-3">
-        {icon && <div className="text-accent dark:text-dark-accent">{icon}</div>}
-        <div>
-          <h4 className="text-base sm:text-lg font-semibold text-text-primary dark:text-dark-text-primary flex items-center gap-2">
-            {title}
-            {required && (
-              <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">
-                Required
-              </span>
-            )}
-          </h4>
-          {description && (
-            <p className="text-xs sm:text-sm text-text-muted dark:text-dark-text-muted mt-0.5">
-              {description}
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
-    <div className="p-4 sm:p-6">
-      {children}
-    </div>
-  </div>
-);
-
-// Info Badge
-const InfoBadge = ({ text, type }: { text: string; type: 'required' | 'optional' | 'low-value' }) => {
-  const styles = {
-    required: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800',
-    optional: 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-dark-text-muted border-gray-200 dark:border-gray-700',
-    'low-value': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800'
-  };
-
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${styles[type]}`}>
-      {text}
-    </span>
   );
 };
 
@@ -620,337 +684,302 @@ export function Heading({
   };
 
   // Image section class
-  const imageSectionClass = `w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 bg-gradient-to-br from-accent/20 to-accent/5 border-2 border-dashed border-light-border dark:border-dark-border overflow-hidden flex items-center justify-center relative rounded-xl cursor-pointer group shadow-md hover:shadow-lg transition-all duration-300 ${
+  const imageSectionClass = `w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-accent/20 to-accent/5 border-2 border-dashed border-light-border dark:border-dark-border overflow-hidden flex items-center justify-center relative rounded-xl cursor-pointer group shadow-md hover:shadow-lg transition-all duration-300 ${
     personal.image ? 'border-solid border-accent' : ''
   }`;
 
   return (
     <div className="w-full min-h-screen pb-8">
-  {/* Header */}
-  <div className=" sticky top-0 z-10 backdrop-blur-sm bg-bg-primary/80">
-    <div className="max-w-7xl mx-auto px-4 ">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-text-primary dark:text-dark-text-primary">
-            Personal Information
-          </h2>
-          <p className="text-sm text-text-muted dark:text-dark-text-muted mt-1">
-            You control what appears on your resume
-          </p>
+      {/* Header */}
+      <div className="sticky top-0 z-10 backdrop-blur-sm bg-bg-primary/80">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-text-primary dark:text-dark-text-primary">
+                Personal Information
+              </h2>
+              <p className="text-sm text-text-muted dark:text-dark-text-muted mt-1">
+                You control what appears on your resume
+              </p>
+            </div>
+          </div>
         </div>
-       
       </div>
-    </div>
+
+      {/* Main Content */}
+      <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Single Card with Photo and Form */}
+        <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl  shadow-sm">
+          <div className="p-4 sm:p-6">
+            {/* Profile Photo Section */}
+<div className="flex items-center gap-6 mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
+
+  {/* Avatar */}
+  <div
+    className="relative w-28 h-28 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-center"
+    onMouseEnter={() => setIsImageHovered(true)}
+    onMouseLeave={() => setIsImageHovered(false)}
+  >
+    {personal.image ? (
+      <>
+        <img
+          src={personal.image}
+          alt="Profile"
+          className="w-full h-full object-cover"
+        />
+
+        {/* Hover overlay */}
+        {isImageHovered && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-3">
+            <button
+              onClick={handleEditImage}
+              className="p-2 bg-white rounded-lg shadow hover:bg-gray-100 transition"
+              title="Edit photo"
+            >
+              <Edit2 className="w-4 h-4 text-gray-800" />
+            </button>
+
+            <button
+              onClick={handleRemoveImage}
+              className="p-2 bg-red-500 rounded-lg shadow hover:bg-red-600 transition"
+              title="Remove photo"
+            >
+              <Trash className="w-4 h-4 text-white" />
+            </button>
+          </div>
+        )}
+      </>
+    ) : (
+      <div className="flex items-center justify-center text-gray-400 dark:text-gray-500">
+        <Camera className="w-10 h-10" />
+      </div>
+    )}
   </div>
 
-  {/* Main Content */}
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-    {/* Profile Photo Section - Compact */}
-    <SectionCard title="Profile Photo" icon={<Camera className="w-5 h-5" />}>
-      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-        <div
-          className={imageSectionClass}
-          onMouseEnter={() => setIsImageHovered(true)}
-          onMouseLeave={() => setIsImageHovered(false)}
-        >
-          {personal.image ? (
-            <>
-              <img
-                src={personal.image}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-              {isImageHovered && (
-                <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-2">
-                  <button
-                    onClick={handleEditImage}
-                    className="p-1.5 bg-white rounded-lg hover:bg-gray-100 transition-colors"
-                    title="Edit photo"
-                  >
-                    <Edit2 className="w-3.5 h-3.5 text-gray-900" />
-                  </button>
-                  <button
-                    onClick={handleRemoveImage}
-                    className="p-1.5 bg-red-500 rounded-lg hover:bg-red-600 transition-colors"
-                    title="Remove photo"
-                  >
-                    <Trash className="w-3.5 h-3.5 text-white" />
-                  </button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-2xl font-bold text-accent dark:text-dark-accent">
-              {getInitials()}
-            </div>
-          )}
-        </div>
+  {/* Upload Controls */}
+  <div className="flex flex-col gap-2">
 
-        <div className="flex-1 text-center sm:text-left">
-          <p className="text-xs text-text-muted dark:text-dark-text-muted mb-3">
-            Optional - JPEG, PNG, WebP (max 5MB)
-          </p>
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            className="hidden"
-          />
+    <input
+      type="file"
+      accept="image/*"
+      ref={fileInputRef}
+      onChange={handleFileUpload}
+      className="hidden"
+    />
+
+    <button
+      onClick={triggerFileUpload}
+      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-accent hover:bg-accent-hover dark:bg-dark-accent dark:hover:bg-dark-accent-hover rounded-lg transition shadow-sm"
+    >
+      <Camera className="w-4 h-4" />
+      {personal.image ? "Change Photo" : "Upload Photo"}
+    </button>
+
+    <span className="text-xs text-gray-500 dark:text-gray-400">
+      JPG, PNG, WebP • Max size 5MB
+    </span>
+
+  </div>
+
+</div>
+
+            {/* Form Fields - Compact Grid with Clean Placeholders */}
+            <div className="space-y-4">
+              {/* Name Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <StyledInput
+                  label="First Name"
+                  placeholder="John"
+                  value={(() => {
+                    if (!personal.name) return "";
+                    return personal.name.split(" ")[0] || "";
+                  })()}
+                  onChange={(e) => {
+                    const parts = personal.name?.split(" ") || [];
+                    const middle = personal.middleName || "";
+                    const last = parts.slice(2).join(" ");
+                    handleFieldChange("name", `${e.target.value} ${middle} ${last}`.trim());
+                  }}
+                  onBlur={() => handleFieldBlur("personal.name")}
+                  required
+                  icon={<User className="w-4 h-4" />}
+                  error={formErrors.firstName}
+                />
+
+                <StyledInput
+                  label="Middle Name"
+                  placeholder="Michael"
+                  value={personal.middleName || ""}
+                  onChange={(e) => {
+                    const first = personal.name?.split(" ")[0] || "";
+                    const last = personal.name?.split(" ").slice(2).join(" ") || "";
+                    handleFieldChange("middleName", e.target.value);
+                    handleFieldChange("name", `${first} ${e.target.value} ${last}`.trim());
+                  }}
+                  icon={<User className="w-4 h-4" />}
+                />
+
+                <StyledInput
+                  label="Last Name"
+                  placeholder="Doe"
+                  value={personal.name?.split(" ").slice(2).join(" ") || ""}
+                  onChange={(e) => {
+                    const first = personal.name?.split(" ")[0] || "";
+                    const middle = personal.middleName || "";
+                    handleFieldChange("name", `${first} ${middle} ${e.target.value}`.trim());
+                  }}
+                  icon={<User className="w-4 h-4" />}
+                />
+              </div>
+
+              {/* Contact Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <StyledInput
+                  label="Phone"
+                  placeholder="9876543210"
+                  value={personal.phone || ""}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                    handleFieldChange("phone", value);
+                  }}
+                  onBlur={() => handleFieldBlur("personal.phone")}
+                  type="tel"
+                  maxLength={10}
+                  required
+                  icon={<Phone className="w-4 h-4" />}
+                  error={formErrors.phone}
+                />
+
+                <StyledInput
+                  label="Alternate Phone"
+                  placeholder="9876543211"
+                  value={personal.alternatePhone || ""}
+                  onChange={(e) => handleFieldChange("alternatePhone", e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  type="tel"
+                  maxLength={10}
+                  icon={<Phone className="w-4 h-4" />}
+                />
+
+                <StyledInput
+                  label="Email"
+                  placeholder="john.doe@example.com"
+                  value={personal.email || ""}
+                  onChange={(e) => handleFieldChange("email", e.target.value)}
+                  onBlur={() => handleFieldBlur("personal.email")}
+                  type="email"
+                  required
+                  icon={<Mail className="w-4 h-4" />}
+                  error={formErrors.email}
+                />
+              </div>
+
+              {/* Demographics Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <StyledSelect
+                  label="Gender"
+                  value={personal.gender || ""}
+                  onChange={(e) => handleFieldChange("gender", e.target.value)}
+                  options={[
+                    { value: "Male", label: "Male" },
+                    { value: "Female", label: "Female" },
+                    { value: "Other", label: "Other" },
+                    { value: "Prefer not to say", label: "Prefer not to say" },
+                  ]}
+                  icon={<Users className="w-4 h-4" />}
+                />
+
+                <StyledSelect
+                  label="Marital Status"
+                  value={personal.maritalStatus || ""}
+                  onChange={(e) => handleFieldChange("maritalStatus", e.target.value)}
+                  options={[
+                    { value: "Single", label: "Single" },
+                    { value: "Married", label: "Married" },
+                    { value: "Divorced", label: "Divorced" },
+                    { value: "Widowed", label: "Widowed" },
+                  ]}
+                  icon={<Users className="w-4 h-4" />}
+                />
+
+                <DatePicker
+                  label="Date of Birth"
+                  value={personal.dob || ""}
+                  onChange={(date) => handleFieldChange("dob", date)}
+                />
+              </div>
+
+              {/* Address Row */}
+              <div className="space-y-3">
+                <StyledInput
+                  label="Address / Locality"
+                  placeholder="123 Main Street, Downtown"
+                  value={personal.fullAddress || ""}
+                  onChange={(e) => handleFieldChange("fullAddress", e.target.value)}
+                  icon={<MapPin className="w-4 h-4" />}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <StyledInput
+                    label="City"
+                    placeholder="Mumbai"
+                    value={personal.location || ""}
+                    onChange={(e) => handleFieldChange("location", e.target.value)}
+                    icon={<MapPin className="w-4 h-4" />}
+                  />
+
+                  <StyledInput
+                    label="Pin Code"
+                    placeholder="400001"
+                    value={personal.pinCode || ""}
+                    onChange={(e) => handleFieldChange("pinCode", e.target.value.replace(/\D/g, ""))}
+                    maxLength={6}
+                    icon={<MapPin className="w-4 h-4" />}
+                  />
+
+                  <StyledInput
+                    label="Country"
+                    placeholder="India"
+                    value={personal.country || ""}
+                    onChange={(e) => handleFieldChange("country", e.target.value)}
+                    icon={<Globe className="w-4 h-4" />}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Buttons */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 pt-6 border-t border-light-border dark:border-dark-border">
+        <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3">
           <button
-            onClick={triggerFileUpload}
-            className="px-4 py-2 bg-accent hover:bg-accent-hover dark:bg-dark-accent dark:hover:bg-dark-accent-hover text-white rounded-lg text-sm font-semibold transition-colors inline-flex items-center gap-2"
+            onClick={onBack}
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl border border-light-border dark:border-dark-border text-text-primary dark:text-dark-text-primary font-semibold hover:bg-accent/10 hover:border-accent transition-all duration-200 text-sm"
           >
-            <Camera className="w-4 h-4" />
-            {personal.image ? "Change Photo" : "Upload Photo"}
+            ← Back
+          </button>
+
+          <button
+            onClick={handleContinue}
+            className="w-full sm:w-auto px-8 py-2.5 rounded-xl bg-accent hover:bg-accent-hover dark:bg-dark-accent dark:hover:bg-dark-accent-hover text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 text-sm"
+          >
+            Save & Continue →
           </button>
         </div>
       </div>
-    </SectionCard>
 
-    {/* Personal Information - All fields integrated */}
-    <SectionCard 
-      title="Personal Details" 
-      description="Fill in your information (fields marked with * are required)"
-      icon={<User className="w-5 h-5" />}
-    >
-      <div className="space-y-6">
-        {/* Name Row - Required fields highlighted */}
-        <div>
-         
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <StyledInput
-              label="First Name"
-              placeholder="Enter first name"
-              value={(() => {
-                if (!personal.name) return "";
-                return personal.name.split(" ")[0] || "";
-              })()}
-              onChange={(e) => {
-                const parts = personal.name?.split(" ") || [];
-                const middle = personal.middleName || "";
-                const last = parts.slice(2).join(" ");
-                handleFieldChange("name", `${e.target.value} ${middle} ${last}`.trim());
-              }}
-              onBlur={() => handleFieldBlur("personal.name")}
-              required
-              icon={<User className="w-4 h-4" />}
-              error={formErrors.firstName}
-            />
-
-            <StyledInput
-              label="Middle Name"
-              placeholder="Middle name (optional)"
-              value={personal.middleName || ""}
-              onChange={(e) => {
-                const first = personal.name?.split(" ")[0] || "";
-                const last = personal.name?.split(" ").slice(2).join(" ") || "";
-                handleFieldChange("middleName", e.target.value);
-                handleFieldChange("name", `${first} ${e.target.value} ${last}`.trim());
-              }}
-              icon={<User className="w-4 h-4" />}
-            />
-
-            <StyledInput
-              label="Last Name"
-              placeholder="Last name (optional)"
-              value={personal.name?.split(" ").slice(2).join(" ") || ""}
-              onChange={(e) => {
-                const first = personal.name?.split(" ")[0] || "";
-                const middle = personal.middleName || "";
-                handleFieldChange("name", `${first} ${middle} ${e.target.value}`.trim());
-              }}
-              icon={<User className="w-4 h-4" />}
-            />
-          </div>
-        </div>
-
-        {/* Contact Information - Required */}
-        <div>
-        
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
-            <StyledInput
-              label="Phone"
-              placeholder="10-digit mobile number"
-              value={personal.phone || ""}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-                handleFieldChange("phone", value);
-              }}
-              onBlur={() => handleFieldBlur("personal.phone")}
-              type="tel"
-              maxLength={10}
-              required
-              icon={<Phone className="w-4 h-4" />}
-              error={formErrors.phone}
-            />
-
-            <StyledInput
-              label="Alternate Phone"
-              placeholder="Alternate number (optional)"
-              value={personal.alternatePhone || ""}
-              onChange={(e) => handleFieldChange("alternatePhone", e.target.value.replace(/\D/g, "").slice(0, 10))}
-              type="tel"
-              maxLength={10}
-              icon={<Phone className="w-4 h-4" />}
-              // helperText="Optional - may be noise"
-            />
-
-            <StyledInput
-              label="Email"
-              placeholder="your@email.com"
-              value={personal.email || ""}
-              onChange={(e) => handleFieldChange("email", e.target.value)}
-              onBlur={() => handleFieldBlur("personal.email")}
-              type="email"
-              required
-              icon={<Mail className="w-4 h-4" />}
-              error={formErrors.email}
-            />
-
-          </div>
-          {/* Demographics */}
-        <div>
-         
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
-            <StyledSelect
-              label="Gender"
-              value={personal.gender || ""}
-              onChange={(e) => handleFieldChange("gender", e.target.value)}
-              options={[
-                { value: "Male", label: "Male" },
-                { value: "Female", label: "Female" },
-                { value: "Other", label: "Other" },
-                { value: "Prefer not to say", label: "Prefer not to say" },
-              ]}
-              icon={<Users className="w-4 h-4" />}
-            />
-
-            <StyledSelect
-              label="Marital Status"
-              value={personal.maritalStatus || ""}
-              onChange={(e) => handleFieldChange("maritalStatus", e.target.value)}
-              options={[
-                { value: "Single", label: "Single" },
-                { value: "Married", label: "Married" },
-                { value: "Divorced", label: "Divorced" },
-                { value: "Widowed", label: "Widowed" },
-              ]}
-              icon={<Users className="w-4 h-4" />}
-            />
-
-            <DatePicker
-              label="Date of Birth"
-              value={personal.dob || ""}
-              onChange={(date) => handleFieldChange("dob", date)}
-            />
-          </div>
-        </div>
-        </div>
-
-        {/* Location Information */}
-        <div>
-          
-          <div className="space-y-4">
-            <StyledInput
-              label="Address / Locality"
-              placeholder="Street address, locality"
-              value={personal.fullAddress || ""}
-              onChange={(e) => handleFieldChange("fullAddress", e.target.value)}
-              icon={<MapPin className="w-4 h-4" />}
-              // helperText="Not ATS relevant - optional"
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <StyledInput
-                label="City"
-                placeholder="City"
-                value={personal.location || ""}
-                onChange={(e) => handleFieldChange("location", e.target.value)}
-                icon={<MapPin className="w-4 h-4" />}
-              />
-
-              <StyledInput
-                label="Pin Code"
-                placeholder="Postal code"
-                value={personal.pinCode || ""}
-                onChange={(e) => handleFieldChange("pinCode", e.target.value.replace(/\D/g, ""))}
-                maxLength={6}
-                icon={<MapPin className="w-4 h-4" />}
-                // helperText="Low recruiter value"
-              />
-
-              <StyledInput
-                label="Country"
-                placeholder="Country"
-                value={personal.country || ""}
-                onChange={(e) => handleFieldChange("country", e.target.value)}
-                icon={<Globe className="w-4 h-4" />}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Family & Nationality */}
-        {/* <div>
-          <div className="flex items-center gap-2 mb-3">
-            <h5 className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Family & Nationality</h5>
-            <span className="text-xs bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-dark-text-muted px-2 py-0.5 rounded-full">All Optional</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <StyledInput
-              label="Father's Name"
-              placeholder="Enter father's name"
-              value={personal.fathersName || ""}
-              onChange={(e) => handleFieldChange("fathersName", e.target.value)}
-              icon={<Users className="w-4 h-4" />}
-            />
-
-            <StyledInput
-              label="Nationality"
-              placeholder="e.g., Indian"
-              value={personal.nationality || ""}
-              onChange={(e) => handleFieldChange("nationality", e.target.value)}
-              icon={<Globe className="w-4 h-4" />}
-            />
-          </div>
-        </div> */}
-
-        
-      </div>
-    </SectionCard>
-  </div>
-
-  {/* Footer Buttons */}
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-light-border dark:border-dark-border">
-    <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3">
-      <button
-        onClick={onBack}
-        className="w-full sm:w-auto px-6 py-2.5 rounded-xl border border-light-border dark:border-dark-border text-text-primary dark:text-dark-text-primary font-semibold hover:bg-accent/10 hover:border-accent transition-all duration-200 text-sm"
-      >
-        ← Back
-      </button>
-
-      <button
-        onClick={handleContinue}
-        className="w-full sm:w-auto px-8 py-2.5 rounded-xl bg-accent hover:bg-accent-hover dark:bg-dark-accent dark:hover:bg-dark-accent-hover text-white font-bold shadow-lg hover:shadow-xl transition-all duration-200 text-sm"
-      >
-        Save & Continue →
-      </button>
+      {/* Photo Editor Modal */}
+      <PhotoEditorModal
+        isOpen={showPhotoEditor}
+        onClose={() => {
+          setShowPhotoEditor(false);
+          setSelectedImage(null);
+        }}
+        selectedImage={selectedImage}
+        resumeId={resumeId}
+        onImageUpload={handleImageUploadSuccess}
+      />
     </div>
-  </div>
-
-  {/* Photo Editor Modal */}
-  <PhotoEditorModal
-    isOpen={showPhotoEditor}
-    onClose={() => {
-      setShowPhotoEditor(false);
-      setSelectedImage(null);
-    }}
-    selectedImage={selectedImage}
-    resumeId={resumeId}
-    onImageUpload={handleImageUploadSuccess}
-  />
-</div>
   );
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { RichTextEditor } from "../editor/RichTextEditor";
 import { useResumeStore } from "../../stores";
-import { Target, AlertCircle, Bold, Italic } from "lucide-react";
+import { Target, AlertCircle } from "lucide-react";
 import toast from 'react-hot-toast';
 
 // Toast configuration
@@ -16,35 +16,6 @@ interface CareerObjectiveFormProps {
     onBack?: () => void;
     onNext?: () => void;
 }
-
-// Section Card Component
-const SectionCard = ({ title, description, children, icon }: {
-    title: string;
-    description?: string;
-    children: React.ReactNode;
-    icon?: React.ReactNode;
-}) => (
-    <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border overflow-hidden shadow-sm">
-        <div className="px-5 py-4 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-bg-secondary/30 to-transparent">
-            <div className="flex items-center gap-3">
-                {icon && <div className="text-accent dark:text-dark-accent">{icon}</div>}
-                <div>
-                    <h4 className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
-                        {title}
-                    </h4>
-                    {description && (
-                        <p className="text-sm text-text-muted dark:text-dark-text-muted mt-0.5">
-                            {description}
-                        </p>
-                    )}
-                </div>
-            </div>
-        </div>
-        <div className="p-5">
-            {children}
-        </div>
-    </div>
-);
 
 export function CareerObjectiveForm({
     onBack,
@@ -148,8 +119,8 @@ export function CareerObjectiveForm({
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="space-y-6">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="space-y-8">
                 {/* Header */}
                 <div>
                     <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
@@ -160,98 +131,59 @@ export function CareerObjectiveForm({
                     </p>
                 </div>
 
-                {/* Career Objective Card */}
-                <SectionCard 
-                    title="Define your goal" 
-                    description="This will appear only if Profile Summary is not added."
-                    icon={<Target className="w-5 h-5" />}
-                >
-                    <div className="space-y-4">
-                        <div>
-                            <div className="flex items-center justify-between mb-2">
-                                <label className="text-sm font-semibold text-text-primary dark:text-dark-text-primary">
-                                    Your Objective <span className="text-red-500">*</span>
-                                </label>
-                                <div className="flex items-center gap-3">
-                                    {/* Formatting indicators */}
-                                    <div className="flex items-center gap-1 text-xs text-text-muted dark:text-dark-text-muted">
-                                        <Bold className="w-3.5 h-3.5" />
-                                        <span>Bold</span>
-                                    </div>
-                                    <div className="flex items-center gap-1 text-xs text-text-muted dark:text-dark-text-muted">
-                                        <Italic className="w-3.5 h-3.5" />
-                                        <span>Italic</span>
-                                    </div>
-                                </div>
-                            </div>
+                {/* Career Objective - No header card */}
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <label className="text-sm font-semibold text-text-primary dark:text-dark-text-primary">
+                            Your Objective <span className="text-red-500">*</span>
+                        </label>
+                        
+                    </div>
 
-                            <RichTextEditor
-                                value={objective}
-                                onChange={updateField}
-                                placeholder="Entry-level finance graduate seeking an analyst role to apply accounting and data analysis skills."
-                                sectionTitle="Career Objective"
-                                maxLength={MAX_CHARS}
+                    <RichTextEditor
+                        value={objective}
+                        onChange={updateField}
+                        placeholder="Entry-level finance graduate seeking an analyst role to apply accounting and data analysis skills."
+                        sectionTitle="Career Objective"
+                        maxLength={MAX_CHARS}
+                    />
+
+                    {/* Character count and progress */}
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-1 text-text-muted dark:text-dark-text-muted">
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                <span>Maximum {MAX_CHARS} characters</span>
+                            </div>
+                            <span className={`font-medium ${
+                                charCount > MAX_CHARS ? 'text-red-500' : 
+                                charCount >= MAX_CHARS * 0.9 ? 'text-yellow-500' : 
+                                'text-accent'
+                            }`}>
+                                {charCount}/{MAX_CHARS}
+                            </span>
+                        </div>
+                        
+                        {/* Progress bar */}
+                        <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div 
+                                className={`h-full transition-all duration-300 ${getProgressColor()}`}
+                                style={{ width: `${Math.min((charCount / MAX_CHARS) * 100, 100)}%` }}
                             />
-
-                            {/* Character count and progress */}
-                            <div className="mt-3 space-y-2">
-                                <div className="flex items-center justify-between text-xs">
-                                    <div className="flex items-center gap-1 text-text-muted dark:text-dark-text-muted">
-                                        <AlertCircle className="w-3.5 h-3.5" />
-                                        <span>Maximum {MAX_CHARS} characters</span>
-                                    </div>
-                                    <span className={`font-medium ${
-                                        charCount > MAX_CHARS ? 'text-red-500' : 
-                                        charCount >= MAX_CHARS * 0.9 ? 'text-yellow-500' : 
-                                        'text-accent'
-                                    }`}>
-                                        {charCount}/{MAX_CHARS}
-                                    </span>
-                                </div>
-                                
-                                {/* Progress bar */}
-                                <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                    <div 
-                                        className={`h-full transition-all duration-300 ${getProgressColor()}`}
-                                        style={{ width: `${Math.min((charCount / MAX_CHARS) * 100, 100)}%` }}
-                                    />
-                                </div>
-
-                                {error && (
-                                    <p className="text-xs text-red-500 flex items-center gap-1">
-                                        <AlertCircle className="w-3.5 h-3.5" />
-                                        {error}
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* Example text */}
-                            <div className="mt-4 p-3 bg-bg-secondary dark:bg-dark-bg-secondary rounded-lg border border-light-border dark:border-dark-border">
-                                <p className="text-xs text-text-muted dark:text-dark-text-muted">
-                                    <span className="font-semibold text-accent">Example:</span> "Entry-level finance graduate seeking an analyst role to apply accounting and data analysis skills."
-                                </p>
-                            </div>
                         </div>
-                    </div>
-                </SectionCard>
 
-                {/* Tips Card */}
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-                    <div className="flex items-start gap-3">
-                        <Target className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                        <div>
-                            <h5 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-1">
-                                Tips for a great career objective:
-                            </h5>
-                            <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1 list-disc list-inside">
-                                <li>Keep it concise (2-3 lines maximum)</li>
-                                <li>Mention the specific role you're seeking</li>
-                                <li>Highlight key skills relevant to the position</li>
-                                <li>Tailor it to the job you're applying for</li>
-                            </ul>
-                        </div>
+                        {error && (
+                            <p className="text-xs text-red-500 flex items-center gap-1">
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                {error}
+                            </p>
+                        )}
                     </div>
+
+                    
                 </div>
+
+                
             </div>
 
             {/* Footer */}

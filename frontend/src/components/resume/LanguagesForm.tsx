@@ -449,7 +449,7 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
   };
 
   return (
-    <div ref={formContainerRef} className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div ref={formContainerRef} className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ">
       {/* Header */}
       <div className="mb-6 sm:mb-8">
         <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">

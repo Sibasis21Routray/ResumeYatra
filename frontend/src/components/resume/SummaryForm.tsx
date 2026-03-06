@@ -147,11 +147,11 @@ export function SummaryForm({
     <div className="w-full max-w-full">
       {/* Header */}
       <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-3 sm:mb-4">
-        <span className="text-accent">Add your summary</span>
+        <span className="text-accent">Add your professional summary</span>
       </h2>
 
       {/* Main Card */}
-      <div className="border border-slate-200 dark:border-gray-700 rounded-xl sm:rounded-2xl bg-white dark:bg-gray-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+      <div className=" overflow-hidden ">
         {/* Editor Section */}
         <div className="p-3 sm:p-4 lg:p-6 relative">
           <RichTextEditor

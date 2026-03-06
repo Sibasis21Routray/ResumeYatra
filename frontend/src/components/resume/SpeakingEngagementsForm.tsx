@@ -231,6 +231,13 @@ const SpeakingEngagementCard = ({ engagement, onEdit, onDelete }: {
     </div>
 );
 
+// Simplified Section Card - no header
+const SectionCard = ({ children }: { children: React.ReactNode }) => (
+    <div className="bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 shadow-sm">
+        {children}
+    </div>
+);
+
 export function SpeakingEngagementsForm({
     onBack,
     onNext,
@@ -270,14 +277,6 @@ export function SpeakingEngagementsForm({
             newErrors.topic = "Topic must be less than 120 characters";
         }
 
-        if (tempItem.eventName && tempItem.eventName.length > 120) {
-            newErrors.eventName = "Event name must be less than 120 characters";
-        }
-
-        if (tempItem.description && tempItem.description.length > 500) {
-            newErrors.description = "Description must be less than 500 characters";
-        }
-
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length > 0) {
@@ -295,42 +294,42 @@ export function SpeakingEngagementsForm({
     };
 
     const handleSubmit = () => {
-    // Mark all fields as touched first
-    setTouched({
-        topic: true,
-        eventName: true,
-        description: true
-    });
-    
-    if (!validateForm()) {
-        return;
-    }
-
-    updateData((draft) => {
-        if (!draft.speakingEngagements) draft.speakingEngagements = [];
-        if (editingId) {
-            const index = draft.speakingEngagements.findIndex((a) => a.id === editingId);
-            if (index !== -1) {
-                draft.speakingEngagements[index] = tempItem as SpeakingEngagementItem;
-            }
-            toast.success('Speaking engagement updated successfully!', {
-                style: toastStyle.success,
-                duration: 2000,
-            });
-        } else {
-            draft.speakingEngagements.push(tempItem as SpeakingEngagementItem);
-            toast.success('Speaking engagement added successfully!', {
-                style: toastStyle.success,
-                duration: 2000,
-            });
+        // Mark all fields as touched first
+        setTouched({
+            topic: true,
+            eventName: true,
+            description: true
+        });
+        
+        if (!validateForm()) {
+            return;
         }
-    });
 
-    save();
-    setIsEditing(false);
-    setEditingId(null);
-    setTempItem({});
-};
+        updateData((draft) => {
+            if (!draft.speakingEngagements) draft.speakingEngagements = [];
+            if (editingId) {
+                const index = draft.speakingEngagements.findIndex((a) => a.id === editingId);
+                if (index !== -1) {
+                    draft.speakingEngagements[index] = tempItem as SpeakingEngagementItem;
+                }
+                toast.success('Speaking engagement updated successfully!', {
+                    style: toastStyle.success,
+                    duration: 2000,
+                });
+            } else {
+                draft.speakingEngagements.push(tempItem as SpeakingEngagementItem);
+                toast.success('Speaking engagement added successfully!', {
+                    style: toastStyle.success,
+                    duration: 2000,
+                });
+            }
+        });
+
+        save();
+        setIsEditing(false);
+        setEditingId(null);
+        setTempItem({});
+    };
 
     const handleEdit = (id: string) => {
         const item = engagements.find((a) => a.id === id);
@@ -449,7 +448,7 @@ export function SpeakingEngagementsForm({
     );
 
     const renderForm = () => (
-        <div className="space-y-6">
+        <div className="space-y-8">
             <div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
                     {editingId ? "Edit" : "Add"} <span className="text-accent dark:text-dark-accent">Speaking Engagement</span>
@@ -459,11 +458,12 @@ export function SpeakingEngagementsForm({
                 </p>
             </div>
 
-            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Form fields - no card header */}
+            <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <StyledInput
                         label="Topic / Session Title"
-                        placeholder="e.g., Introduction to Machine Learning"
+                        placeholder="Introduction to Machine Learning"
                         value={currentItem.topic}
                         onChange={(e) => updateField("topic", e.target.value)}
                         onBlur={() => handleBlur("topic")}
@@ -476,38 +476,37 @@ export function SpeakingEngagementsForm({
 
                     <StyledInput
                         label="Event / Organization"
-                        placeholder="e.g., Tech Conference 2024"
+                        placeholder="Tech Conference 2024"
                         value={currentItem.eventName}
                         onChange={(e) => updateField("eventName", e.target.value)}
                         maxLength={120}
                         characterCount
                         icon={<Building2 className="w-4 h-4" />}
-                        error={touched.eventName ? errors.eventName : ""}
                     />
+                </div>
 
-                    <div>
-                        <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
-                            Year
-                        </label>
-                        <MonthYearPicker
-                            value={currentItem.date || ""}
-                            onChange={(value) => updateField("date", value)}
-                            className="w-full"
-                            placeholder="Select year"
-                        />
-                    </div>
+                <div className="max-w-md">
+                    <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
+                        Year
+                    </label>
+                    <MonthYearPicker
+                        value={currentItem.date || ""}
+                        onChange={(value) => updateField("date", value)}
+                        className="w-full"
+                        placeholder="Select year"
+                    />
+                </div>
 
-                    <div className="md:col-span-2">
-                        <StyledTextArea
-                            label="Description"
-                            value={currentItem.description}
-                            onChange={(e) => updateField("description", e.target.value)}
-                            placeholder="Describe your presentation and key takeaways..."
-                            maxLength={500}
-                            rows={3}
-                            error={touched.description ? errors.description : ""}
-                        />
-                    </div>
+                <div>
+                    <StyledTextArea
+                        label="Description"
+                        value={currentItem.description}
+                        onChange={(e) => updateField("description", e.target.value)}
+                        placeholder="Describe your presentation and key takeaways..."
+                        maxLength={500}
+                        rows={3}
+                        error={touched.description ? errors.description : ""}
+                    />
                 </div>
             </div>
 
@@ -542,7 +541,7 @@ export function SpeakingEngagementsForm({
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
             {isSummaryView ? renderSummary() : renderForm()}
         </div>
     );

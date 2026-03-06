@@ -420,44 +420,6 @@ const MonthYearPicker = ({
   );
 };
 
-// Section Card Component - FIXED OVERFLOW
-const SectionCard = ({ title, description, children, icon, required, isDropdownOpen }: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-  icon?: React.ReactNode;
-  required?: boolean;
-  isDropdownOpen?: boolean;
-}) => (
-  <div className={`bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border shadow-sm ${
-    isDropdownOpen ? '' : 'overflow-hidden'
-  }`}>
-    <div className="px-4 sm:px-6 py-4 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-bg-secondary/30 to-transparent">
-      <div className="flex items-center gap-3">
-        {icon && <div className="text-accent dark:text-dark-accent">{icon}</div>}
-        <div>
-          <h4 className="text-base sm:text-lg font-semibold text-text-primary dark:text-dark-text-primary flex items-center gap-2">
-            {title}
-            {required && (
-              <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">
-                Required
-              </span>
-            )}
-          </h4>
-          {description && (
-            <p className="text-xs sm:text-sm text-text-muted dark:text-dark-text-muted mt-0.5">
-              {description}
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
-    <div className="p-4 sm:p-6">
-      {children}
-    </div>
-  </div>
-);
-
 // Info Badge
 const InfoBadge = ({ text, type }: { text: string; type: 'required' | 'optional' }) => {
   const styles = {
@@ -736,7 +698,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
   );
 
   const renderForm = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
           List your formal education <span className="text-accent dark:text-dark-accent">details</span>
@@ -747,75 +709,54 @@ export const EducationForm: React.FC<EducationFormProps> = ({
         </p>
       </div>
 
-      {/* Institution Details */}
-      <SectionCard 
-        title="Institution Information" 
-        description="Where did you study?"
-        icon={<GraduationCap className="w-5 h-5" />}
-        isDropdownOpen={isAnyDropdownOpen}
-      >
+      {/* Institution Details - No border */}
+      <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <StyledInput
             label="Institution Name"
-            placeholder="e.g., Nalanda Institute of Technology"
+            placeholder="Nalanda Institute of Technology"
             value={currentEducation.school || ""}
             onChange={(e) => updateField("school", e.target.value)}
             icon={<BookOpen className="w-4 h-4" />}
-            // helperText="Optional"
           />
 
           <StyledInput
             label="Institution Location"
-            placeholder="e.g., Bhubaneswar, India"
+            placeholder="Bhubaneswar, India"
             value={currentEducation.location || ""}
             onChange={(e) => updateField("location", e.target.value)}
             icon={<MapPin className="w-4 h-4" />}
-            // helperText="Optional"
           />
         </div>
-      </SectionCard>
+      </div>
 
-      {/* Degree Information */}
-      <SectionCard 
-        title="Degree Information" 
-        description="What did you study?"
-        icon={<Award className="w-5 h-5" />}
-        required
-        isDropdownOpen={isAnyDropdownOpen}
-      >
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <DropdownWithSearch
-              label="Degree"
-              value={currentEducation.degree || ""}
-              onChange={(value) => updateField("degree", value)}
-              options={QUALIFICATION_OPTIONS}
-              required
-              icon={<Award className="w-4 h-4" />}
-              error={formErrors.degree}
-              placeholder="Search or enter degree"
-              onOpenChange={setIsDegreeDropdownOpen}
-            />
+      {/* Degree Information - No border */}
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <DropdownWithSearch
+            label="Degree"
+            value={currentEducation.degree || ""}
+            onChange={(value) => updateField("degree", value)}
+            options={QUALIFICATION_OPTIONS}
+            required
+            icon={<Award className="w-4 h-4" />}
+            error={formErrors.degree}
+            placeholder="Search or enter degree"
+            onOpenChange={setIsDegreeDropdownOpen}
+          />
 
-            <StyledInput
-              label="Field of Study"
-              placeholder="e.g., Accounting and Finance"
-              value={currentEducation.field || ""}
-              onChange={(e) => updateField("field", e.target.value)}
-              icon={<BookOpen className="w-4 h-4" />}
-              // helperText="Optional"
-            />
-          </div>
+          <StyledInput
+            label="Field of Study"
+            placeholder="Accounting and Finance"
+            value={currentEducation.field || ""}
+            onChange={(e) => updateField("field", e.target.value)}
+            icon={<BookOpen className="w-4 h-4" />}
+          />
         </div>
-      </SectionCard>
+      </div>
 
-      {/* Duration */}
-      <SectionCard 
-        title="Duration" 
-        description="When did you study?"
-        icon={<Calendar className="w-5 h-5" />}
-        isDropdownOpen={isAnyDropdownOpen}
-      >
+      {/* Duration - No border */}
+      <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs sm:text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
@@ -843,90 +784,83 @@ export const EducationForm: React.FC<EducationFormProps> = ({
             />
           </div>
         </div>
-      </SectionCard>
+      </div>
 
-      {/* Grade/GPA */}
-      <SectionCard 
-        title="Grade / GPA" 
-        description="Your academic performance (optional)"
-        icon={<Award className="w-5 h-5" />}
-        isDropdownOpen={isAnyDropdownOpen}
-      >
-        <div className="space-y-4">
-          <div className="flex gap-2 mb-3">
-            <button
-              onClick={() => setGradeType('cgpa')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                gradeType === 'cgpa'
-                  ? 'bg-accent text-white'
-                  : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-muted hover:text-accent'
-              }`}
-            >
-              CGPA
-            </button>
-            <button
-              onClick={() => setGradeType('percentage')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                gradeType === 'percentage'
-                  ? 'bg-accent text-white'
-                  : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-muted hover:text-accent'
-              }`}
-            >
-              Percentage
-            </button>
-            <button
-              onClick={() => setGradeType('grade')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                gradeType === 'grade'
-                  ? 'bg-accent text-white'
-                  : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-muted hover:text-accent'
-              }`}
-            >
-              Grade
-            </button>
-          </div>
-
-          {gradeType === 'cgpa' && (
-            <DropdownWithSearch
-              label="CGPA"
-              value={currentEducation.cgpa || ""}
-              onChange={(value) => updateField("cgpa", value)}
-              options={CGPA_OPTIONS}
-              icon={<Award className="w-4 h-4" />}
-              placeholder="Select or enter CGPA"
-              onOpenChange={setIsCgpaDropdownOpen}
-            />
-          )}
-
-          {gradeType === 'percentage' && (
-            <StyledInput
-              label="Percentage"
-              placeholder="e.g., 85%"
-              value={currentEducation.percentage || ""}
-              onChange={(e) => {
-                const value = e.target.value.replace(/[^0-9.]/g, '');
-                updateField("percentage", value ? `${value}%` : '');
-              }}
-              icon={<Award className="w-4 h-4" />}
-              helperText="Enter percentage (e.g., 85%)"
-            />
-          )}
-
-          {gradeType === 'grade' && (
-            <DropdownWithSearch
-              label="Grade"
-              value={currentEducation.grade || ""}
-              onChange={(value) => updateField("grade", value)}
-              options={GRADE_OPTIONS}
-              icon={<Award className="w-4 h-4" />}
-              placeholder="Select or enter grade"
-              onOpenChange={setIsGradeDropdownOpen}
-            />
-          )}
+      {/* Grade/GPA - No border */}
+      <div className="space-y-4">
+        <div className="flex gap-2 mb-3">
+          <button
+            onClick={() => setGradeType('cgpa')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              gradeType === 'cgpa'
+                ? 'bg-accent text-white'
+                : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-muted hover:text-accent'
+            }`}
+          >
+            CGPA
+          </button>
+          <button
+            onClick={() => setGradeType('percentage')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              gradeType === 'percentage'
+                ? 'bg-accent text-white'
+                : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-muted hover:text-accent'
+            }`}
+          >
+            Percentage
+          </button>
+          <button
+            onClick={() => setGradeType('grade')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              gradeType === 'grade'
+                ? 'bg-accent text-white'
+                : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-muted hover:text-accent'
+            }`}
+          >
+            Grade
+          </button>
         </div>
-      </SectionCard>
 
-      {/* Additional Academic Details - Collapsible */}
+        {gradeType === 'cgpa' && (
+          <DropdownWithSearch
+            label="CGPA"
+            value={currentEducation.cgpa || ""}
+            onChange={(value) => updateField("cgpa", value)}
+            options={CGPA_OPTIONS}
+            icon={<Award className="w-4 h-4" />}
+            placeholder="Select or enter CGPA"
+            onOpenChange={setIsCgpaDropdownOpen}
+          />
+        )}
+
+        {gradeType === 'percentage' && (
+          <StyledInput
+            label="Percentage"
+            placeholder="85%"
+            value={currentEducation.percentage || ""}
+            onChange={(e) => {
+              const value = e.target.value.replace(/[^0-9.]/g, '');
+              updateField("percentage", value ? `${value}%` : '');
+            }}
+            icon={<Award className="w-4 h-4" />}
+            helperText="Enter percentage (e.g., 85%)"
+          />
+        )}
+
+        {gradeType === 'grade' && (
+          <DropdownWithSearch
+            label="Grade"
+            value={currentEducation.grade || ""}
+            onChange={(value) => updateField("grade", value)}
+            options={GRADE_OPTIONS}
+            icon={<Award className="w-4 h-4" />}
+            placeholder="Select or enter grade"
+            onOpenChange={setIsGradeDropdownOpen}
+          />
+        )}
+      </div>
+
+      {/* Additional Academic Details - Collapsible with minimal border */}
       <div className="border border-light-border dark:border-dark-border rounded-xl overflow-hidden">
         <button
           onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}
@@ -963,7 +897,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
   );
 
   return (
-    <div className="w-full mx-auto px-4  ">
+    <div className="w-full mx-auto px-4">
       {isSummaryView ? renderSummary() : renderForm()}
 
       {/* Footer */}

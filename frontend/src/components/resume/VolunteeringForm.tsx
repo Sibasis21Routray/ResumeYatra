@@ -481,11 +481,11 @@ export function VolunteeringForm({
                 </p>
             </div>
 
-            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border p-6">
+            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl  pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <StyledInput
                         label="Role / Position"
-                        placeholder="e.g., Volunteer Coordinator"
+                        placeholder="  Volunteer Coordinator"
                         value={currentItem.role}
                         onChange={(e) => updateField("role", e.target.value)}
                         onBlur={() => handleBlur("role")}
@@ -493,40 +493,40 @@ export function VolunteeringForm({
                         maxLength={120}
                         characterCount
                         error={touched.role ? errors.role : ""}
-                        tooltip="Volunteer role or position"
+                        // tooltip="Volunteer role or position"
                     />
 
                     <StyledInput
                         label="Organization Name"
-                        placeholder="e.g., Red Cross"
+                        placeholder="  Red Cross"
                         value={currentItem.organization}
                         onChange={(e) => updateField("organization", e.target.value)}
                         maxLength={120}
                         characterCount
                         error={touched.organization ? errors.organization : ""}
-                        tooltip="NGO or organization name"
+                        // tooltip="NGO or organization name"
                     />
 
                     <StyledInput
                         label="Cause / Area"
-                        placeholder="e.g., Education, Health, Environment"
+                        placeholder="  Education, Health, Environment"
                         value={currentItem.causeArea}
                         onChange={(e) => updateField("causeArea", e.target.value)}
                         maxLength={120}
                         characterCount
                         error={touched.causeArea ? errors.causeArea : ""}
-                        tooltip="Education, Health, Environment, etc."
+                        // tooltip="Education, Health, Environment, etc."
                     />
 
                     <StyledInput
                         label="Duration"
-                        placeholder="e.g., 2021 – 2023"
+                        placeholder="  2021 – 2023"
                         value={currentItem.duration}
                         onChange={(e) => updateField("duration", e.target.value)}
                         maxLength={50}
                         characterCount
                         error={touched.duration ? errors.duration : ""}
-                        tooltip="Example: 2021 – 2023"
+                        // tooltip="Example: 2021 – 2023"
                     />
 
                     <div className="md:col-span-2">
@@ -538,7 +538,7 @@ export function VolunteeringForm({
                             maxLength={200}
                             rows={3}
                             error={touched.description ? errors.description : ""}
-                            tooltip="Brief description of contribution"
+                            // tooltip="Brief description of contribution"
                         />
                     </div>
                 </div>
@@ -574,7 +574,7 @@ export function VolunteeringForm({
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ">
             {isSummaryView ? renderSummary() : renderForm()}
         </div>
     );

@@ -38,7 +38,6 @@ const StyledInput = ({
     maxLength,
     icon,
     error,
-    helperText,
     characterCount,
 }: {
     label: string;
@@ -50,7 +49,6 @@ const StyledInput = ({
     maxLength?: number;
     icon?: React.ReactNode;
     error?: string;
-    helperText?: string;
     characterCount?: boolean;
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -92,12 +90,6 @@ const StyledInput = ({
                     </div>
                 )}
             </div>
-            {helperText && !error && (
-                <p className="mt-1.5 text-xs text-text-muted dark:text-dark-text-muted flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    {helperText}
-                </p>
-            )}
             {error && (
                 <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
@@ -108,32 +100,10 @@ const StyledInput = ({
     );
 };
 
-// Section Card Component
-const SectionCard = ({ title, description, children, icon }: {
-    title: string;
-    description?: string;
-    children: React.ReactNode;
-    icon?: React.ReactNode;
-}) => (
-    <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border overflow-hidden shadow-sm">
-        <div className="px-5 py-4 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-bg-secondary/30 to-transparent">
-            <div className="flex items-center gap-3">
-                {icon && <div className="text-accent dark:text-dark-accent">{icon}</div>}
-                <div>
-                    <h4 className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
-                        {title}
-                    </h4>
-                    {description && (
-                        <p className="text-sm text-text-muted dark:text-dark-text-muted mt-0.5">
-                            {description}
-                        </p>
-                    )}
-                </div>
-            </div>
-        </div>
-        <div className="p-5">
-            {children}
-        </div>
+// Simplified Section Card - no header
+const SectionCard = ({ children }: { children: React.ReactNode }) => (
+    <div className="bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 shadow-sm">
+        {children}
     </div>
 );
 
@@ -370,7 +340,7 @@ export function LeadershipPositionsForm({
     );
 
     const renderForm = () => (
-        <div className="space-y-6">
+        <div className="space-y-8">
             <div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
                     Add <span className="text-accent dark:text-dark-accent">Leadership Position</span>
@@ -380,16 +350,12 @@ export function LeadershipPositionsForm({
                 </p>
             </div>
 
-            {/* Position Details */}
-            <SectionCard 
-                title="Position Details" 
-                description="Basic information about your leadership role"
-                icon={<Users className="w-5 h-5" />}
-            >
+            {/* Position Details - No header */}
+            <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <StyledInput
                         label="Position Title"
-                        placeholder="e.g., President, Class Representative"
+                        placeholder="President, Class Representative"
                         value={currentPosition.position || ""}
                         onChange={(e) => updateField("position", e.target.value)}
                         required
@@ -397,12 +363,11 @@ export function LeadershipPositionsForm({
                         characterCount
                         icon={<Briefcase className="w-4 h-4" />}
                         error={errors.position}
-                        helperText="President, Class Representative, Committee Member"
                     />
 
                     <StyledInput
                         label="Organization / Body"
-                        placeholder="e.g., Student Council, Debate Club"
+                        placeholder="Student Council, Debate Club"
                         value={currentPosition.organization || ""}
                         onChange={(e) => updateField("organization", e.target.value)}
                         required
@@ -410,17 +375,12 @@ export function LeadershipPositionsForm({
                         characterCount
                         icon={<Building className="w-4 h-4" />}
                         error={errors.organization}
-                        helperText="College committee, student body, club, or organization"
                     />
                 </div>
-            </SectionCard>
+            </div>
 
-            {/* Duration */}
-            <SectionCard 
-                title="Duration" 
-                description="When did you hold this position?"
-                icon={<Calendar className="w-5 h-5" />}
-            >
+            {/* Duration - No header */}
+            <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
@@ -461,32 +421,25 @@ export function LeadershipPositionsForm({
                         </div>
                     </div>
                 </div>
-            </SectionCard>
+            </div>
 
-            {/* Key Contributions & Learnings */}
-            <SectionCard 
-                title="Key Contributions & Learnings" 
-                description="What did you achieve in this role?"
-                icon={<Award className="w-5 h-5" />}
-            >
-                <div className="space-y-2">
-                    <RichTextEditor
-                        value={currentPosition.description || ""}
-                        onChange={(value) => updateField("description", value)}
-                        placeholder="Briefly describe your leadership responsibilities, initiatives, or impact (2–4 points)."
-                        sectionTitle="Leadership"
-                    />
-                    <p className="text-xs text-text-muted dark:text-dark-text-muted flex items-center gap-1 mt-2">
-                        <AlertCircle className="w-3.5 h-3.5" />
-                        Max 200 words recommended. Use bullet points for better readability.
-                    </p>
-                </div>
-            </SectionCard>
+            {/* Key Contributions & Learnings - With Label */}
+            <div className="space-y-4">
+                <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary">
+                    Key Contributions & Learnings
+                </label>
+                <RichTextEditor
+                    value={currentPosition.description || ""}
+                    onChange={(value) => updateField("description", value)}
+                    placeholder="Briefly describe your leadership responsibilities, initiatives, or impact (2–4 points)."
+                    sectionTitle="Leadership"
+                />
+            </div>
         </div>
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
             {isSummaryView ? renderSummary() : renderForm()}
 
             {/* Footer */}

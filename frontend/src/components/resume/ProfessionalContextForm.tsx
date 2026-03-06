@@ -49,7 +49,7 @@ const INDUSTRY_OPTIONS = [
     "Staffing, HR & Recruitment",
     "Research & Analytics",
     "Other / Multi-Industry"
-].sort(); // Sort alphabetically
+].sort();
 
 // Functional Domain Options with Groups
 const FUNCTIONAL_DOMAIN_GROUPS = [
@@ -62,7 +62,7 @@ const FUNCTIONAL_DOMAIN_GROUPS = [
             "Strategy & Planning",
             "Operations & Process Management",
             "General Management / Leadership"
-        ].sort() // Alphabetical within group
+        ].sort()
     },
     {
         group: "B. Technology",
@@ -175,47 +175,18 @@ const validateCustomRole = (value: string): { isValid: boolean; error?: string }
     return { isValid: true };
 };
 
-// Section Card Component
-const SectionCard = ({ title, description, children, icon, required, isDropdownOpen }: {
-    title: string;
-    description?: string;
-    children: React.ReactNode;
-    icon?: React.ReactNode;
-    required?: boolean;
-    isDropdownOpen?: boolean;
-}) => (
-    <div className={`bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border shadow-sm ${
+// Simplified Section Card - no header
+const SectionCard = ({ children, isDropdownOpen }: { children: React.ReactNode; isDropdownOpen?: boolean }) => (
+    <div className={`bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 shadow-sm ${
         isDropdownOpen ? 'overflow-visible' : 'overflow-hidden'
     }`}>
-        <div className="px-5 py-4 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-bg-secondary/30 to-transparent">
-            <div className="flex items-center gap-3">
-                {icon && <div className="text-accent dark:text-dark-accent">{icon}</div>}
-                <div>
-                    <h4 className="text-base font-semibold text-text-primary dark:text-dark-text-primary flex items-center gap-2">
-                        {title}
-                        {required && (
-                            <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">
-                                Required
-                            </span>
-                        )}
-                    </h4>
-                    {description && (
-                        <p className="text-sm text-text-muted dark:text-dark-text-muted mt-0.5">
-                            {description}
-                        </p>
-                    )}
-                </div>
-            </div>
-        </div>
-        <div className="p-5">
-            {children}
-        </div>
+        {children}
     </div>
 );
 
-// Info Helper Component
+// Info Helper Component - Simplified
 const InfoHelper = ({ text }: { text: string }) => (
-    <div className="flex items-start gap-1.5 mt-2 text-xs text-text-muted bg-bg-secondary/50 dark:bg-dark-bg-secondary/50 p-2 rounded-lg">
+    <div className="flex items-start gap-1.5 mt-2 text-xs text-text-muted">
         <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-accent" />
         <span className="leading-relaxed">{text}</span>
     </div>
@@ -653,7 +624,7 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
     ];
 
     return (
-        <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 ">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
             <div className="mb-8">
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
@@ -664,17 +635,14 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
                 </p>
             </div>
 
-            {/* Form Grid */}
-            <div className="space-y-6">
+            {/* Form Grid - No section headers */}
+            <div className="space-y-8">
                 {/* Total Experience - Required */}
-                <SectionCard 
-                    title="Total Experience" 
-                    // description="Required to calibrate your leadership level."
-                    // icon={<Info className="w-5 h-5" />}
-                    required
-                    isDropdownOpen={isAnyDropdownOpen}
-                >
-                    <div className="max-w-md">
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
+                            Total Experience <span className="text-red-500">*</span>
+                        </label>
                         <select
                             value={formData.totalExperience}
                             onChange={(e) => handleChange("totalExperience", e.target.value)}
@@ -698,16 +666,14 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
                         )}
                         <InfoHelper text="Required to calibrate your leadership level." />
                     </div>
-                </SectionCard>
+                </div>
 
                 {/* Team Size */}
-                <SectionCard 
-                    title="Team Size (People Led)" 
-                    // description="Total number of people you were responsible for, directly or indirectly"
-                    // icon={<Info className="w-5 h-5" />}
-                    isDropdownOpen={isAnyDropdownOpen}
-                >
-                    <div className="max-w-md">
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
+                            Team Size (People Led)
+                        </label>
                         <select
                             value={formData.teamSize}
                             onChange={(e) => handleChange("teamSize", e.target.value)}
@@ -720,36 +686,29 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
                         </select>
                         <InfoHelper text="Used to define your leadership seniority." />
                     </div>
-                </SectionCard>
+                </div>
 
                 {/* Industry / Sector */}
-                <SectionCard 
-                    title="Industry / Sector" 
-                    // description="The industry your company operates in."
-                    // icon={<Info className="w-5 h-5" />}
-                    isDropdownOpen={isAnyDropdownOpen}
-                >
-                    <div className="space-y-3">
-                        <div className="max-w-md">
-                            <IndustrySelect
-                                value={formData.industry}
-                                onChange={(value) => handleChange("industry", value)}
-                                error={errors.industry}
-                                onOpenChange={(isOpen) => handleDropdownOpen('industry', isOpen)}
-                            />
-                        </div>
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
+                            Industry / Sector
+                        </label>
+                        <IndustrySelect
+                            value={formData.industry}
+                            onChange={(value) => handleChange("industry", value)}
+                            error={errors.industry}
+                            onOpenChange={(isOpen) => handleDropdownOpen('industry', isOpen)}
+                        />
                         
                         {formData.industry === "Other / Multi-Industry" && (
-                            <div className="max-w-md mt-3">
-                                <label className="block text-sm font-medium text-text-primary mb-1.5">
-                                    Specify Industry
-                                </label>
+                            <div className="mt-3">
                                 <input
                                     type="text"
                                     value={formData.industryCustom}
                                     onChange={(e) => handleChange("industryCustom", e.target.value)}
                                     onBlur={() => handleBlur("industryCustom")}
-                                    placeholder="e.g., Renewable Energy, EdTech"
+                                    placeholder="Renewable Energy, EdTech"
                                     className={`w-full px-4 py-2.5 bg-bg-primary dark:bg-dark-bg-primary border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                                         errors.industryCustom && touched.industryCustom
                                             ? 'border-red-500 focus:ring-red-500' 
@@ -768,36 +727,29 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
 
                         <InfoHelper text="Different industries use different 'power words.' This ensures your profile sounds like an insider." />
                     </div>
-                </SectionCard>
+                </div>
 
                 {/* Functional Domain */}
-                <SectionCard 
-                    title="Functional Domain" 
-                    // description="Your primary area of work across roles."
-                    // icon={<Info className="w-5 h-5" />}
-                    isDropdownOpen={isAnyDropdownOpen}
-                >
-                    <div className="space-y-3">
-                        <div className="max-w-md">
-                            <FunctionalDomainSelect
-                                value={formData.functionalDomain}
-                                onChange={(value) => handleChange("functionalDomain", value)}
-                                error={errors.functionalDomain}
-                                onOpenChange={(isOpen) => handleDropdownOpen('functionalDomain', isOpen)}
-                            />
-                        </div>
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
+                            Functional Domain
+                        </label>
+                        <FunctionalDomainSelect
+                            value={formData.functionalDomain}
+                            onChange={(value) => handleChange("functionalDomain", value)}
+                            error={errors.functionalDomain}
+                            onOpenChange={(isOpen) => handleDropdownOpen('functionalDomain', isOpen)}
+                        />
 
                         {formData.functionalDomain === "Other Functional Role" && (
-                            <div className="max-w-md mt-3">
-                                <label className="block text-sm font-medium text-text-primary mb-1.5">
-                                    Specify Functional Role
-                                </label>
+                            <div className="mt-3">
                                 <input
                                     type="text"
                                     value={formData.functionalDomainCustom}
                                     onChange={(e) => handleCustomRoleChange(e.target.value)}
                                     onBlur={() => handleBlur("functionalDomainCustom")}
-                                    placeholder="e.g., Revenue Operations, Prompt Engineering"
+                                    placeholder="Revenue Operations, Prompt Engineering"
                                     className={`w-full px-4 py-2.5 bg-bg-primary dark:bg-dark-bg-primary border rounded-lg focus:outline-none focus:ring-2 transition-all ${
                                         (errors.functionalDomainCustom || customRoleError) && touched.functionalDomainCustom
                                             ? 'border-red-500 focus:ring-red-500' 
@@ -819,16 +771,14 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
 
                         <InfoHelper text="This helps the AI prioritize the most relevant skills for your specific career track." />
                     </div>
-                </SectionCard>
+                </div>
 
                 {/* Geographic Scope */}
-                <SectionCard 
-                    title="Geographic Scope" 
-                    // description="The geographic reach of your role"
-                    // icon={<Info className="w-5 h-5" />}
-                    isDropdownOpen={isAnyDropdownOpen}
-                >
-                    <div className="max-w-md">
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
+                            Geographic Scope
+                        </label>
                         <select
                             value={formData.geographicScope}
                             onChange={(e) => handleChange("geographicScope", e.target.value)}
@@ -841,32 +791,28 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
                         </select>
                         <InfoHelper text="Establishes role scale" />
                     </div>
-                </SectionCard>
+                </div>
 
                 {/* Revenue / Budget Responsibility */}
-                <SectionCard 
-                    title="Revenue / Budget Responsibility" 
-                    // description="Approximate annual revenue or budget you were responsible for."
-                    // icon={<Info className="w-5 h-5" />}
-                    isDropdownOpen={isAnyDropdownOpen}
-                >
-                    <div className="space-y-3">
-                        <div className="max-w-md">
-                            <select
-                                value={formData.revenueResponsibility}
-                                onChange={(e) => handleChange("revenueResponsibility", e.target.value)}
-                                className="w-full px-4 py-3 bg-bg-primary dark:bg-dark-bg-primary border border-light-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
-                            >
-                                <option value="">Select range</option>
-                                {REVENUE_OPTIONS.map(opt => (
-                                    <option key={opt} value={opt}>{opt}</option>
-                                ))}
-                            </select>
-                        </div>
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
+                            Revenue / Budget Responsibility
+                        </label>
+                        <select
+                            value={formData.revenueResponsibility}
+                            onChange={(e) => handleChange("revenueResponsibility", e.target.value)}
+                            className="w-full px-4 py-3 bg-bg-primary dark:bg-dark-bg-primary border border-light-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all"
+                        >
+                            <option value="">Select range</option>
+                            {REVENUE_OPTIONS.map(opt => (
+                                <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                        </select>
                         
                         <InfoHelper text="Quantifiable results are the #1 thing recruiters look for in senior roles. This data creates impact-driven bullets." />
                     </div>
-                </SectionCard>
+                </div>
             </div>
 
             {/* Footer Buttons */}

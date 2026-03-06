@@ -37,7 +37,6 @@ const StyledInput = ({
     maxLength,
     icon,
     error,
-    helperText,
     characterCount,
 }: {
     label: string;
@@ -49,7 +48,6 @@ const StyledInput = ({
     maxLength?: number;
     icon?: React.ReactNode;
     error?: string;
-    helperText?: string;
     characterCount?: boolean;
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -91,12 +89,6 @@ const StyledInput = ({
                     </div>
                 )}
             </div>
-            {helperText && !error && (
-                <p className="mt-1.5 text-xs text-text-muted dark:text-dark-text-muted flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    {helperText}
-                </p>
-            )}
             {error && (
                 <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
@@ -116,7 +108,6 @@ const StyledTextArea = ({
     required = false,
     maxLength,
     error,
-    helperText,
     rows = 4,
 }: {
     label: string;
@@ -126,7 +117,6 @@ const StyledTextArea = ({
     required?: boolean;
     maxLength?: number;
     error?: string;
-    helperText?: string;
     rows?: number;
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -163,12 +153,6 @@ const StyledTextArea = ({
                     </div>
                 )}
             </div>
-            {helperText && !error && (
-                <p className="mt-1.5 text-xs text-text-muted dark:text-dark-text-muted flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    {helperText}
-                </p>
-            )}
             {error && (
                 <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
@@ -179,32 +163,10 @@ const StyledTextArea = ({
     );
 };
 
-// Section Card Component - LARGER TEXT
-const SectionCard = ({ title, description, children, icon }: {
-    title: string;
-    description?: string;
-    children: React.ReactNode;
-    icon?: React.ReactNode;
-}) => (
-    <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border overflow-hidden shadow-sm">
-        <div className="px-5 py-4 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-bg-secondary/30 to-transparent">
-            <div className="flex items-center gap-3">
-                {icon && <div className="text-accent dark:text-dark-accent">{icon}</div>}
-                <div>
-                    <h4 className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
-                        {title}
-                    </h4>
-                    {description && (
-                        <p className="text-sm text-text-muted dark:text-dark-text-muted mt-0.5">
-                            {description}
-                        </p>
-                    )}
-                </div>
-            </div>
-        </div>
-        <div className="p-5">
-            {children}
-        </div>
+// Simplified Section Card - no header
+const SectionCard = ({ children }: { children: React.ReactNode }) => (
+    <div className="bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 shadow-sm">
+        {children}
     </div>
 );
 
@@ -419,7 +381,7 @@ export function TrainingProgramsForm({
     );
 
     const renderForm = () => (
-        <div className="space-y-6">
+        <div className="space-y-8">
             <div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
                     List certifications
@@ -427,19 +389,14 @@ export function TrainingProgramsForm({
                 <p className="text-base text-text-muted dark:text-dark-text-muted">
                     Courses or workshops that boosted your skills.
                 </p>
-               
             </div>
 
-            {/* Program Details */}
-            <SectionCard 
-                title="Program Details" 
-                description="Basic information about your training"
-                icon={<Briefcase className="w-5 h-5" />}
-            >
+            {/* Program Details - No header */}
+            <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <StyledInput
                         label="Program Title"
-                        placeholder="e.g., Advanced Data Science"
+                        placeholder="Advanced Data Science"
                         value={currentProgram.name || ""}
                         onChange={(e) => updateField("name", e.target.value)}
                         required
@@ -447,28 +404,22 @@ export function TrainingProgramsForm({
                         characterCount
                         icon={<Briefcase className="w-4 h-4" />}
                         error={errors.name}
-                        helperText="Training or course name"
                     />
 
                     <StyledInput
                         label="Conducted By"
-                        placeholder="e.g., Coursera, Udemy"
+                        placeholder="Coursera, Udemy"
                         value={currentProgram.provider || ""}
                         onChange={(e) => updateField("provider", e.target.value)}
                         maxLength={120}
                         characterCount
                         icon={<Building className="w-4 h-4" />}
-                        helperText="Institute or company"
                     />
                 </div>
-            </SectionCard>
+            </div>
 
-            {/* Duration & Date */}
-            <SectionCard 
-                title="Duration & Date" 
-                description="When did you complete this?"
-                icon={<Clock className="w-5 h-5" />}
-            >
+            {/* Duration & Date - No header */}
+            <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
@@ -484,38 +435,35 @@ export function TrainingProgramsForm({
 
                     <StyledInput
                         label="Duration"
-                        placeholder="e.g., 12 weeks, 50 hrs"
+                        placeholder="12 weeks, 50 hrs"
                         value={currentProgram.duration || ""}
                         onChange={(e) => updateField("duration", e.target.value)}
                         maxLength={50}
                         characterCount
                         icon={<Clock className="w-4 h-4" />}
-                        helperText="Program duration"
                     />
                 </div>
-            </SectionCard>
+            </div>
 
-            {/* Key Contributions & Learnings */}
-            <SectionCard 
-                title="Key Contributions & Learnings" 
-                description="What skills did you gain?"
-                icon={<Award className="w-5 h-5" />}
-            >
+            {/* Key Contributions & Learnings - With Label */}
+            <div className="space-y-4">
+                <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary">
+                    Key Contributions & Learnings
+                </label>
                 <StyledTextArea
-                    label="Description"
+                    // label="Description"
                     value={currentProgram.description || ""}
                     onChange={(e) => updateField("description", e.target.value)}
                     placeholder="Briefly mention skills learned, tools used, or outcomes achieved (2–3 points)."
                     maxLength={200}
                     rows={4}
-                    helperText="Skills learned, tools used, or outcomes achieved"
                 />
-            </SectionCard>
+            </div>
         </div>
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
             {isSummaryView ? renderSummary() : renderForm()}
 
             {/* Footer */}

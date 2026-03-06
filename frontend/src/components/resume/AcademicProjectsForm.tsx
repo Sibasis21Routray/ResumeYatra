@@ -39,7 +39,6 @@ const StyledInput = ({
     maxLength,
     icon,
     error,
-    helperText,
     characterCount,
 }: {
     label: string;
@@ -51,7 +50,6 @@ const StyledInput = ({
     maxLength?: number;
     icon?: React.ReactNode;
     error?: string;
-    helperText?: string;
     characterCount?: boolean;
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -93,12 +91,6 @@ const StyledInput = ({
                     </div>
                 )}
             </div>
-            {helperText && !error && (
-                <p className="mt-1 text-xs text-text-muted dark:text-dark-text-muted flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {helperText}
-                </p>
-            )}
             {error && (
                 <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" />
@@ -106,50 +98,6 @@ const StyledInput = ({
                 </p>
             )}
         </div>
-    );
-};
-
-// Section Card Component
-const SectionCard = ({ title, description, children, icon }: {
-    title: string;
-    description?: string;
-    children: React.ReactNode;
-    icon?: React.ReactNode;
-}) => (
-    <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border overflow-hidden shadow-sm">
-        <div className="px-4 sm:px-6 py-4 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-bg-secondary/30 to-transparent">
-            <div className="flex items-center gap-3">
-                {icon && <div className="text-accent dark:text-dark-accent">{icon}</div>}
-                <div>
-                    <h4 className="text-base sm:text-lg font-semibold text-text-primary dark:text-dark-text-primary">
-                        {title}
-                    </h4>
-                    {description && (
-                        <p className="text-xs sm:text-sm text-text-muted dark:text-dark-text-muted mt-0.5">
-                            {description}
-                        </p>
-                    )}
-                </div>
-            </div>
-        </div>
-        <div className="p-4 sm:p-6">
-            {children}
-        </div>
-    </div>
-);
-
-// Info Badge
-const InfoBadge = ({ text, type }: { text: string; type: 'required' | 'optional' | 'info' }) => {
-    const styles = {
-        required: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-        optional: 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-dark-text-muted',
-        info: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-    };
-
-    return (
-        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${styles[type]}`}>
-            {text}
-        </span>
     );
 };
 
@@ -423,7 +371,7 @@ export function AcademicProjectsForm({
     );
 
     const renderForm = () => (
-        <div className="space-y-6">
+        <div className="space-y-8">
             <div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
                     Highlight your projects
@@ -433,16 +381,12 @@ export function AcademicProjectsForm({
                 </p>
             </div>
 
-            {/* Basic Information */}
-            <SectionCard 
-                title="Project Details" 
-                description="Basic information about your project"
-                icon={<Briefcase className="w-5 h-5" />}
-            >
+            {/* Basic Information - No header */}
+            <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <StyledInput
                         label="Project Title"
-                        placeholder="e.g., Machine Learning Classification Model"
+                        placeholder="Machine Learning Classification Model"
                         value={currentProject.name || ""}
                         onChange={(e) => updateField("name", e.target.value)}
                         required
@@ -450,12 +394,11 @@ export function AcademicProjectsForm({
                         characterCount
                         icon={<Briefcase className="w-4 h-4" />}
                         error={errors.name}
-                        
                     />
 
                     <StyledInput
                         label="Duration"
-                        placeholder="e.g., Jan 2024 – Mar 2024"
+                        placeholder="Jan 2024 – Mar 2024"
                         value={currentProject.duration || ""}
                         onChange={(e) => updateField("duration", e.target.value)}
                         maxLength={50}
@@ -463,120 +406,96 @@ export function AcademicProjectsForm({
                         icon={<Calendar className="w-4 h-4" />}
                     />
                 </div>
-            </SectionCard>
+            </div>
 
-            {/* Institution & Course */}
-            <SectionCard 
-                title="Institution & Course" 
-                description="Where did you work on this project?"
-                icon={<BookOpen className="w-5 h-5" />}
-            >
+            {/* Institution & Course - No header */}
+            <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <StyledInput
                         label="Course / Program"
-                        placeholder="e.g., Data Science, Computer Science"
+                        placeholder="Data Science, Computer Science"
                         value={currentProject.course || ""}
                         onChange={(e) => updateField("course", e.target.value)}
                         maxLength={120}
                         characterCount
                         icon={<BookOpen className="w-4 h-4" />}
-                        helperText="Course or program name"
                     />
 
                     <StyledInput
                         label="Institution"
-                        placeholder="e.g., Stanford University"
+                        placeholder="Stanford University"
                         value={currentProject.institution || ""}
                         onChange={(e) => updateField("institution", e.target.value)}
                         maxLength={120}
                         characterCount
                         icon={<BookOpen className="w-4 h-4" />}
-                        helperText="College, university, or learning platform"
                     />
                 </div>
-            </SectionCard>
+            </div>
 
-            {/* Technologies Used */}
-            <SectionCard 
-                title="Technologies Used" 
-                description="Tools, languages, and frameworks"
-                icon={<Code className="w-5 h-5" />}
-            >
-                <div className="space-y-3">
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={newTech}
-                            onChange={(e) => setNewTech(e.target.value)}
-                            className="flex-1 px-4 py-2.5 bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all text-text-primary dark:text-dark-text-primary"
-                            placeholder="Add a technology (e.g., Python, React, TensorFlow)"
-                            onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addTech())}
-                        />
-                        <button
-                            type="button"
-                            onClick={addTech}
-                            className="px-4 py-2.5 bg-accent hover:bg-accent-hover text-white rounded-xl transition-colors flex items-center gap-2"
+            {/* Technologies Used - With Label */}
+            <div className="space-y-4">
+                <label className="block text-xs sm:text-sm font-semibold text-text-primary dark:text-dark-text-primary">
+                    Technologies Used
+                </label>
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        value={newTech}
+                        onChange={(e) => setNewTech(e.target.value)}
+                        className="flex-1 px-4 py-2.5 bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all text-text-primary dark:text-dark-text-primary"
+                        placeholder="Python, React, TensorFlow"
+                        onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addTech())}
+                    />
+                    <button
+                        type="button"
+                        onClick={addTech}
+                        className="px-4 py-2.5 bg-accent hover:bg-accent-hover text-white rounded-xl transition-colors flex items-center gap-2"
+                    >
+                        <Plus className="w-4 h-4" /> Add
+                    </button>
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                    {currentProject.technologies?.map((tech, i) => (
+                        <span
+                            key={i}
+                            className="bg-accent/10 text-accent dark:text-dark-accent px-3 py-1.5 rounded-lg text-sm flex items-center gap-2 border border-accent/20"
                         >
-                            <Plus className="w-4 h-4" /> Add
-                        </button>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2">
-                        {currentProject.technologies?.map((tech, i) => (
-                            <span
-                                key={i}
-                                className="bg-accent/10 text-accent dark:text-dark-accent px-3 py-1.5 rounded-lg text-sm flex items-center gap-2 border border-accent/20"
+                            <Code className="w-3 h-3" />
+                            {tech}
+                            <button 
+                                type="button" 
+                                onClick={() => removeTech(tech)} 
+                                className="hover:text-red-600 transition-colors"
                             >
-                                <Code className="w-3 h-3" />
-                                {tech}
-                                <button 
-                                    type="button" 
-                                    onClick={() => removeTech(tech)} 
-                                    className="hover:text-red-600 transition-colors"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            </span>
-                        ))}
-                        {(!currentProject.technologies || currentProject.technologies.length === 0) && (
-                            <p className="text-sm text-text-muted dark:text-dark-text-muted">
-                                No technologies added yet
-                            </p>
-                        )}
-                    </div>
-                    <p className="text-xs text-text-muted dark:text-dark-text-muted flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        Add key tools, languages, or frameworks used
-                    </p>
+                                <X className="w-4 h-4" />
+                            </button>
+                        </span>
+                    ))}
+                    {(!currentProject.technologies || currentProject.technologies.length === 0) && (
+                        <p className="text-sm text-text-muted dark:text-dark-text-muted">
+                            No technologies added yet
+                        </p>
+                    )}
                 </div>
-            </SectionCard>
+            </div>
 
-            {/* Key Contributions & Learnings */}
-            <SectionCard 
-                title="Key Contributions & Learnings" 
-                description="What did you build and learn?"
-                icon={<Award className="w-5 h-5" />}
-            >
-                <div className="space-y-2">
-                    <RichTextEditor
-                        value={currentProject.description || ""}
-                        onChange={(value) => updateField("description", value)}
-                        placeholder="Briefly explain what you built, your role, and what you learned or achieved (2–4 points)"
-                        sectionTitle="Academic Project"
-                    />
-                    <p className="text-xs text-text-muted dark:text-dark-text-muted flex items-center gap-1 mt-2">
-                        <AlertCircle className="w-3 h-3" />
-                        Max 200 words recommended. Use bullet points for better readability.
-                    </p>
-                </div>
-            </SectionCard>
+            {/* Key Contributions & Learnings - With Label */}
+            <div className="space-y-4">
+                <label className="block text-xs sm:text-sm font-semibold text-text-primary dark:text-dark-text-primary">
+                    Key Contributions & Learnings
+                </label>
+                <RichTextEditor
+                    value={currentProject.description || ""}
+                    onChange={(value) => updateField("description", value)}
+                    placeholder="Briefly explain what you built, your role, and what you learned or achieved (2–4 points)"
+                    sectionTitle="Academic Project"
+                />
+            </div>
 
-            {/* Project URL */}
-            <SectionCard 
-                title="Project Link" 
-                description="Optional - share your work"
-                icon={<Link className="w-5 h-5" />}
-            >
+            {/* Project URL - No header */}
+            <div className="space-y-4">
                 <StyledInput
                     label="Project URL"
                     placeholder="https://github.com/username/project"
@@ -584,14 +503,13 @@ export function AcademicProjectsForm({
                     onChange={(e) => updateField("url", e.target.value)}
                     type="url"
                     icon={<Link className="w-4 h-4" />}
-                    helperText="Add a link only if the project is publicly accessible"
                 />
-            </SectionCard>
+            </div>
         </div>
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
             {isSummaryView ? renderSummary() : renderForm()}
 
             {/* Footer */}

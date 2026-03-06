@@ -34,7 +34,6 @@ const StyledInput = ({
     maxLength,
     icon,
     error,
-    helperText,
     characterCount,
 }: {
     label: string;
@@ -46,7 +45,6 @@ const StyledInput = ({
     maxLength?: number;
     icon?: React.ReactNode;
     error?: string;
-    helperText?: string;
     characterCount?: boolean;
 }) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -88,12 +86,6 @@ const StyledInput = ({
                     </div>
                 )}
             </div>
-            {helperText && !error && (
-                <p className="mt-1.5 text-xs text-text-muted dark:text-dark-text-muted flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    {helperText}
-                </p>
-            )}
             {error && (
                 <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
@@ -191,35 +183,12 @@ const YearDropdown = ({
     );
 };
 
-// Section Card Component - FIXED OVERFLOW
-const SectionCard = ({ title, description, children, icon, isDropdownOpen }: {
-    title: string;
-    description?: string;
-    children: React.ReactNode;
-    icon?: React.ReactNode;
-    isDropdownOpen?: boolean;
-}) => (
-    <div className={`bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border shadow-sm ${
+// Simplified Section Card - no header
+const SectionCard = ({ children, isDropdownOpen }: { children: React.ReactNode; isDropdownOpen?: boolean }) => (
+    <div className={`bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 shadow-sm ${
         isDropdownOpen ? 'overflow-visible' : 'overflow-hidden'
     }`}>
-        <div className="px-5 py-4 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-bg-secondary/30 to-transparent">
-            <div className="flex items-center gap-3">
-                {icon && <div className="text-accent dark:text-dark-accent">{icon}</div>}
-                <div>
-                    <h4 className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
-                        {title}
-                    </h4>
-                    {description && (
-                        <p className="text-sm text-text-muted dark:text-dark-text-muted mt-0.5">
-                            {description}
-                        </p>
-                    )}
-                </div>
-            </div>
-        </div>
-        <div className="p-5">
-            {children}
-        </div>
+        {children}
     </div>
 );
 
@@ -419,7 +388,7 @@ export function ExtracurricularForm({
     );
 
     const renderForm = () => (
-        <div className="space-y-6">
+        <div className="space-y-8">
             <div>
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
                     Add non-academic activities
@@ -432,17 +401,12 @@ export function ExtracurricularForm({
                 </p>
             </div>
 
-            {/* Activity Details */}
-            <SectionCard 
-                title="Activity Details" 
-                description="Information about your extracurricular activity"
-                icon={<Heart className="w-5 h-5" />}
-                isDropdownOpen={isYearDropdownOpen}
-            >
+            {/* Activity Details - No header */}
+            <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <StyledInput
                         label="Activity Name"
-                        placeholder="e.g., Playing guitar, recreational sports, photography"
+                        placeholder="Playing guitar, recreational sports, photography"
                         value={currentActivity.activity || ""}
                         onChange={(e) => updateField("activity", e.target.value)}
                         required
@@ -450,43 +414,34 @@ export function ExtracurricularForm({
                         characterCount
                         icon={<Music className="w-4 h-4" />}
                         error={errors.activity}
-                        helperText="Playing guitar, recreational sports, photography"
                     />
 
                     <StyledInput
                         label="Role / Achievement"
-                        placeholder="e.g., Participant, Lead, Organizer"
+                        placeholder="Participant, Lead, Organizer"
                         value={currentActivity.role || ""}
                         onChange={(e) => updateField("role", e.target.value)}
                         maxLength={120}
                         characterCount
                         icon={<Award className="w-4 h-4" />}
-                        helperText="Participant, Lead, Organizer"
                     />
                 </div>
-            </SectionCard>
+            </div>
 
-            {/* Year */}
-            <SectionCard 
-                title="Year" 
-                description="When did you participate?"
-                icon={<Calendar className="w-5 h-5" />}
-                isDropdownOpen={isYearDropdownOpen}
-            >
-                <div className="grid grid-cols-1 md:grid-cols-1 gap-4 max-w-md">
-                    <YearDropdown
-                        label="Year"
-                        value={currentActivity.year || ""}
-                        onChange={(value) => updateField("year", value)}
-                        onOpenChange={setIsYearDropdownOpen}
-                    />
-                </div>
-            </SectionCard>
+            {/* Year - No header */}
+            <div className="space-y-4 max-w-md">
+                <YearDropdown
+                    label="Year"
+                    value={currentActivity.year || ""}
+                    onChange={(value) => updateField("year", value)}
+                    onOpenChange={setIsYearDropdownOpen}
+                />
+            </div>
         </div>
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
             {isSummaryView ? renderSummary() : renderForm()}
 
             {/* Footer */}

@@ -382,11 +382,11 @@ export function IndustryExpertiseForm({
                 </p>
             </div>
 
-            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border p-6">
+            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl  pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <StyledInput
                         label="Industry Name"
-                        placeholder="e.g., BFSI, IT, Healthcare"
+                        placeholder="BFSI, IT, Healthcare"
                         value={currentItem.industry}
                         onChange={(e) => updateField("industry", e.target.value)}
                         onBlur={() => handleBlur("industry")}
@@ -394,30 +394,30 @@ export function IndustryExpertiseForm({
                         maxLength={120}
                         characterCount
                         error={touched.industry ? errors.industry : ""}
-                        tooltip="BFSI, IT, Healthcare, etc."
+                        // tooltip="BFSI, IT, Healthcare, etc."
                     />
 
                     <StyledInput
                         label="Domain Area"
-                        placeholder="e.g., Payments, Lending, Insurance"
+                        placeholder="Payments, Lending, Insurance"
                         value={currentItem.domainArea}
                         onChange={(e) => updateField("domainArea", e.target.value)}
                         maxLength={120}
                         characterCount
                         error={touched.domainArea ? errors.domainArea : ""}
-                        tooltip="Payments, Lending, Insurance, etc."
+                        // tooltip="Payments, Lending, Insurance, etc."
                     />
 
                     <div className="md:col-span-2">
                         <StyledInput
                             label="Experience Duration"
-                            placeholder="e.g., 5 years"
+                            placeholder="5 years"
                             value={currentItem.experienceDuration}
                             onChange={(e) => updateField("experienceDuration", e.target.value)}
                             maxLength={50}
                             characterCount
                             error={touched.experienceDuration ? errors.experienceDuration : ""}
-                            tooltip="Years in industry"
+                            // tooltip="Years in industry"
                         />
                     </div>
                 </div>
@@ -453,7 +453,7 @@ export function IndustryExpertiseForm({
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ">
             {isSummaryView ? renderSummary() : renderForm()}
         </div>
     );

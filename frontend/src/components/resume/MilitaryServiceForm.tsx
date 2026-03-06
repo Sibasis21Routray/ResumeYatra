@@ -491,11 +491,11 @@ export function MilitaryServiceForm({
                 </p>
             </div>
 
-            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border p-6">
+            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl  pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <StyledInput
                         label="Branch / Service"
-                        placeholder="e.g., US Army, US Navy"
+                        placeholder="  US Army, US Navy"
                         value={currentItem.branch}
                         onChange={(e) => updateField("branch", e.target.value)}
                         onBlur={() => handleBlur("branch")}
@@ -503,40 +503,40 @@ export function MilitaryServiceForm({
                         maxLength={120}
                         characterCount
                         error={touched.branch ? errors.branch : ""}
-                        tooltip="Army, Navy, Air Force, etc."
+                        // tooltip="Army, Navy, Air Force, etc."
                     />
 
                     <StyledInput
                         label="Rank / Position"
-                        placeholder="e.g., Sergeant, Lieutenant"
+                        placeholder="  Sergeant, Lieutenant"
                         value={currentItem.rank}
                         onChange={(e) => updateField("rank", e.target.value)}
                         maxLength={120}
                         characterCount
                         error={touched.rank ? errors.rank : ""}
-                        tooltip="Rank held"
+                        // tooltip="Rank held"
                     />
 
                     <StyledInput
                         label="Duration"
-                        placeholder="e.g., 2015 – 2020"
+                        placeholder="  2015 – 2020"
                         value={currentItem.duration}
                         onChange={(e) => updateField("duration", e.target.value)}
                         maxLength={50}
                         characterCount
                         error={touched.duration ? errors.duration : ""}
-                        tooltip="Service period"
+                        // tooltip="Service period"
                     />
 
                     <StyledInput
                         label="Specialization"
-                        placeholder="e.g., Infantry, Communications, Medical"
+                        placeholder="  Infantry, Communications, Medical"
                         value={currentItem.specialization}
                         onChange={(e) => updateField("specialization", e.target.value)}
                         maxLength={120}
                         characterCount
                         error={touched.specialization ? errors.specialization : ""}
-                        tooltip="Area of specialization"
+                        // tooltip="Area of specialization"
                     />
 
                     <div className="md:col-span-2">
@@ -548,7 +548,7 @@ export function MilitaryServiceForm({
                             maxLength={200}
                             rows={3}
                             error={touched.description ? errors.description : ""}
-                            tooltip="Brief summary of service"
+                            // tooltip="Brief summary of service"
                         />
                     </div>
                 </div>
@@ -584,7 +584,7 @@ export function MilitaryServiceForm({
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ">
             {isSummaryView ? renderSummary() : renderForm()}
         </div>
     );

@@ -1,236 +1,3 @@
-// import React, { useState } from "react";
-// import { useResumeStore } from "../../stores";
-// import { ReviewListStep, ItemConfig } from "./steps/ReviewListStep";
-// import { BasicDetailsStep, FieldConfig } from "./steps/BasicDetailsStep";
-// import { DescriptionStep } from "./steps/DescriptionStep";
-// import { calculateDuration } from "../../utils/dateUtils";
-
-// type ExperienceStep = "review" | "basic" | "description";
-
-// interface ExperienceData {
-//   id: string;
-//   company?: string;
-//   title?: string;
-//   domain?: string;
-//   location?: string;
-//   startDate?: string;
-//   endDate?: string;
-//   description?: string;
-//   achievements?: string;
-//   duration?: string;
-//   isCurrent?: boolean;
-// }
-
-// interface ExperienceFormProps {
-//   data?: any;
-//   onNext?: () => void;
-//   onBack?: () => void;
-//   onOpenAIModal?: () => void;
-//   resumeId?: string;
-// }
-
-// export default function ExperienceForm({
-//   data,
-//   onNext,
-//   onBack,
-//   onOpenAIModal,
-//   resumeId,
-// }: ExperienceFormProps) {
-//   const updateData = useResumeStore((s) => s.updateData);
-//   const experience = data?.experience || useResumeStore((s) => s.data.experience || []);
-
-//   const [step, setStep] = useState<ExperienceStep>(
-//     experience.length === 0 ? "basic" : "review"
-//   );
-
-//   const [editingId, setEditingId] = useState<string | null>(null);
-//   const [draft, setDraft] = useState<ExperienceData | null>(null);
-//   const [showSkipModal, setShowSkipModal] = useState(false);
-
-//   const basicFields: FieldConfig[] = [
-//     { name: "title", label: "Job Title", type: "text", placeholder: "e.g., Software Engineer" },
-//     { name: "company", label: "Employer", type: "text", placeholder: "e.g., Google, Microsoft" },
-//     { name: "domain", label: "Domain", type: "text", placeholder: "e.g., Technology, Healthcare, Finance" },
-//     { name: "location", label: "Company Location", type: "text", placeholder: "e.g., San Francisco, CA" },
-//     { name: "startDate", label: "Start Date", type: "text" },
-//     { name: "endDate", label: "End Date", type: "text" },
-//     { name: "isCurrent", label: "I currently work here", type: "checkbox" },
-//   ];
-
-//   const itemConfig: ItemConfig = {
-//     titleField: "title",
-//     subtitleField: "company",
-//     dateRangeFields: { start: "startDate", end: "endDate" },
-//     descriptionField: "description",
-//   };
-
-//   const activeExperience =
-//     editingId
-//       ? experience.find((e: ExperienceData) => e.id === editingId)
-//       : draft;
-
-//   const handleAdd = () => {
-//     setEditingId(null);
-//     setDraft(null);
-//     setStep("basic");
-//   };
-
-//   const handleDelete = (id: string) => {
-//     updateData((d) => {
-//       d.experience = d.experience.filter((e: ExperienceData) => e.id !== id);
-//     });
-//   };
-
-//   const handleBasicSubmit = (data: Record<string, any>) => {
-//     if (editingId) {
-//       updateData((d) => {
-//         const exp = d.experience.find((e: ExperienceData) => e.id === editingId);
-//         if (exp) Object.assign(exp, data);
-//       });
-//     } else {
-//       setDraft({
-//         id: `exp-${Date.now()}`,
-//         ...data,
-//       });
-//     }
-//     setStep("description");
-//   };
-
-//   const handleDescriptionSubmit = ({ description, achievements }: { description: string; achievements?: string }) => {
-//     if (editingId) {
-//       updateData((d) => {
-//         const exp = d.experience.find((e: ExperienceData) => e.id === editingId);
-//         if (exp) {
-//           exp.description = description;
-//           exp.achievements = achievements;
-//         }
-//       });
-//       setEditingId(null);
-//       setStep("review");
-//     } else if (draft) {
-//       updateData((d) => {
-//         d.experience.push({ ...draft, description, achievements } as ExperienceData);
-//       });
-//       setDraft(null);
-//       setStep("review");
-//     }
-//   };
-
-//   const handleBack = () => {
-//     if (step === "description") {
-//       setStep("basic");
-//       return;
-//     }
-//     if (step === "basic") {
-//       experience.length === 0 ? onBack?.() : setStep("review");
-//       return;
-//     }
-//     onBack?.();
-//   };
-
-//   return (
-//     <>
-//       {step === "review" && (
-//         <ReviewListStep
-//           title="Review your work history"
-//           items={experience}
-//           itemConfig={itemConfig}
-//           emptyTitle="No Experience Added"
-//           emptyDescription="Add your work experience to showcase your professional background and achievements."
-//           addButtonText="+ Add more experience"
-//           onAdd={handleAdd}
-//           onEditBasic={(id) => {
-//             setEditingId(id);
-//             setDraft(null);
-//             setStep("basic");
-//           }}
-//           onEditDescription={(id) => {
-//             setEditingId(id);
-//             setDraft(null);
-//             setStep("description");
-//           }}
-//           onDelete={handleDelete}
-//           onBack={onBack}
-//           onContinue={onNext}
-//           canContinue={true}
-//           isContinueLoading={false}
-//         />
-//       )}
-
-//       {step === "basic" && (
-//         <BasicDetailsStep
-//           title={editingId ? "Edit experience" : "Add your experience"}
-//           fields={basicFields}
-//           initialData={activeExperience || {}}
-//           onSubmit={handleBasicSubmit}
-//           onEmptySubmit={() => setShowSkipModal(true)}
-//           onBack={handleBack}
-//           submitButtonText="Continue"
-//         />
-//       )}
-
-//       {step === "description" && (
-//         <DescriptionStep
-//           title="Add role description and achievements"
-//           initialDescription={activeExperience?.description || ""}
-//           initialAchievements={activeExperience?.achievements || ""}
-//           onSubmit={handleDescriptionSubmit}
-//           onBack={handleBack}
-//           resumeId={resumeId}
-//           context="experience"
-//           metadata={{
-//             title: activeExperience?.title || "",
-//             company: activeExperience?.company || "",
-//             domain: activeExperience?.domain || "",
-//             duration: calculateDuration(
-//               activeExperience?.startDate || "",
-//               activeExperience?.isCurrent ? "" : activeExperience?.endDate || ""
-//             ),
-//           }}
-//           onEnhanceWithAI={onOpenAIModal}
-//         />
-//       )}
-
-//       {showSkipModal && (
-//         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-//           <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-lg p-6 max-w-md w-full">
-//             <h3 className="text-lg font-semibold mb-3 text-text-primary dark:text-dark-text-primary">
-//               Skip Experience Section?
-//             </h3>
-
-//             <p className="text-text-muted dark:text-dark-text-muted mb-6">
-//               You have not added any experience details.
-//               Are you sure you want to skip this section?
-//             </p>
-
-//             <div className="flex gap-4">
-//               <button
-//                 onClick={() => {
-//                   setShowSkipModal(false);
-//                   onNext?.();
-//                 }}
-//                 className="flex-1 bg-accent hover:bg-accent-hover dark:bg-dark-accent dark:hover:bg-dark-accent-hover text-bg-primary dark:text-dark-bg-primary py-2 rounded font-medium transition-colors"
-//               >
-//                 Yes, skip
-//               </button>
-
-//               <button
-//                 onClick={() => setShowSkipModal(false)}
-//                 className="flex-1 border border-light-border dark:border-dark-border text-text-primary dark:text-dark-text-primary py-2 rounded font-medium hover:bg-accent/10 transition-colors"
-//               >
-//                 No, I will add
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </>
-//   );
-// }
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { useResumeStore } from "../../stores";
 import { MonthYearPicker } from "./MonthYearPicker";
@@ -274,7 +41,6 @@ const StyledInput = ({
   maxLength,
   icon,
   error,
-  helperText,
   characterCount,
 }: {
   label: string;
@@ -286,7 +52,6 @@ const StyledInput = ({
   maxLength?: number;
   icon?: React.ReactNode;
   error?: string;
-  helperText?: string;
   characterCount?: boolean;
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -328,12 +93,6 @@ const StyledInput = ({
           </div>
         )}
       </div>
-      {helperText && !error && (
-        <p className="mt-1.5 text-xs text-text-muted dark:text-dark-text-muted flex items-center gap-1">
-          <AlertCircle className="w-3.5 h-3.5" />
-          {helperText}
-        </p>
-      )}
       {error && (
         <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
           <AlertCircle className="w-3.5 h-3.5" />
@@ -344,38 +103,10 @@ const StyledInput = ({
   );
 };
 
-// Section Card Component
-const SectionCard = ({ title, description, children, icon, required }: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-  icon?: React.ReactNode;
-  required?: boolean;
-}) => (
-  <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border overflow-hidden shadow-sm">
-    <div className="px-5 py-4 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-bg-secondary/30 to-transparent">
-      <div className="flex items-center gap-3">
-        {icon && <div className="text-accent dark:text-dark-accent">{icon}</div>}
-        <div>
-          <h4 className="text-base font-semibold text-text-primary dark:text-dark-text-primary flex items-center gap-2">
-            {title}
-            {required && (
-              <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">
-                Required
-              </span>
-            )}
-          </h4>
-          {description && (
-            <p className="text-sm text-text-muted dark:text-dark-text-muted mt-0.5">
-              {description}
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
-    <div className="p-5">
-      {children}
-    </div>
+// Simplified Section Card - no header
+const SectionCard = ({ children }: { children: React.ReactNode }) => (
+  <div className="bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 shadow-sm">
+    {children}
   </div>
 );
 
@@ -742,7 +473,7 @@ export default function ExperienceForm({
   );
 
   const renderForm = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div>
         <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
@@ -753,17 +484,12 @@ export default function ExperienceForm({
         </p>
       </div>
 
-      {/* Basic Information */}
-      <SectionCard 
-        title="Basic Information" 
-        description="Tell us about your role"
-        icon={<Briefcase className="w-5 h-5" />}
-        required
-      >
+      {/* Basic Information - No header */}
+      <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <StyledInput
             label="Job Title"
-            placeholder="e.g., Software Engineer"
+            placeholder="Software Engineer"
             value={formData.title}
             onChange={(e) => handleChange("title", e.target.value)}
             onBlur={() => handleBlur("title")}
@@ -775,7 +501,7 @@ export default function ExperienceForm({
 
           <StyledInput
             label="Company"
-            placeholder="e.g., Google, Microsoft"
+            placeholder="Google, Microsoft"
             value={formData.company}
             onChange={(e) => handleChange("company", e.target.value)}
             onBlur={() => handleBlur("company")}
@@ -787,22 +513,17 @@ export default function ExperienceForm({
 
           <StyledInput
             label="Location"
-            placeholder="e.g., San Francisco, CA"
+            placeholder="San Francisco, CA"
             value={formData.location || ""}
             onChange={(e) => handleChange("location", e.target.value)}
             maxLength={100}
             icon={<MapPin className="w-4 h-4" />}
-            helperText="City, state, or remote"
           />
         </div>
-      </SectionCard>
+      </div>
 
-      {/* Duration */}
-      <SectionCard 
-        title="Duration" 
-        description="When did you work here?"
-        icon={<Calendar className="w-5 h-5" />}
-      >
+      {/* Duration - No header */}
+      <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
@@ -843,32 +564,26 @@ export default function ExperienceForm({
             </div>
           </div>
         </div>
-      </SectionCard>
+      </div>
 
-      {/* Role Description */}
-      <SectionCard 
-        title="Role Description" 
-        description="Describe your role and responsibilities in brief"
-        icon={<Briefcase className="w-5 h-5" />}
-      >
+      {/* Role Description - No header */}
+      <div className="space-y-4">
+        <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary">
+          Role Description
+        </label>
         <RichTextEditor
           value={formData.description || ""}
           onChange={(value) => handleChange("description", value)}
           placeholder="Describe your day-to-day responsibilities, scope of work, and key functions..."
           sectionTitle="Experience"
         />
-        <p className="mt-2 text-xs text-text-muted flex items-center gap-1">
-          <AlertCircle className="w-3.5 h-3.5" />
-          Briefly describe your role and key responsibilities
-        </p>
-      </SectionCard>
+      </div>
 
-      {/* Achievements */}
-      <SectionCard 
-        title="Achievements" 
-        description="3–5 bullet achievements"
-        icon={<Award className="w-5 h-5" />}
-      >
+      {/* Achievements - No header */}
+      <div className="space-y-4">
+        <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary">
+          Achievements
+        </label>
         <RichTextEditor
           value={formData.achievements || ""}
           onChange={(value) => handleChange("achievements", value)}
@@ -877,11 +592,7 @@ export default function ExperienceForm({
 • Implemented new process that saved $50k annually"
           sectionTitle="Achievements"
         />
-        <p className="mt-2 text-xs text-text-muted flex items-center gap-1">
-          <AlertCircle className="w-3.5 h-3.5" />
-          Use bullet points for better readability. Quantify achievements where possible.
-        </p>
-      </SectionCard>
+      </div>
 
       {/* Form Buttons */}
       <div className="flex justify-between mt-8 pt-6 border-t border-light-border dark:border-dark-border">
@@ -916,7 +627,7 @@ export default function ExperienceForm({
   );
 
   return (
-    <div className="w-full  mx-auto px-4 sm:px-6 lg:px-8 ">
+    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
       {isSummaryView ? renderSummary() : renderForm()}
     </div>
   );

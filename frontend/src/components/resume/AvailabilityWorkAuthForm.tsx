@@ -206,7 +206,7 @@ export function AvailabilityWorkAuthForm({
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full  mx-auto px-4 sm:px-6 lg:px-8 ">
             <div className="space-y-6">
                 <div>
                     <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
@@ -217,7 +217,7 @@ export function AvailabilityWorkAuthForm({
                     </p>
                 </div>
 
-                <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border p-6">
+                <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl  pt-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <StyledInput
                             label="Availability / Notice Period"

@@ -36,7 +36,6 @@ const StyledInput = ({
   required = false,
   icon,
   error,
-  helperText,
   onBlur,
 }: {
   label: string;
@@ -47,7 +46,6 @@ const StyledInput = ({
   required?: boolean;
   icon?: React.ReactNode;
   error?: string;
-  helperText?: string;
   onBlur?: () => void;
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -92,42 +90,14 @@ const StyledInput = ({
           {error}
         </p>
       )}
-      {helperText && !error && (
-        <p className="mt-1.5 text-xs text-text-muted dark:text-dark-text-muted flex items-center gap-1">
-          <AlertCircle className="w-3.5 h-3.5" />
-          {helperText}
-        </p>
-      )}
     </div>
   );
 };
 
-// Section Card Component
-const SectionCard = ({ title, description, children, icon }: {
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-  icon?: React.ReactNode;
-}) => (
-  <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border overflow-hidden shadow-sm">
-    <div className="px-5 py-4 border-b border-light-border dark:border-dark-border bg-gradient-to-r from-bg-secondary/30 to-transparent">
-      <div className="flex items-center gap-3">
-        {icon && <div className="text-accent dark:text-dark-accent">{icon}</div>}
-        <div>
-          <h4 className="text-base font-semibold text-text-primary dark:text-dark-text-primary">
-            {title}
-          </h4>
-          {description && (
-            <p className="text-sm text-text-muted dark:text-dark-text-muted mt-0.5">
-              {description}
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
-    <div className="p-5">
-      {children}
-    </div>
+// Simplified Section Card - no header
+const SectionCard = ({ children }: { children: React.ReactNode }) => (
+  <div className="bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 shadow-sm">
+    {children}
   </div>
 );
 
@@ -396,7 +366,7 @@ export function CertificationsForm({
   );
 
   const renderForm = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
           {editingId ? "Edit" : "Add"} <span className="text-accent dark:text-dark-accent">Certification</span>
@@ -406,15 +376,12 @@ export function CertificationsForm({
         </p>
       </div>
 
-      <SectionCard 
-        title="Certification Details" 
-        description="Information about your certification"
-        icon={<Award className="w-5 h-5" />}
-      >
+      {/* Certification Details - No header */}
+      <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <StyledInput
             label="Certification Name"
-            placeholder="e.g., AWS Certified Solutions Architect"
+            placeholder="AWS Certified Solutions Architect"
             value={currentCertification.name}
             onChange={(e) => updateField("name", e.target.value)}
             onBlur={() => handleBlur("name")}
@@ -425,14 +392,14 @@ export function CertificationsForm({
 
           <StyledInput
             label="Issuing Organization"
-            placeholder="e.g., Amazon Web Services"
+            placeholder="Amazon Web Services"
             value={currentCertification.issuer}
             onChange={(e) => updateField("issuer", e.target.value)}
             icon={<Building2 className="w-4 h-4" />}
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
               Issue Date
@@ -452,10 +419,9 @@ export function CertificationsForm({
             value={currentCertification.url}
             onChange={(e) => updateField("url", e.target.value)}
             icon={<Link className="w-4 h-4" />}
-            helperText="Optional - link to verify certificate"
           />
         </div>
-      </SectionCard>
+      </div>
 
       <div className="flex justify-between mt-8 pt-6 border-t border-light-border dark:border-dark-border">
         <button
@@ -488,7 +454,7 @@ export function CertificationsForm({
   );
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
       {isSummaryView ? renderSummary() : renderForm()}
     </div>
   );

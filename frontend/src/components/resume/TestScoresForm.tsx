@@ -503,7 +503,7 @@ export function TestScoresForm({
                 </p>
             </div>
 
-            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl border border-light-border dark:border-dark-border p-6">
+            <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <StyledSelect
                         label="Test Name"
@@ -519,7 +519,7 @@ export function TestScoresForm({
 
                     <StyledInput
                         label="Score"
-                        placeholder="e.g., 330"
+                        placeholder=" 330"
                         value={currentItem.score}
                         onChange={(e) => updateField("score", e.target.value)}
                         onBlur={() => handleBlur("score")}
@@ -532,7 +532,7 @@ export function TestScoresForm({
 
                     <StyledInput
                         label="Year"
-                        placeholder="e.g., 2023"
+                        placeholder=" 2023"
                         value={currentItem.year}
                         onChange={(e) => updateField("year", e.target.value)}
                         onBlur={() => handleBlur("year")}
@@ -545,7 +545,7 @@ export function TestScoresForm({
 
                     <StyledInput
                         label="Percentile / Rank"
-                        placeholder="e.g., 95th percentile"
+                        placeholder=" 95th percentile"
                         value={currentItem.percentileRank}
                         onChange={(e) => updateField("percentileRank", e.target.value)}
                         maxLength={50}
@@ -586,7 +586,7 @@ export function TestScoresForm({
     );
 
     return (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ">
             {isSummaryView ? renderSummary() : renderForm()}
         </div>
     );

@@ -59,7 +59,7 @@ interface CustomSectionsFormProps {
   onNavigateToSection?: (section: string) => void;
 }
 
-// Section Card Component
+// Section Card Component - Compact version
 const SectionCard = ({ 
   title, 
   description, 
@@ -76,45 +76,43 @@ const SectionCard = ({
   badge?: string;
 }) => {
   const colorClasses = {
-    blue: "from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800",
-    green: "from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200 dark:border-green-800",
-    purple: "from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 border-purple-200 dark:border-purple-800",
-    amber: "from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200 dark:border-amber-800",
-    red: "from-red-50 to-rose-50 dark:from-red-950/30 dark:to-rose-950/30 border-red-200 dark:border-red-800"
+    blue: "border-blue-200 dark:border-blue-800",
+    green: "border-green-200 dark:border-green-800",
+    purple: "border-purple-200 dark:border-purple-800",
+    amber: "border-amber-200 dark:border-amber-800",
+    red: "border-red-200 dark:border-red-800"
   };
 
   return (
-    <div className={`bg-gradient-to-br ${colorClasses[color as keyof typeof colorClasses] || colorClasses.blue} rounded-xl border shadow-sm overflow-hidden`}>
-      <div className="px-5 py-4 border-b border-inherit bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {icon && <div className="text-gray-700 dark:text-gray-300">{icon}</div>}
-            <div>
-              <h4 className="text-base font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                {title}
-                {badge && (
-                  <span className="text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded-full">
-                    {badge}
-                  </span>
-                )}
-              </h4>
-              {description && (
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
-                  {description}
-                </p>
-              )}
-            </div>
+    <div className={`bg-white dark:bg-gray-900 rounded-xl border ${colorClasses[color as keyof typeof colorClasses] || colorClasses.blue} shadow-sm overflow-hidden`}>
+      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <div className="flex items-center gap-2">
+          {icon && <div className="text-gray-600 dark:text-gray-300">{icon}</div>}
+          <div className="flex items-center gap-2 flex-1">
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+              {title}
+            </h4>
+            {badge && (
+              <span className="text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded-full">
+                {badge}
+              </span>
+            )}
           </div>
+          {description && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {description}
+            </span>
+          )}
         </div>
       </div>
-      <div className="p-5 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+      <div className="p-4">
         {children}
       </div>
     </div>
   );
 };
 
-// Section Entry Component
+// Section Entry Component - Compact version
 const SectionEntry = ({ 
   entry, 
   index, 
@@ -181,63 +179,63 @@ const SectionEntry = ({
 
   return (
     <div
-      className="group relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all shadow-sm hover:shadow-md mb-3"
+      className="group relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all shadow-sm hover:shadow-md mb-2"
       draggable
       onDragStart={onDragStart}
       onDragOver={onDragOver}
       onDrop={onDrop}
     >
       {/* Drag Handle */}
-      <div className="absolute left-2 top-1/2 -translate-y-1/2 cursor-move opacity-0 group-hover:opacity-100 transition-opacity">
-        <GripVertical className="w-4 h-4 text-gray-400" />
+      <div className="absolute left-1 top-1/2 -translate-y-1/2 cursor-move opacity-0 group-hover:opacity-100 transition-opacity">
+        <GripVertical className="w-3.5 h-3.5 text-gray-400" />
       </div>
 
-      {/* Entry Header */}
-      <div className="flex items-center justify-between pl-8 pr-4 py-3 border-b border-gray-100 dark:border-gray-700">
-        <div className="flex items-center gap-3">
-          <span className="flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium">
+      {/* Entry Header - Compact */}
+      <div className="flex items-center justify-between pl-6 pr-3 py-2">
+        <div className="flex items-center gap-2">
+          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium">
             {index + 1}
           </span>
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-[200px]">
             {entry.title || `New ${sectionHeading.slice(0, -1) || 'Entry'}`}
           </span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
-            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
           <button
             onClick={onToggleVisibility}
-            className={`p-1.5 rounded-lg transition-colors ${
+            className={`p-1 rounded transition-colors ${
               entry.isVisible
                 ? "text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30"
                 : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
             }`}
           >
-            {entry.isVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            {entry.isVisible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
           </button>
           <button
             onClick={onDelete}
-            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+            className="p-1 text-red-400 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="p-4 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="p-3 pt-0 space-y-3 border-t border-gray-100 dark:border-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input
               type="text"
               placeholder={placeholders.title}
               value={entry.title || ""}
               onChange={(e) => onUpdate("title", e.target.value)}
-              className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+              className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
             />
             
             {placeholders.org && (
@@ -246,7 +244,7 @@ const SectionEntry = ({
                 placeholder={placeholders.org}
                 value={entry.organization || ""}
                 onChange={(e) => onUpdate("organization", e.target.value)}
-                className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+                className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
               />
             )}
           </div>
@@ -283,16 +281,16 @@ const SectionEntry = ({
 
       {/* Collapsed Preview */}
       {!isExpanded && entry.description && (
-        <div className="px-4 pb-3 text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
-          {entry.description.replace(/<[^>]*>/g, '').substring(0, 100)}
-          {entry.description.length > 100 ? '...' : ''}
+        <div className="px-3 pb-2 text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+          {entry.description.replace(/<[^>]*>/g, '').substring(0, 60)}
+          {entry.description.length > 60 ? '...' : ''}
         </div>
       )}
     </div>
   );
 };
 
-// Section Group Component
+// Section Group Component - Compact
 const SectionGroup = ({ 
   group, 
   filledSections, 
@@ -308,24 +306,24 @@ const SectionGroup = ({
     <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+        className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <div className="text-blue-600 dark:text-blue-400">
             {group.icon}
           </div>
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
             {group.title}
           </h4>
-          <span className="text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full">
+          <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full">
             {group.sections.filter((s: any) => filledSections.has(s.form)).length}/{group.sections.length}
           </span>
         </div>
-        {isExpanded ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+        {isExpanded ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
       </button>
 
       {isExpanded && (
-        <div className="p-5 pt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="p-3 pt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {group.sections.map((section: any) => {
             const isFilled = filledSections.has(section.form);
             
@@ -333,37 +331,28 @@ const SectionGroup = ({
               <button
                 key={section.name}
                 onClick={() => onNavigate(section.form)}
-                className={`group relative p-4 rounded-xl border-2 transition-all text-left ${
+                className={`group relative p-3 rounded-lg border transition-all text-left ${
                   isFilled 
                     ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
                     : 'border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
                 }`}
               >
-                <div className="flex items-start justify-between mb-2">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                <div className="flex items-center gap-2">
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center ${
                     isFilled 
                       ? 'bg-green-500 text-white' 
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 group-hover:text-blue-600'
                   } transition-colors`}>
                     {isFilled ? (
-                      <CheckCircle className="w-5 h-5" />
+                      <CheckCircle className="w-3.5 h-3.5" />
                     ) : (
-                      <Plus className="w-5 h-5" />
+                      <Plus className="w-3.5 h-3.5" />
                     )}
                   </div>
-                  {isFilled && (
-                    <span className="text-xs bg-green-200 text-green-800 dark:bg-green-900/50 dark:text-green-300 px-2 py-1 rounded-full">
-                      Added
-                    </span>
-                  )}
+                  <span className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {section.name}
+                  </span>
                 </div>
-                
-                <h5 className="font-medium text-gray-900 dark:text-white mb-1">
-                  {section.name}
-                </h5>
-                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
-                  {getSectionDescription(section.form)}
-                </p>
               </button>
             );
           })}
@@ -402,30 +391,6 @@ const getSectionDescription = (form: string): string => {
   return descriptions[form] || "Add relevant information";
 };
 
-// Stats Card Component
-const StatsCard = ({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) => {
-  const colorClasses = {
-    blue: "bg-blue-50 dark:bg-blue-950/30 text-blue-600",
-    green: "bg-green-50 dark:bg-green-950/30 text-green-600",
-    purple: "bg-purple-50 dark:bg-purple-950/30 text-purple-600",
-    amber: "bg-amber-50 dark:bg-amber-950/30 text-amber-600"
-  };
-
-  return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
-      <div className="flex items-center gap-3">
-        <div className={`p-3 rounded-xl ${colorClasses[color as keyof typeof colorClasses] || colorClasses.blue}`}>
-          {icon}
-        </div>
-        <div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export function CustomSectionsForm({
   data,
   onChange,
@@ -444,7 +409,6 @@ export function CustomSectionsForm({
   } | null>(null);
   const [activeForm, setActiveForm] = useState<string | null>(null);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
@@ -510,23 +474,6 @@ export function CustomSectionsForm({
     
     setFilledSections(newFilledSections);
   }, [data]);
-
-  const addPredefinedCustomSection = (heading: string, subsections: string[]) => {
-    const newSection: CustomSection = {
-      id: generateId(),
-      heading,
-      entries: subsections.map(sub => ({
-        id: generateId(),
-        title: sub,
-        organization: "",
-        date: "",
-        description: "",
-        isVisible: true,
-      })),
-      isVisible: true,
-    };
-    updateCustomSections([...(data.customSections || []), newSection]);
-  };
 
   const addCustomSection = () => {
     const newSection: CustomSection = {
@@ -720,31 +667,31 @@ export function CustomSectionsForm({
     {
       id: "personal",
       title: "Personal & Administrative",
-      icon: <Users className="w-5 h-5" />,
+      icon: <Users className="w-4 h-4" />,
       color: "blue",
       sections: [
         { name: "References", form: "references" },
         { name: "Social Profiles", form: "socialProfiles" },
-        { name: "Availability & Work Authorization", form: "availabilityWorkAuth" },
+        { name: "Availability & Work Auth", form: "availabilityWorkAuth" },
       ]
     },
     {
       id: "career",
       title: "Career Enhancers",
-      icon: <Award className="w-5 h-5" />,
+      icon: <Award className="w-4 h-4" />,
       color: "amber",
       sections: [
         { name: "Certifications", form: "certifications" },
         { name: "Awards", form: "awards" },
         { name: "Speaking Engagements", form: "speakingEngagements" },
-        { name: "Memberships & Affiliations", form: "memberships" },
-        { name: "Workshops & Seminars", form: "workshops" },
+        { name: "Memberships", form: "memberships" },
+        { name: "Workshops", form: "workshops" },
       ]
     },
     {
       id: "projects",
       title: "Projects & Domain Work",
-      icon: <Briefcase className="w-5 h-5" />,
+      icon: <Briefcase className="w-4 h-4" />,
       color: "purple",
       sections: [
         { name: "Client Projects", form: "clientProjects" },
@@ -754,7 +701,7 @@ export function CustomSectionsForm({
     {
       id: "technical",
       title: "Technical Expertise",
-      icon: <Wrench className="w-5 h-5" />,
+      icon: <Wrench className="w-4 h-4" />,
       color: "green",
       sections: [
         { name: "Tools & Technologies", form: "toolsTechnologies" },
@@ -765,7 +712,7 @@ export function CustomSectionsForm({
     {
       id: "volunteering",
       title: "Volunteering & Service",
-      icon: <Heart className="w-5 h-5" />,
+      icon: <Heart className="w-4 h-4" />,
       color: "red",
       sections: [
         { name: "Volunteering", form: "volunteering" },
@@ -775,7 +722,7 @@ export function CustomSectionsForm({
     {
       id: "languages",
       title: "Languages",
-      icon: <Globe className="w-5 h-5" />,
+      icon: <Globe className="w-4 h-4" />,
       color: "blue",
       sections: [
         { name: "Languages", form: "languages" },
@@ -784,11 +731,11 @@ export function CustomSectionsForm({
     {
       id: "academic",
       title: "Academic & Research",
-      icon: <GraduationCap className="w-5 h-5" />,
+      icon: <GraduationCap className="w-4 h-4" />,
       color: "purple",
       sections: [
         { name: "Teaching Experience", form: "teachingExperience" },
-        { name: "Mentorship Experience", form: "mentorshipExperience" },
+        { name: "Mentorship", form: "mentorshipExperience" },
         { name: "Research Grants", form: "researchGrants" },
         { name: "Test Scores", form: "testScores" },
         { name: "Publications", form: "publications" },
@@ -808,122 +755,76 @@ export function CustomSectionsForm({
     .filter(group => group.sections.length > 0)
     .filter(group => !selectedGroup || group.id === selectedGroup);
 
-  const totalSections = sectionGroups.reduce((acc, group) => acc + group.sections.length, 0);
-  const completedSections = filledSections.size;
-  const completionPercentage = Math.round((completedSections / totalSections) * 100);
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header with Stats */}
-      <div className="mb-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+    <div className=" mx-auto px-4 sm:px-6 lg:px-8 ">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-accent dark:text-white mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1">
               Add-On Sections
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
-              Enhance your resume with additional sections that showcase your complete profile
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Enhance your resume with additional sections
             </p>
           </div>
-          
-          {/* <button
-            onClick={addCustomSection}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all shadow-lg hover:shadow-xl"
-          >
-            <Plus className="w-5 h-5" />
-            <span className="font-medium">Create Custom Section</span>
-          </button> */}
         </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <StatsCard 
-            icon={<FileText className="w-5 h-5" />}
-            label="Total Sections"
-            value={totalSections}
-            color="blue"
-          />
-          <StatsCard 
-            icon={<CheckCircle className="w-5 h-5" />}
-            label="Completed"
-            value={completedSections}
-            color="green"
-          />
-          <StatsCard 
-            icon={<Sparkles className="w-5 h-5" />}
-            label="Remaining"
-            value={totalSections - completedSections}
-            color="purple"
-          />
-          {/* <StatsCard 
-            icon={<FolderOpen className="w-5 h-5" />}
-            label="Custom Sections"
-            value={data.customSections?.length || 0}
-            color="amber"
-          /> */}
-        </div>
-
-
       </div>
 
       {/* Custom Sections Display */}
       {(data.customSections || []).length > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Your Custom Sections
             </h2>
-            <span className="text-sm bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-3 py-1 rounded-full">
+            <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-full">
               {data.customSections?.length} section{data.customSections?.length !== 1 ? 's' : ''}
             </span>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {(data.customSections || []).map((section, sectionIndex) => (
               <SectionCard
                 key={section.id}
                 title={section.heading || "Untitled Section"}
-                description={`${section.entries.length} item${section.entries.length !== 1 ? 's' : ''}`}
-                icon={<FolderOpen className="w-5 h-5" />}
+                description={`${section.entries.length} items`}
+                icon={<FolderOpen className="w-4 h-4" />}
                 color="blue"
                 badge={section.isVisible ? "Visible" : "Hidden"}
               >
                 {/* Section Controls */}
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="cursor-move" draggable onDragStart={(e) => handleDragStart(e, "section", section.id)}>
-                      <GripVertical className="w-5 h-5 text-gray-400" />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Section Heading (e.g., Publications, Awards)"
-                      value={section.heading}
-                      onChange={(e) => updateSectionHeading(section.id, e.target.value)}
-                      className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
-                    />
+                <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-200 dark:border-gray-700">
+                  <div className="cursor-move" draggable onDragStart={(e) => handleDragStart(e, "section", section.id)}>
+                    <GripVertical className="w-4 h-4 text-gray-400" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => toggleSectionVisibility(section.id)}
-                      className={`p-2 rounded-lg transition-colors ${
-                        section.isVisible
-                          ? "text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30"
-                          : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      }`}
-                    >
-                      {section.isVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                    </button>
-                    <button
-                      onClick={() => deleteSection(section.id)}
-                      className="p-2 text-red-400 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <input
+                    type="text"
+                    placeholder="Section Heading"
+                    value={section.heading}
+                    onChange={(e) => updateSectionHeading(section.id, e.target.value)}
+                    className="flex-1 px-2 py-1 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                  />
+                  <button
+                    onClick={() => toggleSectionVisibility(section.id)}
+                    className={`p-1 rounded transition-colors ${
+                      section.isVisible
+                        ? "text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30"
+                        : "text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    {section.isVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                  </button>
+                  <button
+                    onClick={() => deleteSection(section.id)}
+                    className="p-1 text-red-400 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
 
                 {/* Section Entries */}
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {section.entries.map((entry, entryIndex) => (
                     <SectionEntry
                       key={entry.id}
@@ -944,10 +845,10 @@ export function CustomSectionsForm({
 
                 <button
                   onClick={() => addEntryToSection(section.id)}
-                  className="mt-4 w-full py-3 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-400 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 transition-all flex items-center justify-center gap-2"
+                  className="mt-3 w-full py-2 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-xs text-gray-600 dark:text-gray-400 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 transition-all flex items-center justify-center gap-1"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span className="text-sm font-medium">Add Item to Section</span>
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Item</span>
                 </button>
               </SectionCard>
             ))}
@@ -955,45 +856,33 @@ export function CustomSectionsForm({
         </div>
       )}
 
-      {/* Section Groups Header */}
-      <div className="mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Available Sections
-          </h2>
-          
-          <div className="flex items-center gap-3">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search sections..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all w-64"
-              />
-            </div>
-
-            {/* Filter */}
-            <select
-              value={selectedGroup || ''}
-              onChange={(e) => setSelectedGroup(e.target.value || null)}
-              className="px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-            >
-              <option value="">All Groups</option>
-              {sectionGroups.map(group => (
-                <option key={group.id} value={group.id}>{group.title}</option>
-              ))}
-            </select>
-
-            
-          </div>
+      {/* Search and Filter */}
+      <div className="mb-4 flex items-center gap-3">
+        <div className="relative flex-1 max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search sections..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+          />
         </div>
+
+        <select
+          value={selectedGroup || ''}
+          onChange={(e) => setSelectedGroup(e.target.value || null)}
+          className="px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+        >
+          <option value="">All Groups</option>
+          {sectionGroups.map(group => (
+            <option key={group.id} value={group.id}>{group.title}</option>
+          ))}
+        </select>
       </div>
 
       {/* Section Groups */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filteredGroups.map((group) => (
           <SectionGroup
             key={group.id}
@@ -1004,28 +893,21 @@ export function CustomSectionsForm({
         ))}
 
         {filteredGroups.length === 0 && (
-          <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
-            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">No sections found</h3>
+          <div className="text-center py-8 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700">
+            <AlertCircle className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+            <h3 className="text-base font-medium text-gray-900 dark:text-white mb-1">No sections found</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Try adjusting your search or filter to find what you're looking for.
+              Try adjusting your search
             </p>
           </div>
         )}
       </div>
 
       {/* Footer */}
-      <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-        {/* <button
-          onClick={onBack}
-          className="px-6 py-2.5 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 hover:border-gray-400 dark:hover:border-gray-500 transition-all flex items-center gap-2"
-        >
-          <span>← Back</span>
-        </button> */}
-
+      <div className="flex justify-end mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={() => navigate("/dashboard")}
-          className="px-8 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+          className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium text-sm shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
         >
           <span>Generate Resume</span>
           <span>→</span>

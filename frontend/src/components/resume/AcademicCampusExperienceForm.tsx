@@ -60,7 +60,7 @@ const SUB_OPTIONS: SubOption[] = [
     {
         id: "scholarship",
         label: "Scholarships",
-        description: "List your scholarships and awards",
+        description: "List your scholarships",
         icon: <Award className="w-6 h-6" />,
         dataKey: "scholarships",
         count: 0,
@@ -68,7 +68,7 @@ const SUB_OPTIONS: SubOption[] = [
     {
         id: "coCurricular",
         label: "Co-curricular",
-        description: "Add co-curricular activities",
+        description: "Add academic activities",
         icon: <Star className="w-6 h-6" />,
         dataKey: "coCurricular",
         count: 0,
@@ -76,7 +76,7 @@ const SUB_OPTIONS: SubOption[] = [
     {
         id: "extraCurricular",
         label: "Extra-curricular",
-        description: "Add extracurricular activities",
+        description: "Add non-academic activities",
         icon: <Trophy className="w-6 h-6" />,
         dataKey: "extracurricular",
         count: 0,
@@ -84,7 +84,7 @@ const SUB_OPTIONS: SubOption[] = [
     {
         id: "careerObjective",
         label: "Career Objective",
-        description: "Add your career objective or summary",
+        description: "Define your goal",
         icon: <Plus className="w-6 h-6" />,
         dataKey: "careerObjective",
         count: 0,
