@@ -33,6 +33,15 @@ import {
   AlertCircle
 } from "lucide-react";
 
+// ── Theme Colors (#00477e) ─────────────────────────────────────────────────
+const THEME = {
+  primary: "#00477e",
+  primaryLight: "#1e6a9e",
+  primaryDark: "#00335c",
+  primaryGradient: "linear-gradient(135deg, #00477e 0%, #1e6a9e 100%)",
+  primaryGlow: "rgba(0, 71, 126, 0.3)",
+};
+
 interface CustomSectionEntry {
   id: string;
   title?: string;
@@ -59,7 +68,7 @@ interface CustomSectionsFormProps {
   onNavigateToSection?: (section: string) => void;
 }
 
-// Section Card Component - Compact version
+// Section Card Component - Compact version with theme
 const SectionCard = ({ 
   title, 
   description, 
@@ -76,7 +85,7 @@ const SectionCard = ({
   badge?: string;
 }) => {
   const colorClasses = {
-    blue: "border-blue-200 dark:border-blue-800",
+    blue: `border-[${THEME.primary}]/20`,
     green: "border-green-200 dark:border-green-800",
     purple: "border-purple-200 dark:border-purple-800",
     amber: "border-amber-200 dark:border-amber-800",
@@ -84,7 +93,8 @@ const SectionCard = ({
   };
 
   return (
-    <div className={`bg-white dark:bg-gray-900 rounded-xl border ${colorClasses[color as keyof typeof colorClasses] || colorClasses.blue} shadow-sm overflow-hidden`}>
+    <div className={`bg-white dark:bg-gray-900 rounded-xl border shadow-sm overflow-hidden`} 
+      style={{ borderColor: color === 'blue' ? `${THEME.primary}20` : undefined }}>
       <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
         <div className="flex items-center gap-2">
           {icon && <div className="text-gray-600 dark:text-gray-300">{icon}</div>}
@@ -112,7 +122,7 @@ const SectionCard = ({
   );
 };
 
-// Section Entry Component - Compact version
+// Section Entry Component - Compact version with theme
 const SectionEntry = ({ 
   entry, 
   index, 
@@ -180,6 +190,9 @@ const SectionEntry = ({
   return (
     <div
       className="group relative bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all shadow-sm hover:shadow-md mb-2"
+      style={{ 
+        hoverBorderColor: THEME.primaryLight,
+      }}
       draggable
       onDragStart={onDragStart}
       onDragOver={onDragOver}
@@ -193,7 +206,8 @@ const SectionEntry = ({
       {/* Entry Header - Compact */}
       <div className="flex items-center justify-between pl-6 pr-3 py-2">
         <div className="flex items-center gap-2">
-          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium">
+          <span className="flex items-center justify-center w-5 h-5 rounded-full text-white text-xs font-medium"
+            style={{ background: THEME.primaryGradient }}>
             {index + 1}
           </span>
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate max-w-[200px]">
@@ -235,7 +249,8 @@ const SectionEntry = ({
               placeholder={placeholders.title}
               value={entry.title || ""}
               onChange={(e) => onUpdate("title", e.target.value)}
-              className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+              className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:border-blue-500 transition-all text-sm"
+              style={{ focusRingColor: `${THEME.primary}20` }}
             />
             
             {placeholders.org && (
@@ -244,7 +259,8 @@ const SectionEntry = ({
                 placeholder={placeholders.org}
                 value={entry.organization || ""}
                 onChange={(e) => onUpdate("organization", e.target.value)}
-                className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+                className="w-full px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:border-blue-500 transition-all text-sm"
+                style={{ focusRingColor: `${THEME.primary}20` }}
               />
             )}
           </div>
@@ -290,7 +306,7 @@ const SectionEntry = ({
   );
 };
 
-// Section Group Component - Compact
+// Section Group Component - Compact with theme
 const SectionGroup = ({ 
   group, 
   filledSections, 
@@ -309,7 +325,7 @@ const SectionGroup = ({
         className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <div className="text-blue-600 dark:text-blue-400">
+          <div className="text-blue-600 dark:text-blue-400" style={{ color: THEME.primary }}>
             {group.icon}
           </div>
           <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -336,13 +352,20 @@ const SectionGroup = ({
                     ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
                     : 'border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20'
                 }`}
+                style={{ 
+                  hoverBorderColor: isFilled ? undefined : THEME.primary,
+                  hoverBackgroundColor: isFilled ? undefined : `${THEME.primary}10`
+                }}
               >
                 <div className="flex items-center gap-2">
                   <div className={`w-6 h-6 rounded-md flex items-center justify-center ${
                     isFilled 
                       ? 'bg-green-500 text-white' 
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 group-hover:text-blue-600'
-                  } transition-colors`}>
+                      : ''
+                  } transition-colors`}
+                  style={{ 
+                    groupHoverBackground: isFilled ? undefined : THEME.primary 
+                  }}>
                     {isFilled ? (
                       <CheckCircle className="w-3.5 h-3.5" />
                     ) : (
@@ -803,7 +826,8 @@ export function CustomSectionsForm({
                     placeholder="Section Heading"
                     value={section.heading}
                     onChange={(e) => updateSectionHeading(section.id, e.target.value)}
-                    className="flex-1 px-2 py-1 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    className="flex-1 px-2 py-1 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:border-blue-500 transition-all"
+                    style={{ focusRingColor: `${THEME.primary}20` }}
                   />
                   <button
                     onClick={() => toggleSectionVisibility(section.id)}
@@ -846,6 +870,7 @@ export function CustomSectionsForm({
                 <button
                   onClick={() => addEntryToSection(section.id)}
                   className="mt-3 w-full py-2 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-xs text-gray-600 dark:text-gray-400 hover:border-blue-500 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 transition-all flex items-center justify-center gap-1"
+                  style={{ hoverBorderColor: THEME.primary, hoverColor: THEME.primary }}
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Add Item</span>
@@ -865,14 +890,16 @@ export function CustomSectionsForm({
             placeholder="Search sections..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            className="w-full pl-9 pr-4 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:border-blue-500 transition-all"
+            style={{ focusRingColor: `${THEME.primary}20` }}
           />
         </div>
 
         <select
           value={selectedGroup || ''}
           onChange={(e) => setSelectedGroup(e.target.value || null)}
-          className="px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+          className="px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:border-blue-500 transition-all"
+          style={{ focusRingColor: `${THEME.primary}20` }}
         >
           <option value="">All Groups</option>
           {sectionGroups.map(group => (
@@ -907,7 +934,19 @@ export function CustomSectionsForm({
       <div className="flex justify-end mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={() => navigate("/dashboard")}
-          className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium text-sm shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+          className="px-6 py-2 rounded-lg text-white font-medium text-sm shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+          style={{ 
+            background: THEME.primaryGradient,
+            boxShadow: `0 4px 12px ${THEME.primaryGlow}`
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.boxShadow = `0 8px 20px ${THEME.primary}`;
+            e.currentTarget.style.transform = 'scale(1.02)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.boxShadow = `0 4px 12px ${THEME.primaryGlow}`;
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
         >
           <span>Generate Resume</span>
           <span>→</span>
