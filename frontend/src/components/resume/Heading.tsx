@@ -34,6 +34,14 @@ const DatePicker = ({
   const [viewMode, setViewMode] = useState<'days' | 'months' | 'years'>('days');
   const pickerRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+  if (value) {
+    setSelectedDate(new Date(value));
+  } else {
+    setSelectedDate(null);
+  }
+}, [value]);
+
   // Close picker when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -79,14 +87,20 @@ const DatePicker = ({
     }
   };
 
-  const handleDateSelect = (day: number) => {
-    const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    const formattedDate = newDate.toISOString().split('T')[0];
-    setSelectedDate(newDate);
-    onChange(formattedDate);
-    setIsOpen(false);
-    setViewMode('days');
-  };
+const handleDateSelect = (day: number) => {
+  const newDate = new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth(),
+    day
+  );
+
+  const formattedDate = newDate.toLocaleDateString("en-CA");
+
+  setSelectedDate(newDate);
+  onChange(formattedDate);
+  setIsOpen(false);
+  setViewMode("days");
+};
 
   const handleMonthSelect = (monthIndex: number) => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), monthIndex, 1));
