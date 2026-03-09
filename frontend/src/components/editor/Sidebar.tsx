@@ -83,6 +83,8 @@ export function Sidebar({ resumeId }: { resumeId: string }) {
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [isMobile, setIsMobile]   = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
   const [sidebarSections, setSidebarSections] = useState(
     CORE_SECTIONS.map(id => ALL_SECTIONS.find(s => s.id === id)).filter(Boolean) as any[]
   );
@@ -99,6 +101,13 @@ export function Sidebar({ resumeId }: { resumeId: string }) {
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
+
+  useEffect(() => {
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    setUser(JSON.parse(storedUser));
+  }
+}, []);
 
   useEffect(() => { if (isMobile && sidebarOpen) setSidebarOpen(false); }, [isMobile]);
   useEffect(() => { setSidebarSections(getSidebarSections(data, completedSections, selectedSection)); }, [data, completedSections, selectedSection]);
@@ -511,63 +520,158 @@ export function Sidebar({ resumeId }: { resumeId: string }) {
             </div>
 
             {/* Enhanced User Footer */}
-            <div style={{ 
-              padding: isMobile ? "16px" : "20px",
-              borderTop: `1px solid ${W10}`, 
-              background: `linear-gradient(180deg, ${BLUE}80 0%, ${BLUE} 100%)`,
-              display: "flex",
-              alignItems: "center",
-              gap: "14px",
-              minHeight: isMobile ? "80px" : "88px"
-            }}>
-             
+<div style={{ 
+  padding: isMobile ? "16px" : "10px",
+  borderTop: `1px solid ${W10}`, 
+  background: `linear-gradient(180deg, ${BLUE} 0%, ${BLUE}CC 100%)`,
+  display: "flex",
+  alignItems: "center",
+  gap: "14px",
+  minHeight: isMobile ? "80px" : "88px",
+  position: "relative",
+  overflow: "hidden"
+}}>
+  
+  {/* Decorative gradient overlay */}
+  <div style={{
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "1px",
+    background: `linear-gradient(90deg, transparent, ${WHITE}20, transparent)`,
+  }} />
 
-              {((sidebarOpen && !isMobile) || (isMobile && sidebarOpen)) && (
-                <>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                   
-                    <div style={{ 
-                      display: "flex", 
-                      alignItems: "center", 
-                      gap: "6px",
-                      background: W10,
-                      padding: "4px 8px",
-                      borderRadius: "20px",
-                      width: "fit-content"
-                    }}>
-                      <ShieldCheck size={10} color={WHITE} />
-                      <span style={{ color: W55, fontSize: "11px", fontWeight: 500 }}>Pro Plan</span>
-                    </div>
-                  </div>
+  {/* User Avatar with Status Indicator */}
+  <div style={{ position: "relative" }}>
+    <div style={{ 
+      width: isMobile ? 40 : 44, 
+      height: isMobile ? 40 : 44, 
+      borderRadius: "14px", 
+      background: ACCENT_GRADIENT,
+      display: "flex", 
+      alignItems: "center", 
+      justifyContent: "center",
+      flexShrink: 0,
+      boxShadow: `0 8px 20px ${BLUE_GLOW}`,
+      transition: "transform 0.2s ease, box-shadow 0.2s ease",
+      cursor: "pointer"
+    }}
+    onMouseEnter={e => {
+      e.currentTarget.style.transform = "scale(1.05)";
+      e.currentTarget.style.boxShadow = `0 12px 25px ${BLUE}`;
+    }}
+    onMouseLeave={e => {
+      e.currentTarget.style.transform = "scale(1)";
+      e.currentTarget.style.boxShadow = `0 8px 20px ${BLUE_GLOW}`;
+    }}>
+      <CircleUserRound size={isMobile ? 22 : 24} color="white" strokeWidth={1.8} />
+    </div>
+    
+   
+  </div>
 
-                  {/* <div style={{ display: "flex", gap: "8px" }}>
-                   
-                    <button style={{
-                      background: W10,
-                      border: "none",
-                      borderRadius: "8px",
-                      padding: isMobile ? "6px" : "8px",
-                      color: W55,
-                      cursor: "pointer",
-                      transition: "all 0.2s ease",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center"
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = W22;
-                      e.currentTarget.style.color = WHITE;
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = W10;
-                      e.currentTarget.style.color = W55;
-                    }}>
-                      <LogOut size={isMobile ? 12 : 14} />
-                    </button>
-                  </div> */}
-                </>
-              )}
-            </div>
+  {((sidebarOpen && !isMobile) || (isMobile && sidebarOpen)) && (
+    <>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        
+        {/* User Name with Greeting */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+          marginBottom: "2px"
+        }}>
+          <span style={{
+            color: WHITE,
+            fontSize: "14px",
+            fontWeight: 600,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            letterSpacing: "-0.01em"
+          }}>
+            {user?.name || "Guest User"}
+          </span>
+         
+        </div>
+
+        {/* User Email with Copy Icon */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+          marginBottom: "8px",
+          color: W55,
+          fontSize: "11px",
+          cursor: "pointer",
+          transition: "color 0.2s ease",
+          width: "fit-content"
+        }}
+        onMouseEnter={e => e.currentTarget.style.color = WHITE}
+        onMouseLeave={e => e.currentTarget.style.color = W55}
+        onClick={() => {
+          if (user?.email) {
+            navigator.clipboard.writeText(user.email);
+            // You can add a toast notification here
+          }
+        }}
+        title="Click to copy email">
+          <span style={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "120px"
+          }}>
+            {user?.email || "guest@example.com"}
+          </span>
+          {/* <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg> */}
+        </div>
+
+        {/* Plan Badge with Usage Indicator */}
+        {/* <div style={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: "8px",
+          flexWrap: "wrap"
+        }}>
+          <div style={{ 
+            display: "flex", 
+            alignItems: "center", 
+            gap: "6px",
+            background: W10,
+            padding: "4px 10px",
+            borderRadius: "20px",
+            width: "fit-content",
+            border: `1px solid ${W15}`,
+            transition: "all 0.2s ease",
+            cursor: "pointer"
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = W15;
+            e.currentTarget.style.borderColor = W22;
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = W10;
+            e.currentTarget.style.borderColor = W15;
+          }}>
+            <ShieldCheck size={11} color={WHITE} />
+            <span style={{ color: WHITE, fontSize: "11px", fontWeight: 600 }}>
+              {user?.role === "user" ? "Free" : "Pro"}
+            </span>
+          </div>
+
+         
+        </div> */}
+      </div>
+
+    
+    </>
+  )}
+</div>
           </>
         )}
       </div>
