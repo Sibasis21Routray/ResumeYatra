@@ -17,7 +17,7 @@ const ALL_SECTIONS = [
   { id: "experience",         label: "Work Experience",              iconName: "briefcase" },
   { id: "projects",           label: "Projects",                     iconName: "cog" },
   { id: "education",          label: "Education",                    iconName: "graduation" },
-  { id: "academicCampus",     label: "Student Life",                 iconName: "academicCampus" },
+  { id: "academicCampus",     label: "Student",                 iconName: "academicCampus" },
   { id: "professionalContext",label: "Professional Context",         iconName: "building" },
   { id: "skills",             label: "Skills",                       iconName: "lightbulb" },
   { id: "languages",          label: "Languages",                    iconName: "globe" },
