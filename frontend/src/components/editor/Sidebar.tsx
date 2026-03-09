@@ -420,7 +420,7 @@ export function Sidebar({ resumeId }: { resumeId: string }) {
                 src={logo} 
                 alt="logo" 
                 style={{ 
-                  height: isMobile ? 28 : 32, 
+                  height: isMobile ? 52 : 52, 
                   filter: "brightness(0) invert(1)",
                   cursor: "pointer",
                   transition: "opacity 0.2s ease"
