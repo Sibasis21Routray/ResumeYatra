@@ -69,6 +69,12 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
             : { name: s.name || "", level: s.level }
         );
     }
+    if (typeof data.skills === "string" && data.skills.includes("<ul>")) {
+      const matches = data.skills.match(/<li>(.*?)<\/li>/g);
+      if (matches) {
+        return matches.map(m => ({ name: m.replace(/<\/?li>/g, '').trim() }));
+      }
+    }
     return data.skills
       .split(",")
       .slice(0, 15)
@@ -91,15 +97,6 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
 
   const certifications = processCertifications();
   const skills = processSkills();
-
-  // Helper arrays for additional sections
-  const internships = data.internships || [];
-  const academicProjects = data.academicProjects || [];
-  const leadershipPositions = data.leadershipPositions || [];
-  const trainingPrograms = data.trainingPrograms || [];
-  const scholarships = data.scholarships || [];
-  const coCurricular = data.coCurricular || [];
-  const extracurricular = data.extracurricular || [];
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -355,6 +352,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
       justify-content: center;
       gap: 12px;
       margin-top: 8px;
+      flex-wrap: wrap;
     }
 
     .social-link {
@@ -366,6 +364,14 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
 
     .social-link:hover {
       color: var(--accent);
+    }
+
+    /* Two Column Grid */
+    .two-column-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 10px;
     }
 
     /* Print Styles */
@@ -417,13 +423,17 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         content: "";
         margin: 0;
       }
+      
+      .two-column-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header data-section="personal">
-      <h1 class="name">${escapeHtml(data.personal?.name || "Your Name")}</h1>
+      <h1 class="name">${escapeHtml(data.personal?.name || "Your Name")}${data.personal?.middleName ? ` ${escapeHtml(data.personal.middleName)}` : ""}</h1>
       ${
         data.personal?.title
           ? `<div class="title">${escapeHtml(data.personal.title)}</div>`
@@ -436,7 +446,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
           data.personal?.country ||
           data.personal?.pinCode ||
           data.personal?.fullAddress
-            ? `<span data-section="contact">${[
+            ? `<span data-section="contact">📍 ${[
                 data.personal?.location,
                 data.personal?.city,
                 data.personal?.country,
@@ -449,21 +459,21 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         }
         ${
           data.personal?.phone
-            ? `<span data-section="contact">${escapeHtml(
+            ? `<span data-section="contact">📞 ${escapeHtml(
                 data.personal.phone
               )}</span>`
             : ""
         }
         ${
           data.personal?.alternatePhone
-            ? `<span data-section="contact">${escapeHtml(
+            ? `<span data-section="contact">📞 ${escapeHtml(
                 data.personal.alternatePhone
               )}</span>`
             : ""
         }
         ${
           data.personal?.email
-            ? `<span data-section="contact"><a href="mailto:${escapeHtml(
+            ? `<span data-section="contact">✉️ <a href="mailto:${escapeHtml(
                 data.personal.email
               )}">${escapeHtml(data.personal.email)}</a></span>`
             : ""
@@ -489,56 +499,41 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
               )}" target="_blank">Portfolio</a></span>`
             : ""
         }
-        ${
-          data.personal?.personalInfoDisplay === "inline" &&
-          (data.personal?.fathersName ||
-            data.personal?.dateOfBirth ||
-            data.personal?.dob ||
-            data.personal?.gender ||
-            data.personal?.maritalStatus ||
-            data.personal?.nationality)
-            ? `
-        ${
-          data.personal?.fathersName
-            ? `<span data-section="contact">Father: ${escapeHtml(
-                data.personal.fathersName
-              )}</span>`
-            : ""
-        }
-        ${
-          data.personal?.dateOfBirth || data.personal?.dob
-            ? `<span data-section="contact">DOB: ${escapeHtml(
-                data.personal?.dateOfBirth || data.personal?.dob
-              )}</span>`
-            : ""
-        }
-        ${
-          data.personal?.gender
-            ? `<span data-section="contact">Gender: ${escapeHtml(
-                data.personal.gender
-              )}</span>`
-            : ""
-        }
-        ${
-          data.personal?.maritalStatus
-            ? `<span data-section="contact">Marital: ${escapeHtml(
-                data.personal.maritalStatus
-              )}</span>`
-            : ""
-        }
-        ${
-          data.personal?.nationality
-            ? `<span data-section="contact">Nationality: ${escapeHtml(
-                data.personal.nationality
-              )}</span>`
-            : ""
-        }
-        `
-            : ""
-        }
       </div>
     </header>
 
+    <!-- Professional Context -->
+    ${
+      data.professionalContext && Object.values(data.professionalContext).some(v => v)
+        ? `
+    <div class="section" data-section="professionalContext">
+      <div class="metrics-grid">
+        ${data.professionalContext.totalExperience ? `
+        <div class="metric-item">
+          <div class="metric-value">${escapeHtml(data.professionalContext.totalExperience)}</div>
+          <div class="metric-label">Total Experience</div>
+        </div>` : ''}
+        ${data.professionalContext.teamSize ? `
+        <div class="metric-item">
+          <div class="metric-value">${escapeHtml(data.professionalContext.teamSize)}</div>
+          <div class="metric-label">Team Size</div>
+        </div>` : ''}
+        ${data.professionalContext.industry ? `
+        <div class="metric-item">
+          <div class="metric-value">${escapeHtml(data.professionalContext.industry)}</div>
+          <div class="metric-label">Industry</div>
+        </div>` : ''}
+        ${data.professionalContext.functionalDomain ? `
+        <div class="metric-item">
+          <div class="metric-value">${escapeHtml(data.professionalContext.functionalDomain)}</div>
+          <div class="metric-label">Domain</div>
+        </div>` : ''}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Personal Details (if not inline) -->
     ${
       data.personal?.personalInfoDisplay !== "inline" &&
       (data.personal?.fathersName ||
@@ -599,6 +594,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- Summary -->
     ${
       data.sectionVisibility?.summary !== false && data.summary
         ? `
@@ -609,6 +605,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- Career Objective -->
     ${
       typeof data.careerObjective === "string" &&
       data.careerObjective.trim().length > 0
@@ -620,6 +617,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- Work Experience -->
     ${
       data.sectionVisibility?.experience !== false &&
       sortedExperience.length > 0
@@ -638,19 +636,12 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
           </div>
           <div class="entry-subtitle">
             <span class="entry-company">${escapeHtml(exp.company || "")}${
-            exp.domain ? ` | ${escapeHtml(exp.domain)}` : ""
+            exp.location ? ` | ${escapeHtml(exp.location)}` : ""
           }</span>
-            <span class="entry-location">${escapeHtml(
-              exp.location || ""
-            )}</span>
           </div>
           ${
             exp.description
-              ? `<div class="entry-content"><ul>${exp.description
-                  .split("\n")
-                  .filter((line: string) => line.trim())
-                  .map((line: string) => `<li>${escapeHtml(line.trim())}</li>`)
-                  .join("")}</ul></div>`
+              ? `<div class="entry-content">${exp.description}</div>`
               : ""
           }
           ${
@@ -668,24 +659,22 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- Internships -->
     ${
-      internships && internships.length > 0
+      data.internships && data.internships.length > 0
         ? `
     <div class="section" data-section="internships">
       <div class="section-header"><div class="section-title">Internships</div></div>
-      ${internships
+      ${data.internships
         .map(
           (item: any, index: number) => `
         <div class="entry" data-index="${index}">
           <div class="entry-header">
             <span class="entry-title">${escapeHtml(item.title || "")}</span>
-            <span class="entry-date">${formatDate(item.startDate || "")} — ${
-            item.endDate ? formatDate(item.endDate) : ""
-          }</span>
+            <span class="entry-date">${escapeHtml(item.duration || "")}</span>
           </div>
           <div class="entry-subtitle">
             <span class="entry-company">${escapeHtml(item.company || "")}</span>
-            <span class="entry-location">${escapeHtml(item.location || "")}</span>
           </div>
           <div class="entry-content">${escapeHtml(item.description || "")}</div>
         </div>
@@ -696,6 +685,34 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- Training Programs -->
+    ${
+      data.trainingPrograms && data.trainingPrograms.length > 0
+        ? `
+    <div class="section" data-section="trainingPrograms">
+      <div class="section-header"><div class="section-title">Training Programs</div></div>
+      ${data.trainingPrograms
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.name || "")}</span>
+            <span class="entry-date">${formatDate(item.completionDate || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.provider || item.organization || "")}</span>
+            ${item.duration ? `<span class="entry-location">${escapeHtml(item.duration)}</span>` : ""}
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Education -->
     ${
       data.sectionVisibility?.education !== false && data.education?.length > 0
         ? `
@@ -706,33 +723,48 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
           (edu: any, index: number) => `
         <div class="entry" data-index="${index}">
           <div class="entry-header">
-            <span class="entry-title">${escapeHtml(edu.school || "")}</span>
-            <span class="entry-date">${formatDate(
-              edu.graduationDate || ""
-            )}</span>
+            <span class="entry-title">${escapeHtml(edu.degree || "")}${edu.field ? ` in ${escapeHtml(edu.field)}` : ""}</span>
+            <span class="entry-date">${edu.graduationDate || ""}</span>
           </div>
           <div class="entry-subtitle">
-            <span>${escapeHtml(edu.degree || "")}${
-            edu.field ? `, ${escapeHtml(edu.field)}` : ""
-          }${
-            edu.qualification ? ` (${escapeHtml(edu.qualification)})` : ""
-          }</span>
-            <span class="entry-location">${escapeHtml(
-              edu.location || ""
-            )}</span>
+            <span class="entry-company">${escapeHtml(edu.school || "")}${edu.location ? `, ${escapeHtml(edu.location)}` : ""}</span>
           </div>
+          ${edu.grade ? `<div class="entry-content">Grade: ${escapeHtml(edu.grade)}</div>` : ""}
+          ${edu.description ? `<div class="entry-content">${escapeHtml(edu.description)}</div>` : ""}
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Academic Projects -->
+    ${
+      data.academicProjects && data.academicProjects.length > 0
+        ? `
+    <div class="section" data-section="academicProjects">
+      <div class="section-header"><div class="section-title">Academic Projects</div></div>
+      ${data.academicProjects
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.name || item.title || "")}</span>
+            <span class="entry-date">${escapeHtml(item.duration || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.institution || "")}${item.course ? ` | Course: ${escapeHtml(item.course)}` : ""}</span>
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
           ${
-            edu.cgpa || edu.gpa
-              ? `<div class="entry-content">CGPA: ${escapeHtml(
-                  edu.cgpa || edu.gpa
-                )}</div>`
+            item.technologies && item.technologies.length > 0
+              ? `<div class="entry-content"><strong>Technologies:</strong> ${Array.isArray(item.technologies) ? item.technologies.map((t: string) => escapeHtml(t)).join(', ') : escapeHtml(item.technologies)}</div>`
               : ""
           }
           ${
-            edu.description
-              ? `<div class="entry-content">${escapeHtml(
-                  edu.description
-                )}</div>`
+            item.url
+              ? `<div class="entry-content"><a href="${escapeHtml(item.url)}" target="_blank" style="color: var(--accent);">View Project</a></div>`
               : ""
           }
         </div>
@@ -743,6 +775,309 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- Client Projects -->
+    ${
+      data.clientProjects && data.clientProjects.length > 0
+        ? `
+    <div class="section" data-section="clientProjects">
+      <div class="section-header"><div class="section-title">Client Projects</div></div>
+      ${data.clientProjects
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.name || "")}</span>
+            <span class="entry-date">${escapeHtml(item.duration || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.clientOrganization || "")}${item.role ? ` | Role: ${escapeHtml(item.role)}` : ""}</span>
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+          ${
+            item.toolsTechnologies
+              ? `<div class="entry-content"><strong>Tools:</strong> ${escapeHtml(item.toolsTechnologies)}</div>`
+              : ""
+          }
+          ${
+            item.projectUrl
+              ? `<div class="entry-content"><a href="${escapeHtml(item.projectUrl)}" target="_blank" style="color: var(--accent);">View Project</a></div>`
+              : ""
+          }
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Portfolio -->
+    ${
+      data.portfolio && data.portfolio.length > 0
+        ? `
+    <div class="section" data-section="portfolio">
+      <div class="section-header"><div class="section-title">Portfolio</div></div>
+      ${data.portfolio
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.name || "")}</span>
+            <span class="entry-date">${escapeHtml(item.type || "")}${item.platform ? ` | ${escapeHtml(item.platform)}` : ""}</span>
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+          ${
+            item.url
+              ? `<div class="entry-content"><a href="${escapeHtml(item.url)}" target="_blank" style="color: var(--accent);">View Portfolio</a></div>`
+              : ""
+          }
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Leadership Positions -->
+    ${
+      data.leadershipPositions && data.leadershipPositions.length > 0
+        ? `
+    <div class="section" data-section="leadershipPositions">
+      <div class="section-header"><div class="section-title">Leadership & Positions</div></div>
+      ${data.leadershipPositions
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.position || item.title || "")}</span>
+            <span class="entry-date">${formatDate(item.startDate || "")} — ${
+            item.endDate ? formatDate(item.endDate) : ""
+          }</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.organization || "")}</span>
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Volunteering -->
+    ${
+      data.volunteering && data.volunteering.length > 0
+        ? `
+    <div class="section" data-section="volunteering">
+      <div class="section-header"><div class="section-title">Volunteering</div></div>
+      ${data.volunteering
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.role || "")}</span>
+            <span class="entry-date">${escapeHtml(item.duration || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.organization || "")}${item.causeArea ? ` | ${escapeHtml(item.causeArea)}` : ""}</span>
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Military Service -->
+    ${
+      data.militaryService && data.militaryService.length > 0
+        ? `
+    <div class="section" data-section="militaryService">
+      <div class="section-header"><div class="section-title">Military Service</div></div>
+      ${data.militaryService
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.rank || "")} - ${escapeHtml(item.branch || "")}</span>
+            <span class="entry-date">${escapeHtml(item.duration || "")}</span>
+          </div>
+          ${item.specialization ? `<div class="entry-subtitle">${escapeHtml(item.specialization)}</div>` : ""}
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Teaching Experience -->
+    ${
+      data.teachingExperience && data.teachingExperience.length > 0
+        ? `
+    <div class="section" data-section="teachingExperience">
+      <div class="section-header"><div class="section-title">Teaching Experience</div></div>
+      ${data.teachingExperience
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.title || "")}</span>
+            <span class="entry-date">${escapeHtml(item.duration || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.institution || "")}${item.subjectCourseTaught ? ` | ${escapeHtml(item.subjectCourseTaught)}` : ""}</span>
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Mentorship Experience -->
+    ${
+      data.mentorshipExperience && data.mentorshipExperience.length > 0
+        ? `
+    <div class="section" data-section="mentorshipExperience">
+      <div class="section-header"><div class="section-title">Mentorship Experience</div></div>
+      ${data.mentorshipExperience
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.mentorshipArea || "")}</span>
+            <span class="entry-date">${escapeHtml(item.duration || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.organizationPlatform || "")}${item.menteeLevel ? ` | Mentee Level: ${escapeHtml(item.menteeLevel)}` : ""}</span>
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Research Grants -->
+    ${
+      data.researchGrants && data.researchGrants.length > 0
+        ? `
+    <div class="section" data-section="researchGrants">
+      <div class="section-header"><div class="section-title">Research Grants</div></div>
+      ${data.researchGrants
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.title || "")}</span>
+            <span class="entry-date">${escapeHtml(item.year || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.agency || "")}${item.amount ? ` | Amount: ${escapeHtml(item.amount)}` : ""}</span>
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Publications -->
+    ${
+      data.publications && data.publications.length > 0
+        ? `
+    <div class="section" data-section="publications">
+      <div class="section-header"><div class="section-title">Publications</div></div>
+      ${data.publications
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.title || "")}</span>
+            <span class="entry-date">${escapeHtml(item.year || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.journalPublisher || "")}${item.publicationType ? ` | ${escapeHtml(item.publicationType)}` : ""}</span>
+          </div>
+          ${item.authors ? `<div class="entry-content"><strong>Authors:</strong> ${escapeHtml(item.authors)}</div>` : ""}
+          ${
+            item.urlDoi
+              ? `<div class="entry-content"><a href="${escapeHtml(item.urlDoi)}" target="_blank" style="color: var(--accent);">View Publication</a></div>`
+              : ""
+          }
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Patents -->
+    ${
+      data.patents && data.patents.length > 0
+        ? `
+    <div class="section" data-section="patents">
+      <div class="section-header"><div class="section-title">Patents</div></div>
+      ${data.patents
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.title || "")}</span>
+            <span class="entry-date">${escapeHtml(item.year || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.patentNumber || "")}${item.issuingAuthority ? ` | ${escapeHtml(item.issuingAuthority)}` : ""}</span>
+          </div>
+          <div class="entry-content"><strong>Status:</strong> ${escapeHtml(item.status || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Test Scores -->
+    ${
+      data.testScores && data.testScores.length > 0
+        ? `
+    <div class="section" data-section="testScores">
+      <div class="section-header"><div class="section-title">Test Scores</div></div>
+      ${data.testScores
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.testName || "")}</span>
+            <span class="entry-date">${escapeHtml(item.year || "")}</span>
+          </div>
+          <div class="entry-content">
+            <strong>Score:</strong> ${escapeHtml(item.score || "")}${item.percentileRank ? ` (${escapeHtml(item.percentileRank)} percentile)` : ""}
+          </div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Skills -->
     ${
       skills.length > 0
         ? `
@@ -754,7 +1089,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
             (skill: any, index: number) => `
           <span class="skill-item" data-index="${index}">${escapeHtml(
               skill.name
-            )}</span>
+            )}${skill.level ? ` (${escapeHtml(skill.level)})` : ""}</span>
         `
           )
           .join("")}
@@ -763,6 +1098,64 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- Tools & Technologies -->
+    ${
+      data.toolsTechnologies && data.toolsTechnologies.length > 0
+        ? `
+    <div class="section" data-section="toolsTechnologies">
+      <div class="section-header"><div class="section-title">Tools & Technologies</div></div>
+      <div class="skills-container">
+        ${data.toolsTechnologies
+          .map(
+            (item: any, index: number) => `
+          <span class="skill-item" data-index="${index}">${escapeHtml(item.name || "")}${item.proficiency ? ` (${escapeHtml(item.proficiency)})` : ""}${item.experienceDuration ? ` - ${escapeHtml(item.experienceDuration)}` : ""}</span>
+        `
+          )
+          .join("")}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Methodologies -->
+    ${
+      data.methodologies && data.methodologies.length > 0
+        ? `
+    <div class="section" data-section="methodologies">
+      <div class="section-header"><div class="section-title">Methodologies</div></div>
+      <div class="skills-container">
+        ${data.methodologies
+          .map(
+            (item: any, index: number) => `
+          <span class="skill-item" data-index="${index}">${escapeHtml(item.name || "")}${item.certification ? ` (${escapeHtml(item.certification)})` : ""}${item.experienceDuration ? ` - ${escapeHtml(item.experienceDuration)} years` : ""}</span>
+        `
+          )
+          .join("")}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Industry Expertise -->
+    ${
+      data.industryExpertise && data.industryExpertise.length > 0
+        ? `
+    <div class="section" data-section="industryExpertise">
+      <div class="section-header"><div class="section-title">Industry Expertise</div></div>
+      <div class="skills-container">
+        ${data.industryExpertise
+          .map(
+            (item: any, index: number) => `
+          <span class="skill-item" data-index="${index}">${escapeHtml(item.industry || "")}${item.domainArea ? ` - ${escapeHtml(item.domainArea)}` : ""}${item.experienceDuration ? ` (${escapeHtml(item.experienceDuration)} years)` : ""}</span>
+        `
+          )
+          .join("")}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Certifications -->
     ${
       data.sectionVisibility?.certifications !== false &&
       certifications.length > 0
@@ -787,6 +1180,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
                 )}" target="_blank" style="color: var(--accent);">View Certificate</a></div>`
               : ""
           }
+          ${cert.description ? `<div class="entry-content">${escapeHtml(cert.description)}</div>` : ""}
         </div>
       `
         )
@@ -795,6 +1189,257 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- Languages -->
+    ${
+      data.sectionVisibility?.languages !== false && data.languages?.length > 0
+        ? `
+    <div class="section" data-section="languages">
+      <div class="section-header"><div class="section-title">Languages</div></div>
+      <div class="skills-container">
+        ${data.languages
+          .map(
+            (lang: any, index: number) => `
+          <span class="skill-item" data-index="${index}">${escapeHtml(
+              lang.language || lang
+            )}${lang.level ? ` (${escapeHtml(lang.level)})` : ""}${
+              lang.capability ? ` - ${escapeHtml(lang.capability)}` : ""
+            }</span>
+        `
+          )
+          .join("")}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Scholarships -->
+    ${
+      data.scholarships && data.scholarships.length > 0
+        ? `
+    <div class="section" data-section="scholarships">
+      <div class="section-header"><div class="section-title">Scholarships</div></div>
+      ${data.scholarships
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.name || "")}</span>
+            <span class="entry-date">${escapeHtml(item.year || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.provider || item.organization || "")}</span>
+            ${item.amount ? `<span class="entry-location">${escapeHtml(item.amount)}</span>` : ""}
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Awards -->
+    ${
+      data.sectionVisibility?.awards !== false && data.awards?.length > 0
+        ? `
+    <div class="section" data-section="awards">
+      <div class="section-header"><div class="section-title">Awards</div></div>
+      ${data.awards
+        .map(
+          (award: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(award.title || "")}</span>
+            <span class="entry-date">${escapeHtml(award.issueYear || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(award.organization || "")}</span>
+          </div>
+          ${
+            award.description
+              ? `<div class="entry-content">${escapeHtml(award.description)}</div>`
+              : ""
+          }
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Speaking Engagements -->
+    ${
+      data.speakingEngagements && data.speakingEngagements.length > 0
+        ? `
+    <div class="section" data-section="speakingEngagements">
+      <div class="section-header"><div class="section-title">Speaking Engagements</div></div>
+      ${data.speakingEngagements
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.topic || "")}</span>
+            <span class="entry-date">${escapeHtml(item.date || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.eventName || "")}</span>
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Memberships -->
+    ${
+      data.memberships && data.memberships.length > 0
+        ? `
+    <div class="section" data-section="memberships">
+      <div class="section-header"><div class="section-title">Memberships</div></div>
+      ${data.memberships
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.membershipName || "")}</span>
+            <span class="entry-date">${escapeHtml(item.year || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.organizationName || "")}</span>
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Workshops -->
+    ${
+      data.workshops && data.workshops.length > 0
+        ? `
+    <div class="section" data-section="workshops">
+      <div class="section-header"><div class="section-title">Workshops</div></div>
+      ${data.workshops
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.programTitle || "")}</span>
+            <span class="entry-date">${escapeHtml(item.year || "")}</span>
+          </div>
+          <div class="entry-subtitle">
+            <span class="entry-company">${escapeHtml(item.conductedBy || "")}</span>
+          </div>
+          <div class="entry-content">${escapeHtml(item.description || "")}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Co-curricular Activities -->
+    ${
+      data.coCurricular && data.coCurricular.length > 0
+        ? `
+    <div class="section" data-section="coCurricular">
+      <div class="section-header"><div class="section-title">Co-curricular Activities</div></div>
+      ${data.coCurricular
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.activity || "")}</span>
+            <span class="entry-date">${escapeHtml(item.year || "")}</span>
+          </div>
+          ${item.role ? `<div class="entry-subtitle">Role: ${escapeHtml(item.role)}</div>` : ""}
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Extracurricular Activities -->
+    ${
+      data.extracurricular && data.extracurricular.length > 0
+        ? `
+    <div class="section" data-section="extracurricular">
+      <div class="section-header"><div class="section-title">Extracurricular Activities</div></div>
+      ${data.extracurricular
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <span class="entry-title">${escapeHtml(item.activity || "")}</span>
+            <span class="entry-date">${escapeHtml(item.year || "")}</span>
+          </div>
+          ${item.role ? `<div class="entry-subtitle">Role: ${escapeHtml(item.role)}</div>` : ""}
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Key Achievements -->
+    ${
+      data.keyAchievements &&
+      data.keyAchievements.filter((a: string) => a && a.trim()).length > 0
+        ? `
+    <div class="section" data-section="keyAchievements">
+      <div class="section-header"><div class="section-title">Key Achievements</div></div>
+      ${data.keyAchievements
+        .map(
+          (achievement: string, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-content">• ${escapeHtml(achievement.trim())}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Key Responsibilities -->
+    ${
+      (Array.isArray(data.responsibilities)
+        ? data.responsibilities
+        : (data.responsibilities || "").split("\n")
+      ).filter((line: string) => line && line.trim()).length > 0
+        ? `
+    <div class="section" data-section="responsibilities">
+      <div class="section-header"><div class="section-title">Key Responsibilities</div></div>
+      ${(Array.isArray(data.responsibilities)
+        ? data.responsibilities
+        : (data.responsibilities || "").split("\n")
+      )
+        .filter((line: string) => line.trim())
+        .map(
+          (line: string, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-content">• ${escapeHtml(line.trim())}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Projects (General) -->
     ${
       data.sectionVisibility?.projects !== false && data.projects?.length > 0
         ? `
@@ -837,271 +1482,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
-    ${
-      data.sectionVisibility?.awards !== false && data.awards?.length > 0
-        ? `
-    <div class="section" data-section="awards">
-      <div class="section-header"><div class="section-title">Awards</div></div>
-      ${data.awards
-        .map(
-          (award: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <span class="entry-title">${escapeHtml(award.title || "")}</span>
-            <span class="entry-date">${escapeHtml(award.issueYear || "")}</span>
-          </div>
-          <div class="entry-subtitle">
-            <span class="entry-company">${escapeHtml(
-              award.organization || ""
-            )}</span>
-          </div>
-          ${
-            award.description
-              ? `<div class="entry-content">${escapeHtml(
-                  award.description
-                )}</div>`
-              : ""
-          }
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    ${
-      academicProjects && academicProjects.length > 0
-        ? `
-    <div class="section" data-section="academicProjects">
-      <div class="section-header"><div class="section-title">Academic Projects</div></div>
-      ${academicProjects
-        .map(
-          (item: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <span class="entry-title">${escapeHtml(item.name || item.title || "")}</span>
-            <span class="entry-date">${escapeHtml(item.duration || "")}</span>
-          </div>
-          <div class="entry-subtitle">
-            <span class="entry-company">${escapeHtml(item.institution || "")}</span>
-          </div>
-          <div class="entry-content">${escapeHtml(item.description || "")}</div>
-          ${
-            item.technologies
-              ? `<div class="entry-content"><strong>Technologies:</strong> ${escapeHtml(item.technologies)}</div>`
-              : ""
-          }
-          ${
-            item.url
-              ? `<div class="entry-content"><a href="${escapeHtml(item.url)}" target="_blank" style="color: var(--accent);">View Project</a></div>`
-              : ""
-          }
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    ${
-      leadershipPositions && leadershipPositions.length > 0
-        ? `
-    <div class="section" data-section="leadershipPositions">
-      <div class="section-header"><div class="section-title">Leadership & Positions</div></div>
-      ${leadershipPositions
-        .map(
-          (item: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <span class="entry-title">${escapeHtml(item.position || item.title || "")}</span>
-            <span class="entry-date">${formatDate(item.startDate || "")} — ${
-            item.endDate ? formatDate(item.endDate) : ""
-          }</span>
-          </div>
-          <div class="entry-subtitle">
-            <span class="entry-company">${escapeHtml(item.organization || "")}</span>
-          </div>
-          <div class="entry-content">${escapeHtml(item.description || "")}</div>
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    ${
-      trainingPrograms && trainingPrograms.length > 0
-        ? `
-    <div class="section" data-section="trainingPrograms">
-      <div class="section-header"><div class="section-title">Training Programs</div></div>
-      ${trainingPrograms
-        .map(
-          (item: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <span class="entry-title">${escapeHtml(item.name || "")}</span>
-            <span class="entry-date">${formatDate(item.completionDate || "")}</span>
-          </div>
-          <div class="entry-subtitle">
-            <span class="entry-company">${escapeHtml(item.provider || item.organization || "")}</span>
-            ${
-              item.duration
-                ? `<span class="entry-location">${escapeHtml(item.duration)}</span>`
-                : ""
-            }
-          </div>
-          <div class="entry-content">${escapeHtml(item.description || "")}</div>
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    ${
-      scholarships && scholarships.length > 0
-        ? `
-    <div class="section" data-section="scholarships">
-      <div class="section-header"><div class="section-title">Scholarships</div></div>
-      ${scholarships
-        .map(
-          (item: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <span class="entry-title">${escapeHtml(item.name || "")}</span>
-            <span class="entry-date">${escapeHtml(item.year || "")}</span>
-          </div>
-          <div class="entry-subtitle">
-            <span class="entry-company">${escapeHtml(item.provider || item.organization || "")}</span>
-            ${
-              item.amount
-                ? `<span class="entry-location">${escapeHtml(item.amount)}</span>`
-                : ""
-            }
-          </div>
-          <div class="entry-content">${escapeHtml(item.description || "")}</div>
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    ${
-      coCurricular && coCurricular.length > 0
-        ? `
-    <div class="section" data-section="coCurricular">
-      <div class="section-header"><div class="section-title">Co-curricular Activities</div></div>
-      ${coCurricular
-        .map(
-          (item: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <span class="entry-title">${escapeHtml(item.activity || "")}</span>
-            <span class="entry-date">${
-              item.year ||
-              (item.startDate ? `${formatDate(item.startDate)} — ${formatDate(item.endDate || "")}` : "")
-            }</span>
-          </div>
-          <div class="entry-subtitle">
-            <span class="entry-company">${escapeHtml(item.organization || "")}</span>
-            ${
-              item.role
-                ? `<span class="entry-location">${escapeHtml(item.role)}</span>`
-                : ""
-            }
-          </div>
-          <div class="entry-content">${escapeHtml(item.description || "")}</div>
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    ${
-      extracurricular && extracurricular.length > 0
-        ? `
-    <div class="section" data-section="extracurricular">
-      <div class="section-header"><div class="section-title">Extracurricular Activities</div></div>
-      ${extracurricular
-        .map(
-          (item: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <span class="entry-title">${escapeHtml(item.activity || "")}</span>
-            <span class="entry-date">${
-              item.year ||
-              (item.startDate ? `${formatDate(item.startDate)} — ${formatDate(item.endDate || "")}` : "")
-            }</span>
-          </div>
-          <div class="entry-subtitle">
-            <span class="entry-company">${escapeHtml(item.organization || "")}</span>
-            ${
-              item.role
-                ? `<span class="entry-location">${escapeHtml(item.role)}</span>`
-                : ""
-            }
-          </div>
-          <div class="entry-content">${escapeHtml(item.description || "")}</div>
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    ${
-      data.keyAchievements &&
-      data.keyAchievements.filter((a: string) => a && a.trim()).length > 0
-        ? `
-    <div class="section" data-section="keyAchievements">
-      <div class="section-header"><div class="section-title">Key Achievements</div></div>
-      ${data.keyAchievements
-        .map(
-          (achievement: string, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-content">• ${escapeHtml(achievement.trim())}</div>
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    ${
-      (Array.isArray(data.responsibilities)
-        ? data.responsibilities
-        : (data.responsibilities || "").split("\n")
-      ).filter((line: string) => line && line.trim()).length > 0
-        ? `
-    <div class="section" data-section="responsibilities">
-      <div class="section-header"><div class="section-title">Key Responsibilities</div></div>
-      ${(Array.isArray(data.responsibilities)
-        ? data.responsibilities
-        : (data.responsibilities || "").split("\n")
-      )
-        .filter((line: string) => line.trim())
-        .map(
-          (line: string, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-content">• ${escapeHtml(line.trim())}</div>
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
+    <!-- Tools (Simple List) -->
     ${
       (Array.isArray(data.tools)
         ? data.tools
@@ -1110,7 +1491,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
       0
         ? `
     <div class="section" data-section="tools">
-      <div class="section-header"><div class="section-title">Tools & Technologies</div></div>
+      <div class="section-header"><div class="section-title">Tools</div></div>
       <div class="skills-container">
         ${(Array.isArray(data.tools)
           ? data.tools
@@ -1131,28 +1512,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
-    ${
-      data.sectionVisibility?.languages !== false && data.languages?.length > 0
-        ? `
-    <div class="section" data-section="languages">
-      <div class="section-header"><div class="section-title">Languages</div></div>
-      <div class="skills-container">
-        ${data.languages
-          .map(
-            (lang: any, index: number) => `
-          <span class="skill-item" data-index="${index}">${escapeHtml(
-              lang.language || lang
-            )}${lang.level ? ` (${escapeHtml(lang.level)})` : ""}${
-              lang.capability ? ` - ${escapeHtml(lang.capability)}` : ""
-            }</span>
-        `
-          )
-          .join("")}
-      </div>
-    </div>`
-        : ""
-    }
-
+    <!-- Hobbies -->
     ${
       data.sectionVisibility?.hobbies !== false && data.hobbies?.length > 0
         ? `
@@ -1178,6 +1538,45 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- Availability & Work Authorization -->
+    ${
+      data.availabilityWorkAuth && Object.values(data.availabilityWorkAuth).some(v => v)
+        ? `
+    <div class="section" data-section="availabilityWorkAuth">
+      <div class="section-header"><div class="section-title">Availability</div></div>
+      <div class="skills-container">
+        ${data.availabilityWorkAuth.availabilityNoticePeriod ? `<span class="skill-item">Notice: ${escapeHtml(data.availabilityWorkAuth.availabilityNoticePeriod)}</span>` : ''}
+        ${data.availabilityWorkAuth.workAuthorizationStatus ? `<span class="skill-item">Work Auth: ${escapeHtml(data.availabilityWorkAuth.workAuthorizationStatus)}</span>` : ''}
+        ${data.availabilityWorkAuth.preferredLocation ? `<span class="skill-item">Preferred: ${escapeHtml(data.availabilityWorkAuth.preferredLocation)}</span>` : ''}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Social Profiles -->
+    ${
+      data.socialProfiles && data.socialProfiles.length > 0
+        ? `
+    <div class="section" data-section="socialProfiles">
+      <div class="section-header"><div class="section-title">Social Profiles</div></div>
+      <div class="social-links">
+        ${data.socialProfiles
+          .map(
+            (profile: any, index: number) => `
+          <a class="social-link" href="${escapeHtml(
+            profile.url
+          )}" target="_blank" data-index="${index}">${escapeHtml(
+              profile.platform || "Profile"
+            )}</a>
+        `
+          )
+          .join("")}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Social Links -->
     ${
       data.sectionVisibility?.socialLinks !== false &&
       data.socialLinks?.length > 0
@@ -1201,6 +1600,31 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- References -->
+    ${
+      data.references && data.references.length > 0
+        ? `
+    <div class="section" data-section="references">
+      <div class="section-header"><div class="section-title">References</div></div>
+      <div class="two-column-grid">
+        ${data.references
+          .map(
+            (ref: any, index: number) => `
+          <div class="entry" data-index="${index}">
+            <div class="entry-title">${escapeHtml(ref.name || "")}</div>
+            <div class="entry-subtitle">${escapeHtml(ref.designationRelationship || "")}</div>
+            <div class="entry-subtitle">${escapeHtml(ref.organization || "")}</div>
+            <div class="entry-content">${escapeHtml(ref.contactInformation || "")}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Custom Sections -->
     ${
       data.customSections && data.customSections.length > 0
         ? data.customSections

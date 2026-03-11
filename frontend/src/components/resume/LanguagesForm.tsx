@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Edit, Trash2, AlertCircle, Plus, Globe } from "lucide-react";
+import { Edit, Trash2, AlertCircle, Plus, Globe, ChevronDown, ChevronUp } from "lucide-react";
 import toast from 'react-hot-toast';
 
 // Toast configuration
@@ -12,17 +12,25 @@ const toastStyle = {
 
 interface LanguageItem {
   language: string;
-  proficiency: string; // Native/Bilingual, Full Professional, Professional Working, Limited Working, Elementary
-  capability: string; // Speak, Read & Write, Read, Write & Speak
+  proficiency?: string; // Made optional - Native/Bilingual, Full Professional, Professional Working, Limited Working, Elementary
+  capability?: string; // Made optional - Speak, Read & Write, Read, Write & Speak
+  levelType: 'proficiency' | 'capability'; // New field to track which type is selected
 }
 
-const COMMON_LANGUAGES = ["English", "Hindi", "Tamil", "Marathi"];
 const ALL_LANGUAGES = [
   "English", "Hindi", "Tamil", "Marathi", "Telugu", "Kannada", "Malayalam",
   "Gujarati", "Bengali", "Punjabi", "Odia", "Assamese", "Urdu", "Kashmiri",
   "Sindhi", "Manipuri", "French", "German", "Spanish", "Portuguese", "Italian",
   "Dutch", "Russian", "Chinese (Mandarin)", "Japanese", "Korean", "Arabic",
-  "Hebrew", "Turkish", "Vietnamese"
+  "Hebrew", "Turkish", "Vietnamese", "Thai", "Indonesian", "Greek", "Polish",
+  "Swedish", "Danish", "Finnish", "Norwegian", "Czech", "Hungarian", "Romanian",
+  "Ukrainian", "Bulgarian", "Serbian", "Croatian", "Slovak", "Slovenian",
+  "Lithuanian", "Latvian", "Estonian", "Icelandic", "Maltese", "Albanian",
+  "Macedonian", "Bosnian", "Montenegrin", "Luxembourgish", "Afrikaans",
+  "Swahili", "Zulu", "Xhosa", "Yoruba", "Igbo", "Hausa", "Amharic",
+  "Somali", "Nepali", "Sinhala", "Burmese", "Khmer", "Lao", "Mongolian",
+  "Persian", "Pashto", "Kurdish", "Armenian", "Georgian", "Azerbaijani",
+  "Kazakh", "Uzbek", "Turkmen", "Kyrgyz", "Tajik", "Hebrew", "Yiddish"
 ];
 
 const PROFICIENCY_OPTIONS = [
@@ -55,29 +63,61 @@ interface LanguagesFormProps {
   onNavigateToSection?: (section: string) => void;
 }
 
-// Styled Input Component
-const StyledInput = ({
+// Styled Input Component with Autocomplete
+const LanguageInputWithAutocomplete = ({
   label,
   value,
   onChange,
+  onSelect,
   placeholder,
   required = false,
   error,
   onBlur,
   icon,
+  suggestions,
+  disabled = false,
 }: {
   label: string;
   value: string | undefined;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSelect: (language: string) => void;
   placeholder?: string;
   required?: boolean;
   error?: string;
   onBlur?: () => void;
   icon?: React.ReactNode;
+  suggestions: string[];
+  disabled?: boolean;
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  let baseInputClass = `w-full ${icon ? 'pl-10' : 'px-4'} py-3 bg-bg-primary dark:bg-dark-bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all duration-200 text-base text-text-primary dark:text-dark-text-primary placeholder:text-sm placeholder:text-text-muted/70 dark:placeholder:text-dark-text-muted/70 shadow-sm hover:shadow-md`;
+  useEffect(() => {
+    if (value) {
+      const filtered = suggestions.filter(lang =>
+        lang.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredSuggestions(filtered);
+    } else {
+      setFilteredSuggestions([]);
+    }
+  }, [value, suggestions]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node) &&
+          inputRef.current && !inputRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  let baseInputClass = `w-full ${icon ? 'pl-10' : 'px-4'} pr-10 py-3 bg-bg-primary dark:bg-dark-bg-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all duration-200 text-base text-text-primary dark:text-dark-text-primary placeholder:text-sm placeholder:text-text-muted/70 dark:placeholder:text-dark-text-muted/70 shadow-sm hover:shadow-md`;
 
   if (error) {
     baseInputClass += " border-red-500 focus:ring-red-500 focus:border-red-500";
@@ -87,30 +127,77 @@ const StyledInput = ({
     baseInputClass += " border-light-border dark:border-dark-border";
   }
 
+  if (disabled) {
+    baseInputClass += " opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800";
+  }
+
+  const handleSuggestionClick = (language: string) => {
+    onSelect(language);
+    setShowSuggestions(false);
+  };
+
   return (
-    <div className="w-full">
+    <div className="w-full relative">
       <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <div className="relative w-full">
         {icon && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted dark:text-dark-text-muted">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted dark:text-dark-text-muted z-10">
             {icon}
           </div>
         )}
         <input
+          ref={inputRef}
           type="text"
           value={value || ""}
           onChange={onChange}
-          placeholder={placeholder}
-          onFocus={() => setIsFocused(true)}
+          onFocus={() => {
+            setIsFocused(true);
+            setShowSuggestions(true);
+          }}
           onBlur={() => {
             setIsFocused(false);
             onBlur?.();
           }}
+          placeholder={placeholder}
+          disabled={disabled}
           className={`${baseInputClass}`}
         />
+        {value && (
+          <button
+            onClick={() => {
+              if (!disabled) {
+                onChange({ target: { value: '' } } as React.ChangeEvent<HTMLInputElement>);
+              }
+            }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-accent transition-colors"
+            type="button"
+          >
+            ×
+          </button>
+        )}
       </div>
+
+      {/* Suggestions Dropdown */}
+      {showSuggestions && !disabled && filteredSuggestions.length > 0 && (
+        <div
+          ref={suggestionsRef}
+          className="absolute z-[100] w-full mt-1 bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-lg shadow-xl max-h-60 overflow-y-auto"
+          style={{ top: '100%', left: 0, right: 0 }}
+        >
+          {filteredSuggestions.map((language) => (
+            <div
+              key={language}
+              onClick={() => handleSuggestionClick(language)}
+              className="px-4 py-2.5 hover:bg-accent/10 dark:hover:bg-dark-accent/10 cursor-pointer text-text-primary dark:text-dark-text-primary transition-colors"
+            >
+              {language}
+            </div>
+          ))}
+        </div>
+      )}
+
       {error && (
         <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
           <AlertCircle className="w-3.5 h-3.5" />
@@ -131,6 +218,7 @@ const StyledSelect = ({
   error,
   onBlur,
   placeholder,
+  disabled = false,
 }: {
   label: string;
   value: string | undefined;
@@ -140,6 +228,7 @@ const StyledSelect = ({
   error?: string;
   onBlur?: () => void;
   placeholder?: string;
+  disabled?: boolean;
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -151,6 +240,10 @@ const StyledSelect = ({
     baseSelectClass += " border-accent dark:border-dark-accent ring-2 ring-accent/20";
   } else {
     baseSelectClass += " border-light-border dark:border-dark-border";
+  }
+
+  if (disabled) {
+    baseSelectClass += " opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800";
   }
 
   return (
@@ -167,6 +260,7 @@ const StyledSelect = ({
             setIsFocused(false);
             onBlur?.();
           }}
+          disabled={disabled}
           className={`${baseSelectClass}`}
         >
           <option value="">{placeholder || `Select ${label.toLowerCase()}`}</option>
@@ -190,64 +284,121 @@ const StyledSelect = ({
   );
 };
 
+// Radio Button Component for Level Type Selection
+const LevelTypeRadio = ({
+  value,
+  selected,
+  onChange,
+  label,
+  description
+}: {
+  value: 'proficiency' | 'capability';
+  selected: 'proficiency' | 'capability';
+  onChange: (value: 'proficiency' | 'capability') => void;
+  label: string;
+  description: string;
+}) => (
+  <label
+    className={`flex-1 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+      selected === value
+        ? 'border-accent dark:border-dark-accent bg-accent/5 dark:bg-dark-accent/5'
+        : 'border-light-border dark:border-dark-border hover:border-accent/50 dark:hover:border-dark-accent/50'
+    }`}
+  >
+    <input
+      type="radio"
+      name="levelType"
+      value={value}
+      checked={selected === value}
+      onChange={() => onChange(value)}
+      className="sr-only"
+    />
+    <div className="flex items-center gap-3">
+      <div className={`w-4 h-4 rounded-full border-2 ${
+        selected === value
+          ? 'border-accent dark:border-dark-accent bg-accent dark:bg-dark-accent'
+          : 'border-text-muted'
+      }`}>
+        {selected === value && (
+          <div className="w-2 h-2 bg-white rounded-full m-0.5" />
+        )}
+      </div>
+      <div>
+        <p className="font-semibold text-text-primary dark:text-dark-text-primary">{label}</p>
+        <p className="text-sm text-text-muted dark:text-dark-text-muted">{description}</p>
+      </div>
+    </div>
+  </label>
+);
+
 // Language Card Component for Summary View
 const LanguageCard = ({ language, index, onEdit, onDelete }: { 
   language: LanguageItem; 
   index: number;
   onEdit: () => void; 
   onDelete: () => void;
-}) => (
-  <div className="bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 hover:shadow-md transition-shadow">
-    <div className="flex justify-between items-start">
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-2">
-          <Globe className="w-5 h-5 text-accent dark:text-dark-accent" />
-          <h3 className="font-semibold text-lg text-text-primary dark:text-dark-text-primary">
-            {language.language}
-          </h3>
-        </div>
-        
-        <div className="grid grid-cols-1 gap-2 mb-3">
-          <div className="text-sm text-text-muted dark:text-dark-text-muted">
-            <span className="font-medium">Proficiency:</span> {language.proficiency}
+}) => {
+  // Determine which level to display
+  const levelDisplay = language.levelType === 'proficiency' 
+    ? language.proficiency 
+    : language.capability;
+  
+  const levelLabel = language.levelType === 'proficiency' ? 'Proficiency' : 'Capability';
+
+  return (
+    <div className="bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 hover:shadow-md transition-shadow">
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            <Globe className="w-5 h-5 text-accent dark:text-dark-accent" />
+            <h3 className="font-semibold text-lg text-text-primary dark:text-dark-text-primary">
+              {language.language}
+            </h3>
           </div>
-          <div className="text-sm text-text-muted dark:text-dark-text-muted">
-            <span className="font-medium">Capability:</span> {language.capability}
+          
+          <div className="grid grid-cols-1 gap-2 mb-3">
+            <div className="text-sm text-text-muted dark:text-dark-text-muted">
+              <span className="font-medium">{levelLabel}:</span> {levelDisplay}
+            </div>
           </div>
+
+          {/* Progress bars - only show for proficiency type */}
+          {language.levelType === 'proficiency' && language.proficiency && (
+            <div className="flex gap-1 mt-2">
+              {Array.from({ length: 5 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`h-2 flex-1 rounded-full ${
+                    idx < PROFICIENCY_LEVEL_MAP[language.proficiency || '']
+                      ? "bg-accent dark:bg-dark-accent"
+                      : "bg-light-border dark:bg-dark-border"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Progress bars */}
-        <div className="flex gap-1 mt-2">
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <div
-              key={idx}
-              className={`h-2 flex-1 rounded ${idx < PROFICIENCY_LEVEL_MAP[language.proficiency]
-                ? "bg-accent dark:bg-dark-accent"
-                : "bg-light-border dark:bg-dark-border"}`}
-            />
-          ))}
+        <div className="flex gap-2 ml-4">
+          <button
+            onClick={onEdit}
+            className="p-2 text-text-muted hover:text-accent dark:hover:text-dark-accent hover:bg-accent/10 rounded-lg transition-all"
+            title="Edit"
+          >
+            <Edit size={18} />
+          </button>
+          <button
+            onClick={onDelete}
+            className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+            title="Delete"
+          >
+            <Trash2 size={18} />
+          </button>
         </div>
-      </div>
-
-      <div className="flex gap-2 ml-4">
-        <button
-          onClick={onEdit}
-          className="p-2 text-text-muted hover:text-accent dark:hover:text-dark-accent hover:bg-accent/10 rounded-lg transition-all"
-          title="Edit"
-        >
-          <Edit size={18} />
-        </button>
-        <button
-          onClick={onDelete}
-          className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
-          title="Delete"
-        >
-          <Trash2 size={18} />
-        </button>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const LanguagesForm: React.FC<LanguagesFormProps> = ({ 
   data, 
@@ -261,14 +412,18 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
   
   const [languages, setLanguages] = useState<LanguageItem[]>(data?.languages || []);
   const [isEditing, setIsEditing] = useState(false);
-  const [tempLang, setTempLang] = useState<LanguageItem>({ language: "", proficiency: "", capability: "" });
+  const [tempLang, setTempLang] = useState<LanguageItem>({ 
+    language: "", 
+    proficiency: "", 
+    capability: "",
+    levelType: 'proficiency' // Default to proficiency
+  });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
-  const languageInputRef = useRef<HTMLInputElement>(null);
   const formContainerRef = useRef<HTMLDivElement>(null);
 
   // Sync with parent data
@@ -285,12 +440,15 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
       newErrors.language = "Language is required";
     }
 
-    if (!tempLang.proficiency) {
-      newErrors.proficiency = "Proficiency is required";
-    }
-
-    if (!tempLang.capability) {
-      newErrors.capability = "Capability is required";
+    // Validate based on selected level type
+    if (tempLang.levelType === 'proficiency') {
+      if (!tempLang.proficiency) {
+        newErrors.proficiency = "Proficiency level is required";
+      }
+    } else {
+      if (!tempLang.capability) {
+        newErrors.capability = "Capability is required";
+      }
     }
 
     setErrors(newErrors);
@@ -306,27 +464,37 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
   };
 
   const isFormValid = () => {
-    return tempLang.language?.trim() !== "" && 
-           tempLang.proficiency !== "" && 
-           tempLang.capability !== "";
+    if (!tempLang.language?.trim()) return false;
+    
+    if (tempLang.levelType === 'proficiency') {
+      return tempLang.proficiency !== "";
+    } else {
+      return tempLang.capability !== "";
+    }
   };
 
-  const startAdding = (language = "") => {
+  const startAdding = () => {
     setEditingIndex(null);
-    setTempLang({ language, proficiency: "", capability: "" });
+    setTempLang({ 
+      language: "", 
+      proficiency: "", 
+      capability: "",
+      levelType: 'proficiency' 
+    });
     setIsEditing(true);
     setErrors({});
     setTouched({});
-
-    setTimeout(() => {
-      languageInputRef.current?.focus();
-    }, 100);
   };
 
   const cancelEdit = () => {
     setIsEditing(false);
     setEditingIndex(null);
-    setTempLang({ language: "", proficiency: "", capability: "" });
+    setTempLang({ 
+      language: "", 
+      proficiency: "", 
+      capability: "",
+      levelType: 'proficiency' 
+    });
     setErrors({});
     setTouched({});
   };
@@ -335,23 +503,46 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
     setTouched({
       language: true,
       proficiency: true,
-      capability: true
+      capability: true,
+      levelType: true
     });
 
     if (!validateForm()) {
       return;
     }
 
+    // Check for duplicate language (case insensitive)
+    const isDuplicate = languages.some(
+      (lang, index) => 
+        lang.language.toLowerCase() === tempLang.language.toLowerCase() && 
+        index !== editingIndex
+    );
+
+    if (isDuplicate) {
+      toast.error('This language has already been added', {
+        style: toastStyle.error,
+        duration: 3000,
+      });
+      return;
+    }
+
+    // Clear the unused field based on level type
+    const languageToSave = {
+      ...tempLang,
+      proficiency: tempLang.levelType === 'proficiency' ? tempLang.proficiency : undefined,
+      capability: tempLang.levelType === 'capability' ? tempLang.capability : undefined
+    };
+
     let newLanguages;
     if (editingIndex !== null) {
       newLanguages = [...languages];
-      newLanguages[editingIndex] = tempLang;
+      newLanguages[editingIndex] = languageToSave;
       toast.success('Language updated successfully!', {
         style: toastStyle.success,
         duration: 2000,
       });
     } else {
-      newLanguages = [...languages, tempLang];
+      newLanguages = [...languages, languageToSave];
       toast.success('Language added successfully!', {
         style: toastStyle.success,
         duration: 2000,
@@ -361,7 +552,12 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
     onChange({ ...data, languages: newLanguages });
     
     setEditingIndex(null);
-    setTempLang({ language: "", proficiency: "", capability: "" });
+    setTempLang({ 
+      language: "", 
+      proficiency: "", 
+      capability: "",
+      levelType: 'proficiency' 
+    });
     setIsEditing(false);
     setErrors({});
     setTouched({});
@@ -383,10 +579,6 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
     setIsEditing(true);
     setErrors({});
     setTouched({});
-
-    setTimeout(() => {
-      languageInputRef.current?.focus();
-    }, 100);
   };
 
   const handleDeleteClick = (index: number) => {
@@ -414,38 +606,54 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
     }
   };
 
+  const handleLevelTypeChange = (levelType: 'proficiency' | 'capability') => {
+    setTempLang((prev) => ({ 
+      ...prev, 
+      levelType,
+      // Clear the other field when switching
+      proficiency: levelType === 'proficiency' ? prev.proficiency : undefined,
+      capability: levelType === 'capability' ? prev.capability : undefined
+    }));
+    // Clear errors for both fields
+    setErrors((prev) => ({ 
+      ...prev, 
+      proficiency: undefined,
+      capability: undefined 
+    }));
+  };
+
+  const handleLanguageSelect = (language: string) => {
+    updateField("language", language);
+  };
+
   const handleBlur = (field: string) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
     
     if (field === "language" && !tempLang.language?.trim()) {
       setErrors((prev) => ({ ...prev, language: "Language is required" }));
     }
-    if (field === "proficiency" && !tempLang.proficiency) {
+    if (field === "proficiency" && tempLang.levelType === 'proficiency' && !tempLang.proficiency) {
       setErrors((prev) => ({ ...prev, proficiency: "Proficiency is required" }));
     }
-    if (field === "capability" && !tempLang.capability) {
+    if (field === "capability" && tempLang.levelType === 'capability' && !tempLang.capability) {
       setErrors((prev) => ({ ...prev, capability: "Capability is required" }));
     }
   };
 
   const handleBack = () => {
-    if (onBack) {
-      onBack();
-    } else if (onNavigateToSection) {
-      onNavigateToSection("customSections");
-    } else {
-      navigate(`/preview/${id}`);
-    }
+    if (onNavigateToSection) {
+            onNavigateToSection("customSections");
+        } else if (onBack) {
+            onBack();
+        }
   };
 
   const handleContinue = () => {
-    if (onNext) {
-      onNext();
-    } else if (onNavigateToSection) {
-      onNavigateToSection("customSections");
-    } else {
-      navigate(`/preview/${id}`);
-    }
+     if (onNavigateToSection) {
+            onNavigateToSection("customSections");
+        } else {
+            navigate(`/preview/${id}`);
+        }
   };
 
   return (
@@ -456,35 +664,8 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
           Languages <span className="text-accent dark:text-dark-accent">you know</span>
         </h2>
         <p className="text-base text-text-muted dark:text-dark-text-muted">
-          Add each language and then select proficiency and capability
+          Add each language and choose either proficiency level OR capability
         </p>
-      </div>
-
-      {/* Quick Add Languages */}
-      <div className="mb-8">
-        <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">
-          Quick Add Common Languages
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {COMMON_LANGUAGES.map((lang) => {
-            const isAlreadySelected = languages.some(l => l.language.toLowerCase() === lang.toLowerCase());
-            return (
-              <button
-                key={lang}
-                type="button"
-                onClick={() => !isAlreadySelected && startAdding(lang)}
-                disabled={isAlreadySelected}
-                className={`px-4 py-3 rounded-lg border transition-all duration-200 text-center ${
-                  isAlreadySelected
-                    ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500'
-                    : 'border-light-border dark:border-dark-border hover:border-accent dark:hover:border-dark-accent hover:bg-accent/5 text-text-primary dark:text-dark-text-primary'
-                }`}
-              >
-                {lang}
-              </button>
-            );
-          })}
-        </div>
       </div>
 
       {/* Editor Section */}
@@ -495,38 +676,66 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
           </h3>
           
           <div className="space-y-4">
-            <StyledInput
+            <LanguageInputWithAutocomplete
               label="Language"
-              placeholder="Type or select a language"
+              placeholder="Start typing to search for a language..."
               value={tempLang.language}
               onChange={(e) => updateField("language", e.target.value)}
+              onSelect={handleLanguageSelect}
               onBlur={() => handleBlur("language")}
               required
               icon={<Globe className="w-4 h-4" />}
               error={touched.language ? errors.language : ""}
+              suggestions={ALL_LANGUAGES}
             />
 
-            <StyledSelect
-              label="Proficiency"
-              value={tempLang.proficiency}
-              onChange={(e) => updateField("proficiency", e.target.value)}
-              onBlur={() => handleBlur("proficiency")}
-              options={PROFICIENCY_OPTIONS}
-              required
-              error={touched.proficiency ? errors.proficiency : ""}
-              placeholder="Select proficiency"
-            />
+            {/* Level Type Selection */}
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-2">
+                Choose how to describe your language level <span className="text-red-500">*</span>
+              </label>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <LevelTypeRadio
+                  value="proficiency"
+                  selected={tempLang.levelType}
+                  onChange={handleLevelTypeChange}
+                  label="Proficiency Level"
+                  description="Native, Professional, Working, etc."
+                />
+                <LevelTypeRadio
+                  value="capability"
+                  selected={tempLang.levelType}
+                  onChange={handleLevelTypeChange}
+                  label="Capability"
+                  description="Speak, Read & Write, etc."
+                />
+              </div>
+            </div>
 
-            <StyledSelect
-              label="Capability"
-              value={tempLang.capability}
-              onChange={(e) => updateField("capability", e.target.value)}
-              onBlur={() => handleBlur("capability")}
-              options={CAPABILITY_OPTIONS}
-              required
-              error={touched.capability ? errors.capability : ""}
-              placeholder="Select capability"
-            />
+            {/* Conditional Select based on level type */}
+            {tempLang.levelType === 'proficiency' ? (
+              <StyledSelect
+                label="Proficiency Level"
+                value={tempLang.proficiency}
+                onChange={(e) => updateField("proficiency", e.target.value)}
+                onBlur={() => handleBlur("proficiency")}
+                options={PROFICIENCY_OPTIONS}
+                required
+                error={touched.proficiency ? errors.proficiency : ""}
+                placeholder="Select proficiency level"
+              />
+            ) : (
+              <StyledSelect
+                label="Capability"
+                value={tempLang.capability}
+                onChange={(e) => updateField("capability", e.target.value)}
+                onBlur={() => handleBlur("capability")}
+                options={CAPABILITY_OPTIONS}
+                required
+                error={touched.capability ? errors.capability : ""}
+                placeholder="Select capability"
+              />
+            )}
           </div>
 
           <div className="flex justify-end gap-3 mt-6">
@@ -579,7 +788,7 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
         {!isEditing && (
           <button
             type="button"
-            onClick={() => startAdding()}
+            onClick={startAdding}
             className="mt-4 w-full border-2 border-dashed border-light-border dark:border-dark-border rounded-xl py-4 text-base text-text-muted dark:text-dark-text-muted hover:bg-accent/5 hover:border-accent dark:hover:border-dark-accent transition-all flex items-center justify-center gap-2"
           >
             <Plus className="w-5 h-5" /> Add Language

@@ -525,7 +525,7 @@ export function Heading({
   onNext,
   onBack,
 }: PersonalInfoFormProps) {
-  const { updateData } = useResumeStore();
+  const { updateData,save } = useResumeStore();
   const { markSectionCompleted } = useUIStore();
   const {
     validateField,
@@ -591,27 +591,33 @@ export function Heading({
     return Object.keys(errors).length === 0;
   };
 
-  const handleContinue = () => {
-    const isValid = validateData();
-    if (!isValid) {
-      const firstError = Object.keys(formErrors).find(key => formErrors[key as keyof typeof formErrors]);
-      if (firstError) {
-        const element = document.getElementById(`error-${firstError}`);
-        element?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      return;
-    }
-    
+ const handleContinue = async () => {
+  const isValid = validateData();
+  if (!isValid) return;
+
+  try {
+    // update store
     updateData((draft) => {
       draft.personal = personal;
     });
+
+    // CALL API
+    await save();
+
     markSectionCompleted("personal");
-    toast.success('Personal information saved successfully!', {
+
+    toast.success("Personal information saved successfully!", {
       style: toastStyle.success,
       duration: 3000,
     });
-    onNext?.();
-  };
+
+    onNext?.(); // navigate only after save
+  } catch (error) {
+    toast.error("Failed to save data", {
+      style: toastStyle.error,
+    });
+  }
+};
 
   const handleFieldChange = (fieldPath: string, value: any) => {
     setPersonal((prev) => ({ ...prev, [fieldPath]: value }));

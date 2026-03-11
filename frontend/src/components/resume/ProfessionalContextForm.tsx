@@ -543,44 +543,57 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleContinue = async () => {
-        if (!isFormValid()) {
-            // Show validation errors for all required fields
-            validateForm();
-            return;
-        }
+   const handleContinue = async () => {
+    if (!isFormValid()) {
+        validateForm();
+        return;
+    }
 
-        const isValid = validateForm();
-        if (!isValid) return;
+    const isValid = validateForm();
+    if (!isValid) return;
 
+    try {
         updateData((draft) => {
             draft.professionalContext = {
                 totalExperience: formData.totalExperience || undefined,
                 teamSize: formData.teamSize || undefined,
                 industry: formData.industry || undefined,
-                industryCustom: formData.industry === "Other / Multi-Industry" ? formData.industryCustom : undefined,
+                industryCustom:
+                    formData.industry === "Other / Multi-Industry"
+                        ? formData.industryCustom
+                        : undefined,
                 functionalDomain: formData.functionalDomain || undefined,
-                functionalDomainCustom: formData.functionalDomain === "Other Functional Role" ? formData.functionalDomainCustom : undefined,
+                functionalDomainCustom:
+                    formData.functionalDomain === "Other Functional Role"
+                        ? formData.functionalDomainCustom
+                        : undefined,
                 geographicScope: formData.geographicScope || undefined,
                 revenueResponsibility: formData.revenueResponsibility || undefined,
             };
         });
 
-        toast.success('Professional context saved successfully!', {
+        // CALL API
+        await save();
+
+        toast.success("Professional context saved successfully!", {
             style: toastStyle.success,
             duration: 2000,
         });
 
         if (onNext) {
-            try {
-                onNext();
-            } catch (e) {
-                console.error("[ProfessionalContextForm] onNext threw:", e);
-            }
+            onNext();
         } else {
             navigate(`/preview/${resumeId}`);
         }
-    };
+
+    } catch (error) {
+        console.error("Save failed:", error);
+
+        toast.error("Failed to save professional context", {
+            style: toastStyle.error,
+        });
+    }
+};
 
     // Experience options
     const EXPERIENCE_OPTIONS = [

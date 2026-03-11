@@ -15,6 +15,7 @@ import { AboutPage } from './pages/AboutPage'
 import { CareerCenterPage } from './pages/CareerCenterPage'
 import { HowToWriteCVPage } from './pages/HowToWriteCVPage'
 import LiveCareerPages from './pages/LiveCareerPages'
+import GlobalLoader from './components/GlobalLoader'
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(!!localStorage.getItem('token'))
@@ -46,6 +47,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+    <GlobalLoader/>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />

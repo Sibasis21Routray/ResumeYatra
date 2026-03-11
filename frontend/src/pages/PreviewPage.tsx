@@ -385,6 +385,7 @@ export default function PreviewPage() {
   const fetchResume = async () => {
     try {
       const response = await resumeAPI.get(id!)
+      console.log('Fetched resume data:>>>>>>>>>>>>>>>>>>>>>>>>>>', response.data)
       setResume(response.data)
 
       const currentVersion = response.data?.versions?.sort(
@@ -843,7 +844,7 @@ export default function PreviewPage() {
 
     <div className="flex-1 overflow-y-auto p-4 section-scroll max-h-[calc(100vh-180px)] sm:max-h-none">
       {/* Sections with improved styling */}
-      <div className="space-y-1 mb-6">
+      {/* <div className="space-y-1 mb-6">
         {sections.map((section, index) => (
           <button
             key={section.id}
@@ -862,7 +863,7 @@ export default function PreviewPage() {
             </span>
           </button>
         ))}
-      </div>
+      </div> */}
 
       {/* Download Options with improved cards */}
       <div className="pt-4 border-t border-gray-100">

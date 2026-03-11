@@ -164,6 +164,7 @@ const DropdownWithSearch = ({
   helperText,
   placeholder = "Search or enter value",
   onOpenChange,
+  disabled = false,
 }: {
   label: string;
   value: string;
@@ -175,6 +176,7 @@ const DropdownWithSearch = ({
   helperText?: string;
   placeholder?: string;
   onOpenChange?: (isOpen: boolean) => void;
+  disabled?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState(value);
@@ -227,24 +229,29 @@ const DropdownWithSearch = ({
             onChange(e.target.value);
             setIsOpen(true);
           }}
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => !disabled && setIsOpen(true)}
           placeholder={placeholder}
+          disabled={disabled}
           className={`w-full ${icon ? 'pl-10' : 'pl-3'} pr-10 py-2.5 bg-bg-primary dark:bg-dark-bg-primary border rounded-xl focus:outline-none focus:ring-2 transition-all duration-200 text-text-primary dark:text-dark-text-primary ${
-            error
-              ? 'border-red-500 focus:ring-red-500'
-              : 'border-light-border dark:border-dark-border focus:ring-accent focus:border-accent'
+            disabled 
+              ? 'opacity-50 cursor-not-allowed bg-gray-100 dark:bg-gray-800'
+              : error
+                ? 'border-red-500 focus:ring-red-500'
+                : 'border-light-border dark:border-dark-border focus:ring-accent focus:border-accent'
           }`}
         />
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted dark:text-dark-text-muted hover:text-accent transition-colors"
-        >
-          {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
+        {!disabled && (
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted dark:text-dark-text-muted hover:text-accent transition-colors"
+          >
+            {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+        )}
       </div>
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div 
           className="absolute z-[100] w-full mt-1 bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl shadow-lg max-h-60 overflow-y-auto"
           style={{ 
@@ -420,17 +427,35 @@ const MonthYearPicker = ({
   );
 };
 
-// Info Badge
-const InfoBadge = ({ text, type }: { text: string; type: 'required' | 'optional' }) => {
-  const styles = {
-    required: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-    optional: 'bg-gray-100 dark:bg-gray-800 text-text-muted dark:text-dark-text-muted'
-  };
-
+// Radio Option Component
+const RadioOption = ({
+  label,
+  selected,
+  onClick,
+}: {
+  label: string;
+  selected: boolean;
+  onClick: () => void;
+}) => {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${styles[type]}`}>
-      {text}
-    </span>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+        selected
+          ? 'bg-accent text-white shadow-md'
+          : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-muted hover:text-accent hover:bg-accent/10'
+      }`}
+    >
+      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+        selected 
+          ? 'border-white' 
+          : 'border-text-muted'
+      }`}>
+        {selected && <div className="w-2 h-2 rounded-full bg-white" />}
+      </div>
+      {label}
+    </button>
   );
 };
 
@@ -439,13 +464,13 @@ export const EducationForm: React.FC<EducationFormProps> = ({
   onBack,
   onOpenAIModal,
 }) => {
-  const { data, updateData } = useResumeStore();
+  const { data, updateData,save } = useResumeStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [tempEducation, setTempEducation] = useState<any>({});
   const [showAdditionalDetails, setShowAdditionalDetails] = useState(false);
-  const [gradeType, setGradeType] = useState<'cgpa' | 'percentage' | 'grade'>('cgpa');
+  const [selectedGradeType, setSelectedGradeType] = useState<'cgpa' | 'percentage' | 'grade' | null>(null);
   
   // Dropdown open states for z-index management
   const [isDegreeDropdownOpen, setIsDegreeDropdownOpen] = useState(false);
@@ -463,9 +488,6 @@ export const EducationForm: React.FC<EducationFormProps> = ({
 
   // Current education being edited
   const currentEducation = tempEducation;
-
-  // Check if any dropdown is open
-  const isAnyDropdownOpen = isDegreeDropdownOpen || isCgpaDropdownOpen || isGradeDropdownOpen || isStartDateOpen || isEndDateOpen;
 
   const onGenerateAI = React.useCallback(
     async (currentContent: string): Promise<string[]> => {
@@ -492,6 +514,21 @@ export const EducationForm: React.FC<EducationFormProps> = ({
   const handleApplyAI = React.useCallback((aiContent: string) => {
     updateField("description", aiContent);
   }, []);
+
+  // Initialize selectedGradeType based on existing data when editing
+  useEffect(() => {
+    if (editingId && currentEducation) {
+      if (currentEducation.cgpa) {
+        setSelectedGradeType('cgpa');
+      } else if (currentEducation.percentage) {
+        setSelectedGradeType('percentage');
+      } else if (currentEducation.grade) {
+        setSelectedGradeType('grade');
+      } else {
+        setSelectedGradeType(null);
+      }
+    }
+  }, [editingId]);
 
   // Initial setup
   useEffect(() => {
@@ -521,25 +558,45 @@ export const EducationForm: React.FC<EducationFormProps> = ({
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = () => {
-    const isValid = validateData();
-    if (!isValid) {
-      return;
+   const handleSubmit = async () => {
+  const isValid = validateData();
+  if (!isValid) {
+    return;
+  }
+
+  try {
+    // Create a clean education object with only the selected grade type
+    const updatedEducation = { ...tempEducation };
+
+    delete updatedEducation.cgpa;
+    delete updatedEducation.percentage;
+    delete updatedEducation.grade;
+
+    if (selectedGradeType === "cgpa" && tempEducation.cgpa) {
+      updatedEducation.cgpa = tempEducation.cgpa;
+    } else if (selectedGradeType === "percentage" && tempEducation.percentage) {
+      updatedEducation.percentage = tempEducation.percentage;
+    } else if (selectedGradeType === "grade" && tempEducation.grade) {
+      updatedEducation.grade = tempEducation.grade;
     }
 
     updateData((draft) => {
       if (!draft.education) draft.education = [];
+
       if (editingId) {
         const index = draft.education.findIndex((e) => e.id === editingId);
         if (index !== -1) {
-          draft.education[index] = tempEducation;
+          draft.education[index] = updatedEducation;
         }
       } else {
-        draft.education.push(tempEducation);
+        draft.education.push(updatedEducation);
       }
     });
 
-    toast.success('Education saved successfully!', {
+    // CALL API SAVE
+    await save();
+
+    toast.success("Education saved successfully!", {
       style: toastStyle.success,
       duration: 3000,
     });
@@ -547,7 +604,12 @@ export const EducationForm: React.FC<EducationFormProps> = ({
     setIsEditing(false);
     setEditingId(null);
     setTempEducation({});
-  };
+  } catch (error) {
+    toast.error("Failed to save education", {
+      style: toastStyle.error,
+    });
+  }
+};
 
   const handleEdit = (id: string) => {
     const edu = data.education?.find((e) => e.id === id);
@@ -582,6 +644,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
     setEditingId(null);
     setTempEducation({ id: `edu-${Date.now()}` });
     setIsEditing(true);
+    setSelectedGradeType(null);
   };
 
   const getDescriptionPreview = (html: string) => {
@@ -602,6 +665,32 @@ export const EducationForm: React.FC<EducationFormProps> = ({
     }
   };
 
+  // Handle grade type selection
+  const handleGradeTypeSelect = (type: 'cgpa' | 'percentage' | 'grade') => {
+    setSelectedGradeType(type);
+    
+    // Clear all grade fields first
+    setTempEducation((prev: any) => {
+      const updated = { ...prev };
+      delete updated.cgpa;
+      delete updated.percentage;
+      delete updated.grade;
+      return updated;
+    });
+  };
+
+  // Function to get the display value for grade based on what's available
+  const getGradeDisplayValue = (education: any) => {
+    if (education.cgpa) {
+      return `CGPA: ${education.cgpa}`;
+    } else if (education.percentage) {
+      return `Percentage: ${education.percentage}`;
+    } else if (education.grade) {
+      return `Grade: ${education.grade}`;
+    }
+    return null;
+  };
+
   const renderSummary = () => (
     <div className="space-y-6">
       <div>
@@ -616,6 +705,8 @@ export const EducationForm: React.FC<EducationFormProps> = ({
       <div className="space-y-4">
         {data.education?.map((edu, index) => {
           const education = edu as any;
+          const gradeDisplay = getGradeDisplayValue(education);
+          
           return (
             <div key={edu.id} className="bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 hover:shadow-md transition-shadow">
               <div className="flex justify-between items-start">
@@ -641,16 +732,20 @@ export const EducationForm: React.FC<EducationFormProps> = ({
                         <span>{education.location}</span>
                       </div>
                     )}
-                    {education.graduationDate && (
+                    {(education.startDate || education.graduationDate) && (
                       <div className="flex items-center gap-2 text-sm text-text-muted dark:text-dark-text-muted">
                         <Calendar className="w-4 h-4" />
-                        <span>{education.graduationDate}</span>
+                        <span>
+                          {education.startDate && education.graduationDate 
+                            ? `${education.startDate} - ${education.graduationDate}`
+                            : education.startDate || education.graduationDate}
+                        </span>
                       </div>
                     )}
-                    {education.cgpa && (
+                    {gradeDisplay && (
                       <div className="flex items-center gap-2 text-sm text-text-muted dark:text-dark-text-muted">
                         <Award className="w-4 h-4" />
-                        <span>CGPA: {education.cgpa}</span>
+                        <span>{gradeDisplay}</span>
                       </div>
                     )}
                   </div>
@@ -709,7 +804,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
         </p>
       </div>
 
-      {/* Institution Details - No border */}
+      {/* Institution Details */}
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <StyledInput
@@ -730,7 +825,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
         </div>
       </div>
 
-      {/* Degree Information - No border */}
+      {/* Degree Information */}
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <DropdownWithSearch
@@ -755,7 +850,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
         </div>
       </div>
 
-      {/* Duration - No border */}
+      {/* Duration */}
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -773,7 +868,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
 
           <div>
             <label className="block text-xs sm:text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
-              End Date
+              End Date (or expected)
             </label>
             <MonthYearPicker
               value={currentEducation.graduationDate || ""}
@@ -786,81 +881,75 @@ export const EducationForm: React.FC<EducationFormProps> = ({
         </div>
       </div>
 
-      {/* Grade/GPA - No border */}
+      {/* Grade/GPA - Radio button style selection */}
       <div className="space-y-4">
-        <div className="flex gap-2 mb-3">
-          <button
-            onClick={() => setGradeType('cgpa')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              gradeType === 'cgpa'
-                ? 'bg-accent text-white'
-                : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-muted hover:text-accent'
-            }`}
-          >
-            CGPA
-          </button>
-          <button
-            onClick={() => setGradeType('percentage')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              gradeType === 'percentage'
-                ? 'bg-accent text-white'
-                : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-muted hover:text-accent'
-            }`}
-          >
-            Percentage
-          </button>
-          <button
-            onClick={() => setGradeType('grade')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              gradeType === 'grade'
-                ? 'bg-accent text-white'
-                : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-muted hover:text-accent'
-            }`}
-          >
-            Grade
-          </button>
+        <label className="block text-xs sm:text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-1.5">
+          Grade/GPA (Optional)
+        </label>
+        <div className="flex flex-wrap gap-2">
+          <RadioOption
+            label="CGPA"
+            selected={selectedGradeType === 'cgpa'}
+            onClick={() => handleGradeTypeSelect('cgpa')}
+          />
+          <RadioOption
+            label="Percentage"
+            selected={selectedGradeType === 'percentage'}
+            onClick={() => handleGradeTypeSelect('percentage')}
+          />
+          <RadioOption
+            label="Grade"
+            selected={selectedGradeType === 'grade'}
+            onClick={() => handleGradeTypeSelect('grade')}
+          />
         </div>
 
-        {gradeType === 'cgpa' && (
-          <DropdownWithSearch
-            label="CGPA"
-            value={currentEducation.cgpa || ""}
-            onChange={(value) => updateField("cgpa", value)}
-            options={CGPA_OPTIONS}
-            icon={<Award className="w-4 h-4" />}
-            placeholder="Select or enter CGPA"
-            onOpenChange={setIsCgpaDropdownOpen}
-          />
+        {selectedGradeType === 'cgpa' && (
+          <div className="mt-4">
+            <DropdownWithSearch
+              label="CGPA"
+              value={currentEducation.cgpa || ""}
+              onChange={(value) => updateField("cgpa", value)}
+              options={CGPA_OPTIONS}
+              icon={<Award className="w-4 h-4" />}
+              placeholder="Select or enter CGPA"
+              onOpenChange={setIsCgpaDropdownOpen}
+            />
+          </div>
         )}
 
-        {gradeType === 'percentage' && (
-          <StyledInput
-            label="Percentage"
-            placeholder="85%"
-            value={currentEducation.percentage || ""}
-            onChange={(e) => {
-              const value = e.target.value.replace(/[^0-9.]/g, '');
-              updateField("percentage", value ? `${value}%` : '');
-            }}
-            icon={<Award className="w-4 h-4" />}
-            helperText="Enter percentage (e.g., 85%)"
-          />
+        {selectedGradeType === 'percentage' && (
+          <div className="mt-4">
+            <StyledInput
+              label="Percentage"
+              placeholder="85%"
+              value={currentEducation.percentage ? currentEducation.percentage.replace('%', '') : ""}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9.]/g, '');
+                updateField("percentage", value ? `${value}%` : '');
+              }}
+              icon={<Award className="w-4 h-4" />}
+              helperText="Enter percentage (e.g., 85%)"
+            />
+          </div>
         )}
 
-        {gradeType === 'grade' && (
-          <DropdownWithSearch
-            label="Grade"
-            value={currentEducation.grade || ""}
-            onChange={(value) => updateField("grade", value)}
-            options={GRADE_OPTIONS}
-            icon={<Award className="w-4 h-4" />}
-            placeholder="Select or enter grade"
-            onOpenChange={setIsGradeDropdownOpen}
-          />
+        {selectedGradeType === 'grade' && (
+          <div className="mt-4">
+            <DropdownWithSearch
+              label="Grade"
+              value={currentEducation.grade || ""}
+              onChange={(value) => updateField("grade", value)}
+              options={GRADE_OPTIONS}
+              icon={<Award className="w-4 h-4" />}
+              placeholder="Select or enter grade"
+              onOpenChange={setIsGradeDropdownOpen}
+            />
+          </div>
         )}
       </div>
 
-      {/* Additional Academic Details - Collapsible with minimal border */}
+      {/* Additional Academic Details */}
       <div className="border border-light-border dark:border-dark-border rounded-xl overflow-hidden">
         <button
           onClick={() => setShowAdditionalDetails(!showAdditionalDetails)}

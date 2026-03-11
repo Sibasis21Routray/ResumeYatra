@@ -50,6 +50,102 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
   const currentFontWeight =
     fontWeightMap[typography.fontWeight as keyof typeof fontWeightMap] || "400";
 
+  // Helper function to check if an array has meaningful content
+  const hasContent = (arr: any): boolean => {
+    if (!arr || !Array.isArray(arr)) return false;
+    if (arr.length === 0) return false;
+    return arr.some((item: any) => {
+      if (typeof item === "string") return item.trim().length > 0;
+      if (typeof item === "object" && item !== null) {
+        return Object.values(item).some(
+          (val: any) => typeof val === "string" && val.trim().length > 0
+        );
+      }
+      return false;
+    });
+  };
+
+  // Helper to safely get non-empty array
+  const getNonEmptyArray = (arr: any): any[] => {
+    if (!arr || !Array.isArray(arr)) return [];
+    return arr.filter((item: any) => {
+      if (typeof item === "string") return item.trim().length > 0;
+      if (typeof item === "object" && item !== null) {
+        return Object.values(item).some(
+          (val: any) => typeof val === "string" && val.trim().length > 0
+        );
+      }
+      return false;
+    });
+  };
+
+  // Helper to safely format subtitle with multiple fields
+  const formatSubtitle = (parts: (string | undefined | null)[]): string => {
+    const filtered = parts.filter(part => part && typeof part === "string" && part.trim().length > 0);
+    return filtered.join(" • ");
+  };
+
+  // Helper to safely format date range
+  const formatDateRange = (startDate?: string, endDate?: string): string => {
+    if (!startDate && !endDate) return "";
+    if (startDate && !endDate) return startDate;
+    if (!startDate && endDate) return endDate;
+    return `${startDate} - ${endDate}`;
+  };
+
+  // Parse skills (handles HTML string or array)
+  const parseSkills = (): any[] => {
+    if (!data.skills) return [];
+    if (Array.isArray(data.skills)) return data.skills.filter((s: any) => s && (typeof s === "string" ? s.trim() : s));
+    if (typeof data.skills === 'string') {
+      if (data.skills.includes('<ul>')) {
+        const matches = data.skills.match(/<li>(.*?)<\/li>/g);
+        if (matches) {
+          return matches.map(m => m.replace(/<\/?li>/g, '').trim());
+        }
+      }
+      return data.skills.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+    return [];
+  };
+
+  const nonEmptySkills = parseSkills();
+  const nonEmptyInternships = getNonEmptyArray(data.internships);
+  const nonEmptyTrainingPrograms = getNonEmptyArray(data.trainingPrograms);
+  const nonEmptyAcademicProjects = getNonEmptyArray(data.academicProjects);
+  const nonEmptyClientProjects = getNonEmptyArray(data.clientProjects);
+  const nonEmptyPortfolio = getNonEmptyArray(data.portfolio);
+  const nonEmptyLeadershipPositions = getNonEmptyArray(data.leadershipPositions);
+  const nonEmptyVolunteering = getNonEmptyArray(data.volunteering);
+  const nonEmptyMilitaryService = getNonEmptyArray(data.militaryService);
+  const nonEmptyTeachingExperience = getNonEmptyArray(data.teachingExperience);
+  const nonEmptyMentorshipExperience = getNonEmptyArray(data.mentorshipExperience);
+  const nonEmptyResearchGrants = getNonEmptyArray(data.researchGrants);
+  const nonEmptyPublications = getNonEmptyArray(data.publications);
+  const nonEmptyPatents = getNonEmptyArray(data.patents);
+  const nonEmptyTestScores = getNonEmptyArray(data.testScores);
+  const nonEmptyScholarships = getNonEmptyArray(data.scholarships);
+  const nonEmptyAwards = getNonEmptyArray(data.awards);
+  const nonEmptySpeakingEngagements = getNonEmptyArray(data.speakingEngagements);
+  const nonEmptyMemberships = getNonEmptyArray(data.memberships);
+  const nonEmptyWorkshops = getNonEmptyArray(data.workshops);
+  const nonEmptyCoCurricular = getNonEmptyArray(data.coCurricular);
+  const nonEmptyExtracurricular = getNonEmptyArray(data.extracurricular);
+  const nonEmptyToolsTechnologies = getNonEmptyArray(data.toolsTechnologies);
+  const nonEmptyMethodologies = getNonEmptyArray(data.methodologies);
+  const nonEmptyIndustryExpertise = getNonEmptyArray(data.industryExpertise);
+  const nonEmptyReferences = getNonEmptyArray(data.references);
+  const nonEmptySocialProfiles = getNonEmptyArray(data.socialProfiles);
+  const nonEmptyKeyAchievements = getNonEmptyArray(data.keyAchievements);
+  const nonEmptyResponsibilities = getNonEmptyArray(
+    Array.isArray(data.responsibilities)
+      ? data.responsibilities
+      : (data.responsibilities || "").split("\n")
+  );
+  const nonEmptyTools = getNonEmptyArray(
+    Array.isArray(data.tools) ? data.tools : (data.tools || "").split("\n")
+  );
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -311,6 +407,36 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
     a:hover {
       text-decoration: underline;
     }
+
+    /* Metrics Grid for Professional Context */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .metric-item {
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .metric-value {
+      font-size: ${Math.round(baseFontSize * 1.2)}px;
+      font-weight: 700;
+      color: var(--primary-color);
+      line-height: 1.2;
+    }
+
+    .metric-label {
+      font-size: ${Math.round(baseFontSize * 0.85)}px;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
     
     /* Print styles */
     @media print {
@@ -348,6 +474,10 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
       .entry-date {
         white-space: normal;
       }
+
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -376,89 +506,92 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
           : ""
       }
 
+      <!-- Contact Information -->
       <div class="contact">
-        ${
-          data.personal?.email
-            ? `<span data-section="personal" data-index="0">${data.personal.email}</span>`
-            : ""
-        }
-        ${
-          data.personal?.phone
-            ? `<span data-section="personal" data-index="1">${data.personal.phone}</span>`
-            : ""
-        }
-        ${
-          data.personal?.alternatePhone
-            ? `<span data-section="personal" data-index="2">${data.personal.alternatePhone} (Alt)</span>`
-            : ""
-        }
-        ${
-          data.personal?.location
-            ? `<span data-section="personal" data-index="3">${
-                data.personal.location
-              }${data.personal?.country ? ", " + data.personal.country : ""}${
-                data.personal?.pinCode ? ", " + data.personal.pinCode : ""
-              }${
-                data.personal?.fullAddress
-                  ? ", " + data.personal.fullAddress
-                  : ""
-              }</span>`
-            : ""
-        }
+        ${data.personal?.email ? `<span data-section="personal">${data.personal.email}</span>` : ""}
+        ${data.personal?.phone ? `<span data-section="personal">${data.personal.phone}</span>` : ""}
+        ${data.personal?.alternatePhone ? `<span data-section="personal">${data.personal.alternatePhone} (Alt)</span>` : ""}
+        
+        <!-- Address -->
+        ${(() => {
+          const addressParts = [
+            data.personal?.fullAddress,
+            data.personal?.location,
+            data.personal?.country,
+            data.personal?.pinCode
+          ].filter(Boolean);
+          return addressParts.length > 0 
+            ? `<span data-section="personal">${addressParts.join(", ")}</span>`
+            : "";
+        })()}
+        
+        <!-- Inline Personal Details -->
         ${
           data.personal?.personalInfoDisplay === "inline"
-            ? `
-        ${
-          data.personal?.fathersName
-            ? `<span data-section="personal" data-index="4">Father: ${data.personal.fathersName}</span>`
+            ? (() => {
+                const inlineParts = [
+                  data.personal?.fathersName ? `Father: ${data.personal.fathersName}` : "",
+                  data.personal?.dob ? `DOB: ${data.personal.dob}` : "",
+                  data.personal?.gender ? `Gender: ${data.personal.gender}` : "",
+                  data.personal?.maritalStatus ? `Marital: ${data.personal.maritalStatus}` : "",
+                  data.personal?.nationality ? `Nationality: ${data.personal.nationality}` : ""
+                ].filter(Boolean);
+                return inlineParts.map(part => `<span data-section="personal">${part}</span>`).join('');
+              })()
             : ""
         }
-        ${
-          data.personal?.dob
-            ? `<span data-section="personal" data-index="5">DOB: ${data.personal.dob}</span>`
-            : ""
-        }
-        ${
-          data.personal?.gender
-            ? `<span data-section="personal" data-index="6">Gender: ${data.personal.gender}</span>`
-            : ""
-        }
-        ${
-          data.personal?.maritalStatus
-            ? `<span data-section="personal" data-index="7">Marital Status: ${data.personal.maritalStatus}</span>`
-            : ""
-        }
-        ${
-          data.personal?.nationality
-            ? `<span data-section="personal" data-index="8">Nationality: ${data.personal.nationality}</span>`
-            : ""
-        }
-        `
-            : ""
-        }
-        ${
-          data.personal?.linkedinUrl
-            ? `<span data-section="personal" data-index="9"><a href="${data.personal.linkedinUrl}" target="_blank">LinkedIn</a></span>`
-            : ""
-        }
-        ${
-          data.personal?.githubUrl
-            ? `<span data-section="personal" data-index="10"><a href="${data.personal.githubUrl}" target="_blank">GitHub</a></span>`
-            : ""
-        }
-        ${
-          data.personal?.portfolioUrl
-            ? `<span data-section="personal" data-index="11"><a href="${data.personal.portfolioUrl}" target="_blank">Portfolio</a></span>`
-            : ""
-        }
-        ${
-          data.personal?.website
-            ? `<span data-section="personal" data-index="12"><a href="${data.personal.website}" target="_blank">Website</a></span>`
-            : ""
-        }
+        
+        <!-- Social/Profile Links -->
+        ${data.personal?.linkedinUrl ? `<span data-section="personal"><a href="${data.personal.linkedinUrl}" target="_blank">LinkedIn</a></span>` : ""}
+        ${data.personal?.githubUrl ? `<span data-section="personal"><a href="${data.personal.githubUrl}" target="_blank">GitHub</a></span>` : ""}
+        ${data.personal?.portfolioUrl ? `<span data-section="personal"><a href="${data.personal.portfolioUrl}" target="_blank">Portfolio</a></span>` : ""}
+        ${data.personal?.website ? `<span data-section="personal"><a href="${data.personal.website}" target="_blank">Website</a></span>` : ""}
       </div>
     </div>
 
+    <!-- Professional Context -->
+    ${
+      data.professionalContext && Object.values(data.professionalContext).some(v => v)
+        ? `
+    <div class="section" data-section="professionalContext">
+      <div class="section-title">Professional Context</div>
+      <div class="metrics-grid">
+        ${data.professionalContext.totalExperience ? `
+        <div class="metric-item">
+          <div class="metric-value">${data.professionalContext.totalExperience}</div>
+          <div class="metric-label">Total Experience</div>
+        </div>` : ''}
+        ${data.professionalContext.teamSize ? `
+        <div class="metric-item">
+          <div class="metric-value">${data.professionalContext.teamSize}</div>
+          <div class="metric-label">Team Size</div>
+        </div>` : ''}
+        ${data.professionalContext.industry ? `
+        <div class="metric-item">
+          <div class="metric-value">${data.professionalContext.industry}</div>
+          <div class="metric-label">Industry</div>
+        </div>` : ''}
+        ${data.professionalContext.functionalDomain ? `
+        <div class="metric-item">
+          <div class="metric-value">${data.professionalContext.functionalDomain}</div>
+          <div class="metric-label">Domain</div>
+        </div>` : ''}
+        ${data.professionalContext.geographicScope ? `
+        <div class="metric-item">
+          <div class="metric-value">${data.professionalContext.geographicScope}</div>
+          <div class="metric-label">Geographic Scope</div>
+        </div>` : ''}
+        ${data.professionalContext.revenueResponsibility ? `
+        <div class="metric-item">
+          <div class="metric-value">${data.professionalContext.revenueResponsibility}</div>
+          <div class="metric-label">Revenue Responsibility</div>
+        </div>` : ''}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Personal Details (if not inline) -->
     ${
       data.personal?.personalInfoDisplay !== "inline" &&
       (data.personal?.fathersName ||
@@ -510,7 +643,6 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
     }
 
     <!-- Summary -->
-
     ${
       data.sectionVisibility?.summary !== false && data.summary
         ? `<div class="section" data-section="summary">
@@ -531,27 +663,24 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
         : ""
     }
 
-    <!-- Experience -->
+    <!-- Work Experience -->
     ${
       data.sectionVisibility?.experience !== false &&
       data.experience &&
       data.experience.length > 0
         ? `<div class="section" data-section="experience">
-      <div class="section-title">Experience</div>
+      <div class="section-title">Work Experience</div>
       ${(data.experience || [])
         .map(
           (exp: any, index: number) => `
         <div class="entry" data-index="${index}">
           <div class="entry-header">
             <div class="entry-title">${exp.title || ""}</div>
-            <div class="entry-date">${exp.startDate || ""} - ${
-            exp.endDate || "Present"
-          }</div>
+            <div class="entry-date">${formatDateRange(exp.startDate, exp.endDate)}</div>
           </div>
-          <div class="entry-subtitle">${exp.company || ""}${
-            exp.location ? `, ${exp.location}` : ""
-          }</div>
+          <div class="entry-subtitle">${formatSubtitle([exp.company, exp.location])}</div>
           <div class="entry-content">${exp.description || ""}</div>
+          ${exp.achievements ? `<div class="entry-content" style="margin-top: 8px;"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
         </div>
       `
         )
@@ -562,22 +691,41 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
 
     <!-- Internships -->
     ${
-      data.internships && data.internships.length > 0
+      nonEmptyInternships.length > 0
         ? `<div class="section" data-section="internships">
       <div class="section-title">Internships</div>
-      ${(data.internships || [])
+      ${nonEmptyInternships
         .map(
           (item: any, index: number) => `
         <div class="entry" data-index="${index}">
           <div class="entry-header">
             <div class="entry-title">${item.title || ""}</div>
-            <div class="entry-date">${item.startDate || ""} - ${
-            item.endDate || ""
-          }</div>
+            <div class="entry-date">${item.duration || ""}</div>
           </div>
-          <div class="entry-subtitle">${item.company || ""}${
-            item.location ? `, ${item.location}` : ""
-          }</div>
+          <div class="entry-subtitle">${item.company || ""}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Training Programs -->
+    ${
+      nonEmptyTrainingPrograms.length > 0
+        ? `<div class="section" data-section="trainingPrograms">
+      <div class="section-title">Training Programs</div>
+      ${nonEmptyTrainingPrograms
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.name || ""}</div>
+            <div class="entry-date">${item.completionDate || ""}</div>
+          </div>
+          <div class="entry-subtitle">${formatSubtitle([item.provider || item.organization, item.duration])}</div>
           <div class="entry-content">${item.description || ""}</div>
         </div>
       `
@@ -600,21 +748,18 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
         <div class="entry" data-index="${index}">
           <div class="entry-header">
             <div class="entry-title">
-              ${edu.degree || ""}${
-            edu.qualification ? ` (${edu.qualification})` : ""
-          }
+              ${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}${edu.qualification ? ` (${edu.qualification})` : ""}
             </div>
             <div class="entry-date">${edu.graduationDate || ""}</div>
           </div>
           ${
             edu.school
-              ? `<div class="education-school">${edu.school}</div>`
+              ? `<div class="education-school">${edu.school}${edu.location ? `, ${edu.location}` : ""}</div>`
               : ""
           }
-          ${edu.field ? `<div class="education-field">${edu.field}</div>` : ""}
           ${
-            edu.location
-              ? `<div class="education-location">${edu.location}</div>`
+            edu.grade
+              ? `<div class="education-field">Grade: ${edu.grade}</div>`
               : ""
           }
           
@@ -622,28 +767,7 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
             edu.description
               ? `
             <div class="education-description">
-              ${
-                edu.description.includes("<ul>") ||
-                edu.description.includes("<li>")
-                  ? edu.description
-                  : `<p>${edu.description}</p>`
-              }
-            </div>
-          `
-              : ""
-          }
-          
-          ${
-            edu.achievements && edu.achievements.length > 0
-              ? `
-            <div class="education-achievements">
-              <h4>Achievements & Highlights</h4>
-              <ul>
-                ${edu.achievements
-                  .filter((achievement: string) => achievement.trim())
-                  .map((achievement: string) => `<li>${achievement}</li>`)
-                  .join("")}
-              </ul>
+              ${edu.description}
             </div>
           `
               : ""
@@ -669,17 +793,10 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
         <div class="entry" data-index="${index}">
           <div class="entry-header">
             <div class="entry-title">${project.name || ""}</div>
-            ${
-              project.startDate || project.endDate
-                ? `<div class="entry-date">${project.startDate || ""} ${
-                    project.startDate && project.endDate
-                      ? `- ${project.endDate}`
-                      : project.endDate
-                      ? `- ${project.endDate}`
-                      : ""
-                  }</div>`
-                : ""
-            }
+            ${(() => {
+              const dateRange = formatDateRange(project.startDate, project.endDate);
+              return dateRange ? `<div class="entry-date">${dateRange}</div>` : "";
+            })()}
           </div>
           ${
             project.technologies
@@ -690,9 +807,7 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
           ${
             project.url
               ? `<div class="entry-content" style="margin-top: 6px;">
-            <a href="${project.url}" target="_blank">${
-                  project.urlText || project.url
-                }</a>
+            <a href="${project.url}" target="_blank">${project.urlText || project.url}</a>
           </div>`
               : ""
           }
@@ -704,21 +819,579 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- Academic Projects -->
+    ${
+      nonEmptyAcademicProjects.length > 0
+        ? `<div class="section" data-section="academicProjects">
+      <div class="section-title">Academic Projects</div>
+      ${nonEmptyAcademicProjects
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.name || item.title || ""}</div>
+            <div class="entry-date">${item.duration || ""}</div>
+          </div>
+          ${
+            item.institution || item.course
+              ? `<div class="entry-subtitle">${formatSubtitle([item.institution, item.course ? `Course: ${item.course}` : ""])}</div>`
+              : ""
+          }
+          <div class="entry-content">${item.description || ""}</div>
+          ${
+            item.technologies
+              ? `<div class="entry-content" style="margin-top: 5px;"><strong>Technologies:</strong> ${Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}</div>`
+              : ""
+          }
+          ${
+            item.url
+              ? `<div class="entry-content" style="margin-top: 5px;"><a href="${item.url}" target="_blank">View Project</a></div>`
+              : ""
+          }
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Client Projects -->
+    ${
+      nonEmptyClientProjects.length > 0
+        ? `<div class="section" data-section="clientProjects">
+      <div class="section-title">Client Projects</div>
+      ${nonEmptyClientProjects
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.name || ""}</div>
+            <div class="entry-date">${item.duration || ""}</div>
+          </div>
+          <div class="entry-subtitle">${formatSubtitle([item.clientOrganization, item.role ? `Role: ${item.role}` : ""])}</div>
+          <div class="entry-content">${item.description || ""}</div>
+          ${
+            item.toolsTechnologies
+              ? `<div class="entry-content" style="margin-top: 5px;"><strong>Tools:</strong> ${item.toolsTechnologies}</div>`
+              : ""
+          }
+          ${
+            item.projectUrl
+              ? `<div class="entry-content" style="margin-top: 5px;"><a href="${item.projectUrl}" target="_blank">View Project</a></div>`
+              : ""
+          }
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Portfolio -->
+    ${
+      nonEmptyPortfolio.length > 0
+        ? `<div class="section" data-section="portfolio">
+      <div class="section-title">Portfolio</div>
+      ${nonEmptyPortfolio
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.name || ""}</div>
+            <div class="entry-date">${formatSubtitle([item.type, item.platform])}</div>
+          </div>
+          <div class="entry-content">${item.description || ""}</div>
+          ${
+            item.url
+              ? `<div class="entry-content" style="margin-top: 5px;"><a href="${item.url}" target="_blank">View Portfolio</a></div>`
+              : ""
+          }
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Leadership Positions -->
+    ${
+      nonEmptyLeadershipPositions.length > 0
+        ? `<div class="section" data-section="leadershipPositions">
+      <div class="section-title">Leadership & Positions</div>
+      ${nonEmptyLeadershipPositions
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.position || item.title || ""}</div>
+            <div class="entry-date">${formatDateRange(item.startDate, item.endDate)}</div>
+          </div>
+          <div class="entry-subtitle">${item.organization || ""}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Volunteering -->
+    ${
+      nonEmptyVolunteering.length > 0
+        ? `<div class="section" data-section="volunteering">
+      <div class="section-title">Volunteering</div>
+      ${nonEmptyVolunteering
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.role || ""}</div>
+            <div class="entry-date">${item.duration || ""}</div>
+          </div>
+          <div class="entry-subtitle">${formatSubtitle([item.organization, item.causeArea])}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Military Service -->
+    ${
+      nonEmptyMilitaryService.length > 0
+        ? `<div class="section" data-section="militaryService">
+      <div class="section-title">Military Service</div>
+      ${nonEmptyMilitaryService
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.rank ? `${item.rank} - ${item.branch}` : item.branch || ""}</div>
+            <div class="entry-date">${item.duration || ""}</div>
+          </div>
+          <div class="entry-subtitle">${item.specialization || ""}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Teaching Experience -->
+    ${
+      nonEmptyTeachingExperience.length > 0
+        ? `<div class="section" data-section="teachingExperience">
+      <div class="section-title">Teaching Experience</div>
+      ${nonEmptyTeachingExperience
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.title || ""}</div>
+            <div class="entry-date">${item.duration || ""}</div>
+          </div>
+          <div class="entry-subtitle">${formatSubtitle([item.institution, item.subjectCourseTaught])}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Mentorship Experience -->
+    ${
+      nonEmptyMentorshipExperience.length > 0
+        ? `<div class="section" data-section="mentorshipExperience">
+      <div class="section-title">Mentorship Experience</div>
+      ${nonEmptyMentorshipExperience
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.mentorshipArea || ""}</div>
+            <div class="entry-date">${item.duration || ""}</div>
+          </div>
+          <div class="entry-subtitle">${formatSubtitle([item.organizationPlatform, item.menteeLevel ? `Mentee Level: ${item.menteeLevel}` : ""])}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Research Grants -->
+    ${
+      nonEmptyResearchGrants.length > 0
+        ? `<div class="section" data-section="researchGrants">
+      <div class="section-title">Research Grants</div>
+      ${nonEmptyResearchGrants
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.title || ""}</div>
+            <div class="entry-date">${item.year || ""}</div>
+          </div>
+          <div class="entry-subtitle">${formatSubtitle([item.agency, item.amount])}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Publications -->
+    ${
+      nonEmptyPublications.length > 0
+        ? `<div class="section" data-section="publications">
+      <div class="section-title">Publications</div>
+      ${nonEmptyPublications
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.title || ""}</div>
+            <div class="entry-date">${item.year || ""}</div>
+          </div>
+          <div class="entry-subtitle">${formatSubtitle([item.journalPublisher, item.publicationType])}</div>
+          ${item.authors ? `<div class="entry-content"><strong>Authors:</strong> ${item.authors}</div>` : ""}
+          ${
+            item.urlDoi
+              ? `<div class="entry-content" style="margin-top: 5px;"><a href="${item.urlDoi}" target="_blank">View Publication</a></div>`
+              : ""
+          }
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Patents -->
+    ${
+      nonEmptyPatents.length > 0
+        ? `<div class="section" data-section="patents">
+      <div class="section-title">Patents</div>
+      ${nonEmptyPatents
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.title || ""}</div>
+            <div class="entry-date">${item.year || ""}</div>
+          </div>
+          <div class="entry-subtitle">${formatSubtitle([item.patentNumber, item.issuingAuthority])}</div>
+          <div class="entry-content"><strong>Status:</strong> ${item.status || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Test Scores -->
+    ${
+      nonEmptyTestScores.length > 0
+        ? `<div class="section" data-section="testScores">
+      <div class="section-title">Test Scores</div>
+      ${nonEmptyTestScores
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.testName || ""}</div>
+            <div class="entry-date">${item.year || ""}</div>
+          </div>
+          <div class="entry-subtitle">Score: ${item.score || ""}${item.percentileRank ? ` (${item.percentileRank} percentile)` : ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Certifications -->
+    ${
+      data.sectionVisibility?.certifications !== false &&
+      data.certifications &&
+      data.certifications.length > 0
+        ? `<div class="section" data-section="certifications">
+      <div class="section-title">Certifications</div>
+      ${(data.certifications || [])
+        .map(
+          (cert: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${cert.name || ""}</div>
+            <div class="entry-date">${cert.date || ""}</div>
+          </div>
+          <div class="entry-subtitle">${cert.issuer || ""}</div>
+          ${cert.description ? `<div class="entry-content">${cert.description}</div>` : ""}
+          ${
+            cert.url
+              ? `<div class="entry-content" style="margin-top: 6px;">
+            <a href="${cert.url}" target="_blank">View Certificate</a>
+          </div>`
+              : ""
+          }
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Scholarships -->
+    ${
+      nonEmptyScholarships.length > 0
+        ? `<div class="section" data-section="scholarships">
+      <div class="section-title">Scholarships</div>
+      ${nonEmptyScholarships
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.name || ""}</div>
+            <div class="entry-date">${item.year || ""}</div>
+          </div>
+          <div class="entry-subtitle">${formatSubtitle([item.provider || item.organization, item.amount])}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Awards -->
+    ${
+      nonEmptyAwards.length > 0
+        ? `<div class="section" data-section="awards">
+      <div class="section-title">Awards</div>
+      ${nonEmptyAwards
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.title || ""}</div>
+            <div class="entry-date">${item.issueYear || ""}</div>
+          </div>
+          <div class="entry-subtitle">${item.organization || ""}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Speaking Engagements -->
+    ${
+      nonEmptySpeakingEngagements.length > 0
+        ? `<div class="section" data-section="speakingEngagements">
+      <div class="section-title">Speaking Engagements</div>
+      ${nonEmptySpeakingEngagements
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.topic || ""}</div>
+            <div class="entry-date">${item.date || ""}</div>
+          </div>
+          <div class="entry-subtitle">${item.eventName || ""}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Memberships -->
+    ${
+      nonEmptyMemberships.length > 0
+        ? `<div class="section" data-section="memberships">
+      <div class="section-title">Memberships</div>
+      ${nonEmptyMemberships
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.membershipName || ""}</div>
+            <div class="entry-date">${item.year || ""}</div>
+          </div>
+          <div class="entry-subtitle">${item.organizationName || ""}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Workshops -->
+    ${
+      nonEmptyWorkshops.length > 0
+        ? `<div class="section" data-section="workshops">
+      <div class="section-title">Workshops</div>
+      ${nonEmptyWorkshops
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.programTitle || ""}</div>
+            <div class="entry-date">${item.year || ""}</div>
+          </div>
+          <div class="entry-subtitle">${item.conductedBy || ""}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Co-curricular Activities -->
+    ${
+      nonEmptyCoCurricular.length > 0
+        ? `<div class="section" data-section="coCurricular">
+      <div class="section-title">Co-curricular Activities</div>
+      ${nonEmptyCoCurricular
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.activity || ""}</div>
+            <div class="entry-date">${item.year || ""}</div>
+          </div>
+          <div class="entry-subtitle">${formatSubtitle([item.organization, item.role])}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
+    <!-- Extracurricular Activities -->
+    ${
+      nonEmptyExtracurricular.length > 0
+        ? `<div class="section" data-section="extracurricular">
+      <div class="section-title">Extracurricular Activities</div>
+      ${nonEmptyExtracurricular
+        .map(
+          (item: any, index: number) => `
+        <div class="entry" data-index="${index}">
+          <div class="entry-header">
+            <div class="entry-title">${item.activity || ""}</div>
+            <div class="entry-date">${item.year || ""}</div>
+          </div>
+          <div class="entry-subtitle">${formatSubtitle([item.organization, item.role])}</div>
+          <div class="entry-content">${item.description || ""}</div>
+        </div>
+      `
+        )
+        .join("")}
+    </div>`
+        : ""
+    }
+
     <!-- Skills -->
     ${
-      data.sectionVisibility?.skills !== false && data.skills
+      nonEmptySkills.length > 0
         ? `<div class="section" data-section="skills">
       <div class="section-title">Skills</div>
       <div class="skills">
-        ${(Array.isArray(data.skills)
-          ? data.skills
-          : (data.skills || "").split(",")
-        )
+        ${nonEmptySkills
           .map(
             (skill: any, index: number) => `
           <div class="skill-badge" data-section="skills" data-index="${index}">${
               typeof skill === "string" ? skill.trim() : skill
             }</div>
+        `
+          )
+          .join("")}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Tools & Technologies -->
+    ${
+      nonEmptyToolsTechnologies.length > 0
+        ? `<div class="section" data-section="toolsTechnologies">
+      <div class="section-title">Tools & Technologies</div>
+      <div class="skills">
+        ${nonEmptyToolsTechnologies
+          .map(
+            (item: any, index: number) => `
+          <div class="skill-badge" data-section="toolsTechnologies" data-index="${index}">
+            ${item.name || ''}${item.proficiency ? ` (${item.proficiency})` : ''}${item.experienceDuration ? ` - ${item.experienceDuration}` : ''}
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Methodologies -->
+    ${
+      nonEmptyMethodologies.length > 0
+        ? `<div class="section" data-section="methodologies">
+      <div class="section-title">Methodologies</div>
+      <div class="skills">
+        ${nonEmptyMethodologies
+          .map(
+            (item: any, index: number) => `
+          <div class="skill-badge" data-section="methodologies" data-index="${index}">
+            ${item.name || ''}${item.certification ? ` (${item.certification})` : ''}${item.experienceDuration ? ` - ${item.experienceDuration} years` : ''}
+          </div>
+        `
+          )
+          .join("")}
+      </div>
+    </div>`
+        : ""
+    }
+
+    <!-- Industry Expertise -->
+    ${
+      nonEmptyIndustryExpertise.length > 0
+        ? `<div class="section" data-section="industryExpertise">
+      <div class="section-title">Industry Expertise</div>
+      <div class="skills">
+        ${nonEmptyIndustryExpertise
+          .map(
+            (item: any, index: number) => `
+          <div class="skill-badge" data-section="industryExpertise" data-index="${index}">
+            ${item.industry || ''}${item.domainArea ? ` - ${item.domainArea}` : ''}${item.experienceDuration ? ` (${item.experienceDuration} years)` : ''}
+          </div>
         `
           )
           .join("")}
@@ -738,9 +1411,9 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
         ${(data.languages || [])
           .map(
             (lang: any, index: number) => `
-          <div class="skill-badge" data-section="languages" data-index="${index}">${
-              lang.language || lang
-            }${lang.level ? ` (${lang.level})` : ""}</div>
+          <div class="skill-badge" data-section="languages" data-index="${index}">
+            ${lang.language || lang}${lang.level ? ` (${lang.level})` : ''}${lang.capability ? ` - ${lang.capability}` : ''}
+          </div>
         `
           )
           .join("")}
@@ -769,6 +1442,20 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
         : ""
     }
 
+    <!-- Availability & Work Authorization -->
+    ${
+      data.availabilityWorkAuth && Object.values(data.availabilityWorkAuth).some(v => v)
+        ? `<div class="section" data-section="availabilityWorkAuth">
+      <div class="section-title">Availability</div>
+      <div class="skills">
+        ${data.availabilityWorkAuth.availabilityNoticePeriod ? `<div class="skill-badge">Notice: ${data.availabilityWorkAuth.availabilityNoticePeriod}</div>` : ''}
+        ${data.availabilityWorkAuth.workAuthorizationStatus ? `<div class="skill-badge">Work Auth: ${data.availabilityWorkAuth.workAuthorizationStatus}</div>` : ''}
+        ${data.availabilityWorkAuth.preferredLocation ? `<div class="skill-badge">Preferred: ${data.availabilityWorkAuth.preferredLocation}</div>` : ''}
+      </div>
+    </div>`
+        : ""
+    }
+
     <!-- Social Links -->
     ${
       data.sectionVisibility?.socialLinks !== false &&
@@ -776,16 +1463,13 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
       data.socialLinks.length > 0
         ? `<div class="section" data-section="socialLinks">
       <div class="section-title">Social Links</div>
-      <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+      <div class="skills">
         ${data.socialLinks
           .map(
             (link: any, index: number) => `
-          <a href="${
-            link.url
-          }" target="_blank" data-section="socialLinks" data-index="${index}">${
-              link.urlText ||
-              link.url.replace("https://", "").replace("http://", "")
-            }</a>
+          <a href="${link.url}" target="_blank" class="skill-badge" style="background: #e6f0fa; color: var(--primary-color);" data-section="socialLinks" data-index="${index}">
+            ${link.urlText || link.url.replace("https://", "").replace("http://", "").split('/')[0]}
+          </a>
         `
           )
           .join("")}
@@ -794,197 +1478,40 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
         : ""
     }
 
-    <!-- Certifications -->
+    <!-- Social Profiles -->
     ${
-      data.sectionVisibility?.certifications !== false &&
-      data.certifications &&
-      data.certifications.length > 0
-        ? `<div class="section" data-section="certifications">
-      <div class="section-title">Certifications</div>
-      ${(data.certifications || [])
-        .map(
-          (cert: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <div class="entry-title">${cert.name || ""}</div>
-            <div class="entry-date">${cert.date || ""}</div>
-          </div>
-          <div class="entry-subtitle">${cert.issuer || ""}</div>
-          ${
-            cert.url
-              ? `<div class="entry-content" style="margin-top: 6px;">
-            <a href="${cert.url}" target="_blank">View Certificate</a>
-          </div>`
-              : ""
-          }
-        </div>
-      `
-        )
-        .join("")}
+      nonEmptySocialProfiles.length > 0
+        ? `<div class="section" data-section="socialProfiles">
+      <div class="section-title">Social Profiles</div>
+      <div class="skills">
+        ${nonEmptySocialProfiles
+          .map(
+            (profile: any, index: number) => `
+          <a href="${profile.url}" target="_blank" class="skill-badge" style="background: #e6f0fa; color: var(--primary-color);" data-section="socialProfiles" data-index="${index}">
+            ${profile.platform || "Profile"}
+          </a>
+        `
+          )
+          .join("")}
+      </div>
     </div>`
         : ""
     }
 
-    <!-- Academic Projects -->
+    <!-- References -->
     ${
-      data.academicProjects && data.academicProjects.length > 0
-        ? `<div class="section" data-section="academicProjects">
-      <div class="section-title">Academic Projects</div>
-      ${(data.academicProjects || [])
+      nonEmptyReferences.length > 0
+        ? `<div class="section" data-section="references">
+      <div class="section-title">References</div>
+      ${nonEmptyReferences
         .map(
-          (item: any, index: number) => `
+          (ref: any, index: number) => `
         <div class="entry" data-index="${index}">
           <div class="entry-header">
-            <div class="entry-title">${item.name || item.title || ""}</div>
-            <div class="entry-date">${item.duration || ""}</div>
+            <div class="entry-title">${ref.name || ""}</div>
           </div>
-          ${
-            item.institution
-              ? `<div class="entry-subtitle">${item.institution}</div>`
-              : ""
-          }
-          <div class="entry-content">${item.description || ""}</div>
-          ${
-            item.technologies
-              ? `<div class="entry-content" style="margin-top: 5px;"><strong>Technologies:</strong> ${item.technologies}</div>`
-              : ""
-          }
-          ${
-            item.url
-              ? `<div class="entry-content" style="margin-top: 5px;"><a href="${item.url}" target="_blank">View Project</a></div>`
-              : ""
-          }
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    <!-- Leadership & Positions -->
-    ${
-      data.leadershipPositions && data.leadershipPositions.length > 0
-        ? `<div class="section" data-section="leadershipPositions">
-      <div class="section-title">Leadership & Positions</div>
-      ${(data.leadershipPositions || [])
-        .map(
-          (item: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <div class="entry-title">${item.position || item.title || ""}</div>
-            <div class="entry-date">${item.startDate || ""} - ${
-            item.endDate || ""
-          }</div>
-          </div>
-          <div class="entry-subtitle">${item.organization || ""}</div>
-          <div class="entry-content">${item.description || ""}</div>
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    <!-- Training Programs -->
-    ${
-      data.trainingPrograms && data.trainingPrograms.length > 0
-        ? `<div class="section" data-section="trainingPrograms">
-      <div class="section-title">Training Programs</div>
-      ${(data.trainingPrograms || [])
-        .map(
-          (item: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <div class="entry-title">${item.name || ""}</div>
-            <div class="entry-date">${item.completionDate || ""}</div>
-          </div>
-          <div class="entry-subtitle">${item.provider || item.organization || ""}${
-            item.duration ? ` • ${item.duration}` : ""
-          }</div>
-          <div class="entry-content">${item.description || ""}</div>
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    <!-- Scholarships -->
-    ${
-      data.scholarships && data.scholarships.length > 0
-        ? `<div class="section" data-section="scholarships">
-      <div class="section-title">Scholarships</div>
-      ${(data.scholarships || [])
-        .map(
-          (item: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <div class="entry-title">${item.name || ""}</div>
-            <div class="entry-date">${item.year || ""}</div>
-          </div>
-          <div class="entry-subtitle">${item.provider || item.organization || ""}${
-            item.amount ? ` • ${item.amount}` : ""
-          }</div>
-          <div class="entry-content">${item.description || ""}</div>
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    <!-- Co-curricular Activities -->
-    ${
-      data.coCurricular && data.coCurricular.length > 0
-        ? `<div class="section" data-section="coCurricular">
-      <div class="section-title">Co-curricular Activities</div>
-      ${(data.coCurricular || [])
-        .map(
-          (item: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <div class="entry-title">${item.activity || ""}</div>
-            <div class="entry-date">${
-              item.year ||
-              (item.startDate ? `${item.startDate} - ${item.endDate || ""}` : "")
-            }</div>
-          </div>
-          <div class="entry-subtitle">${item.organization || ""}${
-            item.role ? ` • ${item.role}` : ""
-          }</div>
-          <div class="entry-content">${item.description || ""}</div>
-        </div>
-      `
-        )
-        .join("")}
-    </div>`
-        : ""
-    }
-
-    <!-- Extracurricular Activities -->
-    ${
-      data.extracurricular && data.extracurricular.length > 0
-        ? `<div class="section" data-section="extracurricular">
-      <div class="section-title">Extracurricular Activities</div>
-      ${(data.extracurricular || [])
-        .map(
-          (item: any, index: number) => `
-        <div class="entry" data-index="${index}">
-          <div class="entry-header">
-            <div class="entry-title">${item.activity || ""}</div>
-            <div class="entry-date">${
-              item.year ||
-              (item.startDate ? `${item.startDate} - ${item.endDate || ""}` : "")
-            }</div>
-          </div>
-          <div class="entry-subtitle">${item.organization || ""}${
-            item.role ? ` • ${item.role}` : ""
-          }</div>
-          <div class="entry-content">${item.description || ""}</div>
+          <div class="entry-subtitle">${formatSubtitle([ref.designationRelationship, ref.organization])}</div>
+          <div class="entry-content">${ref.contactInformation || ""}</div>
         </div>
       `
         )
@@ -995,12 +1522,12 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
 
     <!-- Key Achievements -->
     ${
-      data.keyAchievements && data.keyAchievements.length > 0
+      nonEmptyKeyAchievements.length > 0
         ? `<div class="section" data-section="keyAchievements">
       <div class="section-title">Key Achievements</div>
       <div class="entry-content">
         <ul>
-          ${(data.keyAchievements || [])
+          ${nonEmptyKeyAchievements
             .map(
               (achievement: string, index: number) =>
                 `<li data-section="keyAchievements" data-index="${index}">${achievement}</li>`
@@ -1014,16 +1541,12 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
 
     <!-- Key Responsibilities -->
     ${
-      data.responsibilities && data.responsibilities.length > 0
+      nonEmptyResponsibilities.length > 0
         ? `<div class="section" data-section="responsibilities">
       <div class="section-title">Key Responsibilities</div>
       <div class="entry-content">
         <ul>
-          ${(Array.isArray(data.responsibilities)
-            ? data.responsibilities
-            : (data.responsibilities || "").split("\n")
-          )
-            .filter((line: string) => line.trim())
+          ${nonEmptyResponsibilities
             .map(
               (line: string, index: number) =>
                 `<li data-section="responsibilities" data-index="${index}">${line.trim()}</li>`
@@ -1035,18 +1558,14 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
         : ""
     }
 
-    <!-- Tools & Technologies -->
+    <!-- Tools (Simple List) -->
     ${
-      data.tools && data.tools.length > 0
+      nonEmptyTools.length > 0
         ? `<div class="section" data-section="tools">
-      <div class="section-title">Tools & Technologies</div>
+      <div class="section-title">Tools</div>
       <div class="entry-content">
         <ul>
-          ${(Array.isArray(data.tools)
-            ? data.tools
-            : (data.tools || "").split("\n")
-          )
-            .filter((line: string) => line.trim())
+          ${nonEmptyTools
             .map(
               (line: string, index: number) =>
                 `<li data-section="tools" data-index="${index}">${line.trim()}</li>`
@@ -1064,8 +1583,8 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
         ? data.customSections
             .filter((section: any) => section.isVisible)
             .map(
-              (section: any) => `
-    <div class="section" data-section="customSections">
+              (section: any, sectionIndex: number) => `
+    <div class="section" data-section="custom-${sectionIndex}">
       <div class="section-title">${section.heading || "Custom Section"}</div>
       ${
         section.entries && section.entries.length > 0
@@ -1075,9 +1594,7 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
                 (entry: any, entryIndex: number) => `
         <div class="entry" data-index="${entryIndex}">
           <div class="entry-header">
-            <div class="entry-title">${entry.title || ""}${
-                  entry.title && entry.organization ? " at " : ""
-                }${entry.organization || ""}</div>
+            <div class="entry-title">${entry.title || ""}${entry.title && entry.organization ? " at " : ""}${entry.organization || ""}</div>
             ${entry.date ? `<div class="entry-date">${entry.date}</div>` : ""}
           </div>
           ${

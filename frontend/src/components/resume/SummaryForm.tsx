@@ -36,7 +36,7 @@ export function SummaryForm({
   onOpenAIModal,
   resumeId,
 }: SummaryFormProps) {
-  const { updateData } = useResumeStore();
+  const { updateData ,save} = useResumeStore();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const [defaultSuggestions] = useState<string[]>(DEFAULT_SUMMARY_PARAGRAPHS);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
@@ -55,14 +55,20 @@ export function SummaryForm({
     setSummary(value);
   }, []);
 
-
-
-  const handleContinue = () => {
+const handleContinue = async () => {
+  try {
     updateData((draft) => {
       draft.summary = summary;
     });
+
+    // call API
+    await save();
+
     onNext?.();
-  };
+  } catch (error) {
+    console.error("Failed to save summary:", error);
+  }
+};
 
   const handleGenerateSuggestions = useCallback(async () => {
     if (!effectiveResumeId) {

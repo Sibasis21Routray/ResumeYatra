@@ -55,7 +55,39 @@ import { MentorshipExperienceForm } from "../resume/MentorshipExperienceForm";
 import { ResearchGrantsForm } from "../resume/ResearchGrantsForm";
 import { ResumeData } from "../../stores/resumeStore";
 import AISuggestionPanel from "./AISuggestionPanel";
-import { LanguagesForm } from "../resume/LanguagesForm"; 
+import { LanguagesForm } from "../resume/LanguagesForm";
+
+// Full Screen Loader Component
+const FullScreenLoader = ({ message = "Processing..." }: { message?: string }) => {
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999]">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl flex flex-col items-center gap-4 max-w-md mx-4">
+        <div className="relative">
+          {/* Spinner */}
+          <div className="w-16 h-16 border-4 border-accent/20 border-t-accent rounded-full animate-spin"></div>
+          {/* Optional: Add a logo or icon in the center */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 bg-accent/10 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+        
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-1">
+            {message}
+          </h3>
+          <p className="text-sm text-text-muted dark:text-dark-text-muted">
+            Please wait while we process your request...
+          </p>
+        </div>
+
+        {/* Progress bar (optional) */}
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
+          <div className="bg-accent h-2 rounded-full animate-progress"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Valid editor sections - including new academic campus experience section
 export const VALID_SECTIONS = [
@@ -142,6 +174,10 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const { data, updateData, save } = useResumeStore();
 
+  // Loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Processing...");
+
   // Callback to apply AI content to new items (not yet in store)
   const [onApplyAIContentCallback, setOnApplyAIContentCallback] = useState<
     ((aiContent: string) => void) | null
@@ -149,7 +185,6 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
 
   const {
     selectedSection,
-
     setSelectedSection,
     aiImproving,
     setAiImproving,
@@ -212,8 +247,6 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
     ],
     []
   );
-
-
 
   // Clear AI content when section changes
   useEffect(() => {
@@ -310,11 +343,43 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
     });
   };
 
+  // Enhanced withLoading function with better error handling and minimum display time
+  const withLoading = async <T,>(
+    apiCall: () => Promise<T>,
+    message: string = "Processing..."
+  ): Promise<T> => {
+    const minDisplayTime = 500; // Minimum 500ms to prevent flashing
+    const startTime = Date.now();
+    
+    try {
+      setIsLoading(true);
+      setLoadingMessage(message);
+      
+      const result = await apiCall();
+      
+      // Ensure loader shows for at least minDisplayTime
+      const elapsedTime = Date.now() - startTime;
+      if (elapsedTime < minDisplayTime) {
+        await new Promise(resolve => setTimeout(resolve, minDisplayTime - elapsedTime));
+      }
+      
+      return result;
+    } catch (error) {
+      // Still ensure minimum display time on error
+      const elapsedTime = Date.now() - startTime;
+      if (elapsedTime < minDisplayTime) {
+        await new Promise(resolve => setTimeout(resolve, minDisplayTime - elapsedTime));
+      }
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // AI Suggestion handlers
   const generateAIContent = async () => {
     if (!resumeId) return;
 
-    setIsGeneratingAI(true);
     try {
       let prompt = "";
       let currentContent = "";
@@ -322,7 +387,6 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
 
       // Check if we have content to enhance
       const hasContent = getCurrentUserContent().trim().length > 0;
-
 
       if (
         currentItemIndex !== null &&
@@ -460,12 +524,19 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
         }
       }
 
-      const response = await resumeAPI.autoSuggestions(
-        resumeId,
-        currentContent || sectionOrContent,
-        context,
-        metadata
+      // Show loader during API call
+      setIsGeneratingAI(true);
+      
+      const response = await withLoading(
+        () => resumeAPI.autoSuggestions(
+          resumeId,
+          currentContent || sectionOrContent,
+          context,
+          metadata
+        ),
+        "Generating AI suggestions..."
       );
+      
       const suggestions = response.data.suggestions || [];
       if (suggestions.length > 0) {
         // For summary, take the first suggestion as it's a single paragraph
@@ -479,6 +550,7 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
       setRegenerateCount((prev) => prev + 1);
     } catch (error) {
       console.error("AI generation failed:", error);
+      // Show error message to user
       alert("Failed to generate AI content. Please try again.");
     } finally {
       setIsGeneratingAI(false);
@@ -847,10 +919,14 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
     if (currentIndex === allSectionOrder.length - 1) {
       markSectionCompleted(selectedSection);
       try {
-        await save();
+        await withLoading(
+          () => save(),
+          "Saving your resume..."
+        );
         navigate(`/preview/${resumeId}`);
       } catch (err) {
         console.error("Failed to save:", err);
+        // Still navigate to preview even if save fails
         navigate(`/preview/${resumeId}`);
       }
       return;
@@ -861,6 +937,10 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
     markSectionCompleted(selectedSection);
     setSelectedSection(nextSection);
   };
+
+  useEffect(() => {
+  console.log("Resume Store Data:", data);
+}, [data]);
 
   const handleBack = () => {
     // All sections in navigation order (matching sidebar sections)
@@ -1627,6 +1707,9 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
 
   return (
     <>
+      {/* Full Screen Loader */}
+      {isLoading && <FullScreenLoader message={loadingMessage} />}
+
       <div
         className={`flex-1 bg-white dark:bg-gray-800 ${!isMobile ? "border-r border-gray-200 dark:border-gray-700" : "w-full"
           }`}
@@ -1637,8 +1720,6 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
           </div>
         </div>
       </div>
-
-
 
       {/* AI Modal - Responsive */}
       {isAIModalOpen && (
@@ -1722,6 +1803,16 @@ export function EditorPanel({ sidebarOpen }: { sidebarOpen: boolean }) {
             ::-webkit-scrollbar {
               width: 4px;
             }
+          }
+
+          /* Animation for progress bar */
+          @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+          }
+          .animate-progress {
+            animation: progress 2s ease-in-out infinite;
           }
         `,
         }}

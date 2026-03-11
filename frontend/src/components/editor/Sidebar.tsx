@@ -20,7 +20,7 @@ const ALL_SECTIONS = [
   { id: "academicCampus",     label: "Student",                 iconName: "academicCampus" },
   { id: "professionalContext",label: "Professional Context",         iconName: "building" },
   { id: "skills",             label: "Skills",                       iconName: "lightbulb" },
-  { id: "languages",          label: "Languages",                    iconName: "globe" },
+  // { id: "languages",          label: "Languages",                    iconName: "globe" },
   { id: "hobbies",            label: "Hobbies",                      iconName: "heart" },
   { id: "keyAchievements",    label: "Key Achievements",             iconName: "trophy" },
   { id: "responsibilities",   label: "Responsibilities",             iconName: "clipboard" },
@@ -147,19 +147,19 @@ export function Sidebar({ resumeId }: { resumeId: string }) {
   };
 
   const handleDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const allowed = ["application/pdf","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/msword"];
-    if (!allowed.includes(file.type)) { alert("Please select a valid PDF or Word document."); return; }
-    if (file.size > 10 * 1024 * 1024) { alert("Document size should be less than 10MB."); return; }
-    try {
-      setUploadingDocument(true);
-      const res = await resumeAPI.upload(resumeId, file);
-      if (res.data.structured) { updateData(d => { Object.assign(d, res.data.structured); }); alert("Resume uploaded!"); }
-      else throw new Error("Failed to parse");
-    } catch (e: any) { alert(`Upload failed: ${e.response?.data?.error || e.message}`); }
-    finally { setUploadingDocument(false); }
-    if (documentFileInputRef.current) documentFileInputRef.current.value = "";
+    // const file = event.target.files?.[0];
+    // if (!file) return;
+    // const allowed = ["application/pdf","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/msword"];
+    // if (!allowed.includes(file.type)) { alert("Please select a valid PDF or Word document."); return; }
+    // if (file.size > 10 * 1024 * 1024) { alert("Document size should be less than 10MB."); return; }
+    // try {
+    //   setUploadingDocument(true);
+    //   const res = await resumeAPI.upload(resumeId, file);
+    //   if (res.data.structured) { updateData(d => { Object.assign(d, res.data.structured); }); alert("Resume uploaded!"); }
+    //   else throw new Error("Failed to parse");
+    // } catch (e: any) { alert(`Upload failed: ${e.response?.data?.error || e.message}`); }
+    // finally { setUploadingDocument(false); }
+    // if (documentFileInputRef.current) documentFileInputRef.current.value = "";
   };
 
   // ── Enhanced Section row ───────────────────────────────────────────────────

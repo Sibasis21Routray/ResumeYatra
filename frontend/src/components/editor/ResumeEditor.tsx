@@ -158,12 +158,12 @@ export function ResumeEditor() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
-        <div className="text-center">
+        {/* <div className="text-center">
           <div className="w-8 h-8 sm:w-12 sm:h-12 border border-slate-400 border-t-[#04477E] rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-300 font-medium text-sm sm:text-base">
             Loading resume...
           </p>
-        </div>
+        </div> */}
       </div>
     );
   }

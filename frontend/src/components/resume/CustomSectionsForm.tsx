@@ -328,7 +328,7 @@ const SectionGroup = ({
           <div className="text-blue-600 dark:text-blue-400" style={{ color: THEME.primary }}>
             {group.icon}
           </div>
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+          <h4 className="text-xl font-semibold text-gray-900 dark:text-white">
             {group.title}
           </h4>
           <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded-full">
@@ -933,7 +933,7 @@ export function CustomSectionsForm({
       {/* Footer */}
       <div className="flex justify-end mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
         <button
-          onClick={() => navigate("/dashboard")}
+          onClick={() =>navigate(`/preview/${id}`)}
           className="px-6 py-2 rounded-lg text-white font-medium text-sm shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
           style={{ 
             background: THEME.primaryGradient,

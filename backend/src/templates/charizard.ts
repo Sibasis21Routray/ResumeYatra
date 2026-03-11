@@ -29,6 +29,128 @@ export function buildCharizardTemplate(data: any, theme?: any): string {
   const dateText = "#666666";
   const sectionBorder = currentTheme.primary;
 
+  // Helper function to check if an array has non-empty items
+  const hasNonEmptyItems = (arr: any[]): boolean => {
+    if (!arr || !Array.isArray(arr)) return false;
+    return arr.some(item => {
+      if (typeof item === "string") return item.trim().length > 0;
+      if (typeof item === "object" && item !== null) {
+        return Object.values(item).some(val => 
+          typeof val === "string" && val.trim().length > 0
+        );
+      }
+      return false;
+    });
+  };
+
+  // Helper to get non-empty array items
+  const getNonEmptyArray = (arr: any): any[] => {
+    if (!arr || !Array.isArray(arr)) return [];
+    return arr.filter((item: any) => {
+      if (typeof item === "string") return item.trim().length > 0;
+      if (typeof item === "object" && item !== null) {
+        return Object.values(item).some(
+          (val: any) => typeof val === "string" && val.trim().length > 0
+        );
+      }
+      return false;
+    });
+  };
+
+  // Helper to check if an object has any non-empty values
+  const hasObjectValues = (obj: any): boolean => {
+    if (!obj || typeof obj !== "object") return false;
+    return Object.values(obj).some(val => 
+      val !== null && val !== undefined && val !== ""
+    );
+  };
+
+  // Helper to safely join strings with separator, filtering empty values
+  const safeJoin = (items: any[], separator: string = ", "): string => {
+    if (!items || !Array.isArray(items)) return "";
+    const filtered = items.filter(item => item && typeof item === "string" && item.trim().length > 0);
+    return filtered.join(separator);
+  };
+
+  // Helper to format date range without empty parentheses
+  const formatDateRange = (startDate?: string, endDate?: string, isCurrent?: boolean): string => {
+    const parts = [];
+    if (startDate && startDate.trim()) parts.push(startDate.trim());
+    if (endDate && endDate.trim()) parts.push(endDate.trim());
+    else if (isCurrent && parts.length > 0) parts.push("Present");
+    
+    if (parts.length === 0) return "";
+    if (parts.length === 1) return parts[0];
+    return parts.join(" – ");
+  };
+
+  // Helper to format subtitle with multiple fields
+  const formatSubtitle = (parts: (string | undefined | null)[]): string => {
+    const filtered = parts.filter(part => part && typeof part === "string" && part.trim().length > 0);
+    return filtered.join(" | ");
+  };
+
+  // Parse skills (handles HTML string or array)
+  const parseSkills = (): any[] => {
+    if (!data.skills) return [];
+    if (Array.isArray(data.skills)) return data.skills.filter((s: any) => s && (typeof s === "string" ? s.trim() : s));
+    if (typeof data.skills === 'string') {
+      if (data.skills.includes('<ul>')) {
+        const matches = data.skills.match(/<li>(.*?)<\/li>/g);
+        if (matches) {
+          return matches.map(m => m.replace(/<\/?li>/g, '').trim());
+        }
+      }
+      return data.skills.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+    return [];
+  };
+
+  const nonEmptySkills = parseSkills();
+  const nonEmptyInternships = getNonEmptyArray(data.internships);
+  const nonEmptyTrainingPrograms = getNonEmptyArray(data.trainingPrograms);
+  const nonEmptyAcademicProjects = getNonEmptyArray(data.academicProjects);
+  const nonEmptyClientProjects = getNonEmptyArray(data.clientProjects);
+  const nonEmptyPortfolio = getNonEmptyArray(data.portfolio);
+  const nonEmptyLeadershipPositions = getNonEmptyArray(data.leadershipPositions);
+  const nonEmptyVolunteering = getNonEmptyArray(data.volunteering);
+  const nonEmptyMilitaryService = getNonEmptyArray(data.militaryService);
+  const nonEmptyTeachingExperience = getNonEmptyArray(data.teachingExperience);
+  const nonEmptyMentorshipExperience = getNonEmptyArray(data.mentorshipExperience);
+  const nonEmptyResearchGrants = getNonEmptyArray(data.researchGrants);
+  const nonEmptyPublications = getNonEmptyArray(data.publications);
+  const nonEmptyPatents = getNonEmptyArray(data.patents);
+  const nonEmptyTestScores = getNonEmptyArray(data.testScores);
+  const nonEmptyScholarships = getNonEmptyArray(data.scholarships);
+  const nonEmptyAwards = getNonEmptyArray(data.awards);
+  const nonEmptySpeakingEngagements = getNonEmptyArray(data.speakingEngagements);
+  const nonEmptyMemberships = getNonEmptyArray(data.memberships);
+  const nonEmptyWorkshops = getNonEmptyArray(data.workshops);
+  const nonEmptyCoCurricular = getNonEmptyArray(data.coCurricular);
+  const nonEmptyExtracurricular = getNonEmptyArray(data.extracurricular);
+  const nonEmptyToolsTechnologies = getNonEmptyArray(data.toolsTechnologies);
+  const nonEmptyMethodologies = getNonEmptyArray(data.methodologies);
+  const nonEmptyIndustryExpertise = getNonEmptyArray(data.industryExpertise);
+  const nonEmptyReferences = getNonEmptyArray(data.references);
+  const nonEmptySocialProfiles = getNonEmptyArray(data.socialProfiles);
+  const nonEmptySocialLinks = getNonEmptyArray(data.socialLinks);
+  const nonEmptyLanguages = getNonEmptyArray(data.languages);
+  const nonEmptyHobbies = getNonEmptyArray(data.hobbies);
+  const nonEmptyKeyAchievements = getNonEmptyArray(data.keyAchievements);
+  const nonEmptyResponsibilities = getNonEmptyArray(
+    Array.isArray(data.responsibilities)
+      ? data.responsibilities
+      : (data.responsibilities || "").split("\n")
+  );
+  const nonEmptyTools = getNonEmptyArray(
+    Array.isArray(data.tools) ? data.tools : (data.tools || "").split("\n")
+  );
+  const nonEmptyProjects = getNonEmptyArray(data.projects);
+  const nonEmptyCertifications = getNonEmptyArray(data.certifications);
+  const nonEmptyCustomSections = getNonEmptyArray(data.customSections);
+  const nonEmptyProfessionalContext = data.professionalContext && hasObjectValues(data.professionalContext) ? data.professionalContext : null;
+  const nonEmptyAvailabilityWorkAuth = data.availabilityWorkAuth && hasObjectValues(data.availabilityWorkAuth) ? data.availabilityWorkAuth : null;
+
   // SVG Icons for contact section
   const icons = {
     email: `<svg xmlns="http://www.w3.org/2000/svg" width="${baseFontSize}" height="${baseFontSize}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px; vertical-align: middle;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`,
@@ -122,6 +244,8 @@ export function buildCharizardTemplate(data: any, theme?: any): string {
      display: flex;
      justify-content: space-between;
      margin-bottom: 4px;
+     flex-wrap: wrap;
+     gap: 8px;
    }
    .entry-title {
      font-weight: 700;
@@ -131,6 +255,7 @@ export function buildCharizardTemplate(data: any, theme?: any): string {
      font-size: ${Math.round(baseFontSize * 0.9)}px;
      color: ${dateText};
      font-weight: 600;
+     white-space: nowrap;
    }
    .entry-subtitle {
      color: ${secondaryText};
@@ -250,6 +375,37 @@ export function buildCharizardTemplate(data: any, theme?: any): string {
        color: ${secondaryText};
    }
 
+   .metrics-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+     gap: 12px;
+     margin: 15px 0;
+   }
+
+   .metric-item {
+     text-align: center;
+   }
+
+   .metric-value {
+     font-weight: 700;
+     font-size: ${Math.round(baseFontSize * 1.2)}px;
+     color: ${currentTheme.primary};
+   }
+
+   .metric-label {
+     font-size: ${Math.round(baseFontSize * 0.8)}px;
+     color: ${secondaryText};
+     text-transform: uppercase;
+     letter-spacing: 0.5px;
+   }
+
+   .tags-container {
+     display: flex;
+     flex-wrap: wrap;
+     gap: 8px;
+     margin-top: 10px;
+   }
+
    @media print {
      .header-name-bar, .header-contact-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
    }
@@ -263,7 +419,7 @@ export function buildCharizardTemplate(data: any, theme?: any): string {
           data.personal?.name && data.personal?.name !== "undefined"
             ? data.personal.name
             : "Your Name"
-        }</div>
+        }${data.personal?.middleName ? ` ${data.personal.middleName}` : ""}</div>
         ${
           data.personal?.role
             ? `<div class="role" data-section="personal">${data.personal.role}</div>`
@@ -271,749 +427,718 @@ export function buildCharizardTemplate(data: any, theme?: any): string {
         }
     </div>
     <div class="header-contact-bar" data-section="personal">
-      ${
-        data.personal?.phone
-          ? `<span class="contact-item" data-section="personal">${icons.phone}${data.personal.phone}</span>`
-          : ""
-      }
-      ${
-        data.personal?.email
-          ? `<span class="contact-item" data-section="personal">${icons.email}${data.personal.email}</span>`
-          : ""
-      }
-      ${
-        data.personal?.location ||
-        data.personal?.country ||
-        data.personal?.pinCode ||
-        data.personal?.fullAddress
-          ? `<span class="contact-item" data-section="personal">${
-              icons.location
-            }${[
-              data.personal?.location,
-              data.personal?.country,
-              data.personal?.pinCode,
-              data.personal?.fullAddress,
-            ]
-              .filter(Boolean)
-              .join(", ")}</span>`
-          : ""
-      }
-      ${
-        data.personal?.linkedinUrl
-          ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.linkedinUrl}" target="_blank">LinkedIn</a></span>`
-          : ""
-      }
-      ${
-        data.personal?.githubUrl
-          ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.githubUrl}" target="_blank">GitHub</a></span>`
-          : ""
-      }
-      ${
-        data.personal?.portfolioUrl
-          ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.portfolioUrl}" target="_blank">Portfolio</a></span>`
-          : ""
-      }
-      ${
-        data.personal?.website
-          ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.website}" target="_blank">Website</a></span>`
-          : ""
-      }
-      ${
-        data.personal?.twitterUrl
-          ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.twitterUrl}" target="_blank">Twitter</a></span>`
-          : ""
-      }
-      ${
-        data.personal?.facebookUrl
-          ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.facebookUrl}" target="_blank">Facebook</a></span>`
-          : ""
-      }
-      ${
-        data.personal?.instagramUrl
-          ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.instagramUrl}" target="_blank">Instagram</a></span>`
-          : ""
-      }
-      ${
-        data.personal?.behanceUrl
-          ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.behanceUrl}" target="_blank">Behance</a></span>`
-          : ""
-      }
-      ${
-        data.personal?.dribbbleUrl
-          ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.dribbbleUrl}" target="_blank">Dribbble</a></span>`
-          : ""
-      }
-      ${
-        data.personal?.stackoverflowUrl
-          ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.stackoverflowUrl}" target="_blank">Stack Overflow</a></span>`
-          : ""
-      }
-      ${
-        data.personal?.mediumUrl
-          ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.mediumUrl}" target="_blank">Medium</a></span>`
-          : ""
-      }
-      ${
-        data.personal?.alternatePhone
-          ? `<span class="contact-item" data-section="personal">${icons.phone}${data.personal.alternatePhone}</span>`
-          : ""
-      }
-      ${
-        data.personal?.fathersName
-          ? `<span class="contact-item" data-section="personal">Father's Name: ${data.personal.fathersName}</span>`
-          : ""
-      }
-      ${
-        data.personal?.dob
-          ? `<span class="contact-item" data-section="personal">DOB: ${data.personal.dob}</span>`
-          : ""
-      }
-      ${
-        data.personal?.gender
-          ? `<span class="contact-item" data-section="personal">Gender: ${data.personal.gender}</span>`
-          : ""
-      }
-      ${
-        data.personal?.maritalStatus
-          ? `<span class="contact-item" data-section="personal">Marital Status: ${data.personal.maritalStatus}</span>`
-          : ""
-      }
+      ${data.personal?.phone ? `<span class="contact-item" data-section="personal">${icons.phone}${data.personal.phone}</span>` : ""}
+      ${data.personal?.alternatePhone ? `<span class="contact-item" data-section="personal">${icons.phone}${data.personal.alternatePhone}</span>` : ""}
+      ${data.personal?.email ? `<span class="contact-item" data-section="personal">${icons.email}${data.personal.email}</span>` : ""}
+      ${(() => {
+        const addressParts = [
+          data.personal?.fullAddress,
+          data.personal?.location,
+          data.personal?.country,
+          data.personal?.pinCode
+        ].filter(Boolean);
+        return addressParts.length > 0 ? `<span class="contact-item" data-section="personal">${icons.location}${addressParts.join(", ")}</span>` : "";
+      })()}
+      ${data.personal?.linkedinUrl ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.linkedinUrl}" target="_blank">LinkedIn</a></span>` : ""}
+      ${data.personal?.githubUrl ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.githubUrl}" target="_blank">GitHub</a></span>` : ""}
+      ${data.personal?.portfolioUrl ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.portfolioUrl}" target="_blank">Portfolio</a></span>` : ""}
+      ${data.personal?.website ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.website}" target="_blank">Website</a></span>` : ""}
+      ${data.personal?.twitterUrl ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.twitterUrl}" target="_blank">Twitter</a></span>` : ""}
+      ${data.personal?.facebookUrl ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.facebookUrl}" target="_blank">Facebook</a></span>` : ""}
+      ${data.personal?.instagramUrl ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.instagramUrl}" target="_blank">Instagram</a></span>` : ""}
+      ${data.personal?.behanceUrl ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.behanceUrl}" target="_blank">Behance</a></span>` : ""}
+      ${data.personal?.dribbbleUrl ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.dribbbleUrl}" target="_blank">Dribbble</a></span>` : ""}
+      ${data.personal?.stackoverflowUrl ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.stackoverflowUrl}" target="_blank">Stack Overflow</a></span>` : ""}
+      ${data.personal?.mediumUrl ? `<span class="contact-item" data-section="personal">${icons.link}<a href="${data.personal.mediumUrl}" target="_blank">Medium</a></span>` : ""}
+      
+      ${(() => {
+        const personalDetails = [];
+        if (data.personal?.fathersName) personalDetails.push(`<span class="contact-item" data-section="personal">Father: ${data.personal.fathersName}</span>`);
+        if (data.personal?.dob) personalDetails.push(`<span class="contact-item" data-section="personal">DOB: ${data.personal.dob}</span>`);
+        if (data.personal?.gender) personalDetails.push(`<span class="contact-item" data-section="personal">Gender: ${data.personal.gender}</span>`);
+        if (data.personal?.maritalStatus) personalDetails.push(`<span class="contact-item" data-section="personal">Marital: ${data.personal.maritalStatus}</span>`);
+        if (data.personal?.nationality) personalDetails.push(`<span class="contact-item" data-section="personal">Nationality: ${data.personal.nationality}</span>`);
+        if (data.personal?.passportNo) personalDetails.push(`<span class="contact-item" data-section="personal">Passport: ${data.personal.passportNo}</span>`);
+        
+        return personalDetails.join('');
+      })()}
     </div>
   </div>
 
     <div class="content-wrapper">
-      ${
-        data.sectionVisibility?.summary !== false && data.summary
-          ? `<div class="section" data-section="summary">
-        <div class="section-title" data-section="summary">Professional Summary</div>
-        <p class="summary-text" data-section="summary">${data.summary}</p>
-      </div>`
-          : ""
-      }
+      <!-- Professional Context -->
+      ${nonEmptyProfessionalContext ? `
+      <div class="section " data-section="professionalContext">
+        <div class="section-title">Professional Context</div>
+        <div class="metrics-grid">
+          ${nonEmptyProfessionalContext.totalExperience ? `
+          <div class="metric-item">
+            <div class="metric-value">${nonEmptyProfessionalContext.totalExperience}</div>
+            <div class="metric-label">Total Experience</div>
+          </div>` : ''}
+          ${nonEmptyProfessionalContext.teamSize ? `
+          <div class="metric-item">
+            <div class="metric-value">${nonEmptyProfessionalContext.teamSize}</div>
+            <div class="metric-label">Team Size</div>
+          </div>` : ''}
+          ${nonEmptyProfessionalContext.industry ? `
+          <div class="metric-item">
+            <div class="metric-value">${nonEmptyProfessionalContext.industry}</div>
+            <div class="metric-label">Industry</div>
+          </div>` : ''}
+          ${nonEmptyProfessionalContext.functionalDomain ? `
+          <div class="metric-item">
+            <div class="metric-value">${nonEmptyProfessionalContext.functionalDomain}</div>
+            <div class="metric-label">Domain</div>
+          </div>` : ''}
+          ${nonEmptyProfessionalContext.geographicScope ? `
+          <div class="metric-item">
+            <div class="metric-value">${nonEmptyProfessionalContext.geographicScope}</div>
+            <div class="metric-label">Geographic Scope</div>
+          </div>` : ''}
+          ${nonEmptyProfessionalContext.revenueResponsibility ? `
+          <div class="metric-item">
+            <div class="metric-value">${nonEmptyProfessionalContext.revenueResponsibility}</div>
+            <div class="metric-label">Revenue Responsibility</div>
+          </div>` : ''}
+        </div>
+      </div>` : ''}
 
-      ${
-        typeof data.careerObjective === "string" &&
-        data.careerObjective.trim().length > 0
-          ? `<div class="section" data-section="careerObjective">
-        <div class="section-title" data-section="careerObjective">Career Objective</div>
-        <p class="summary-text" data-section="careerObjective">${data.careerObjective}</p>
-      </div>`
-          : ""
-      }
+      <!-- Availability & Work Auth -->
+      ${nonEmptyAvailabilityWorkAuth ? `
+      <div class="section" data-section="availabilityWorkAuth">
+        <div class="section-title">Availability</div>
+        <div class="tags-container">
+          ${nonEmptyAvailabilityWorkAuth.availabilityNoticePeriod ? `<span class="skill-tag">Notice: ${nonEmptyAvailabilityWorkAuth.availabilityNoticePeriod}</span>` : ''}
+          ${nonEmptyAvailabilityWorkAuth.workAuthorizationStatus ? `<span class="skill-tag">Work Auth: ${nonEmptyAvailabilityWorkAuth.workAuthorizationStatus}</span>` : ''}
+          ${nonEmptyAvailabilityWorkAuth.preferredLocation ? `<span class="skill-tag">Preferred: ${nonEmptyAvailabilityWorkAuth.preferredLocation}</span>` : ''}
+        </div>
+      </div>` : ''}
 
-      ${
-        data.internships && data.internships.length > 0
-          ? `<div class="section" data-section="internships">
-        <div class="section-title" data-section="internships">Internships</div>
-        ${(data.internships || [])
-          .map(
-            (item: any, index: number) => `
-          <div class="entry" data-section="internships" data-index="${index}">
-            <div class="entry-header" data-section="internships" data-index="${index}">
-              <div class="entry-title" data-section="internships" data-index="${index}">${
-              item.title || "Internship Title"
-            }</div>
-              <div class="entry-date" data-section="internships" data-index="${index}">${
-              item.startDate || ""
-            } - ${item.endDate || ""}</div>
-            </div>
-            <div class="entry-subtitle" data-section="internships" data-index="${index}">${
-              item.company || "Company"
-            }${item.location ? `, ${item.location}` : ""}</div>
-            <div class="entry-content" data-section="internships" data-index="${index}">${
-              item.description || ""
-            }</div>
-          </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
+      <!-- Summary -->
+      ${data.summary && data.summary.trim() ? `
+      <div class="section" data-section="summary">
+        <div class="section-title">Professional Summary</div>
+        <p class="entry-content" data-section="summary">${data.summary}</p>
+      </div>` : ""}
 
-      ${
-        data.sectionVisibility?.experience !== false &&
-        data.experience &&
-        data.experience.length > 0
-          ? `<div class="section" data-section="experience">
-        <div class="section-title" data-section="experience">Work Experience</div>
-        ${(data.experience || [])
-          .map(
-            (exp: any, index: number) => `
+      <!-- Career Objective -->
+      ${data.careerObjective && data.careerObjective.trim() ? `
+      <div class="section" data-section="careerObjective">
+        <div class="section-title">Career Objective</div>
+        <p class="entry-content" data-section="careerObjective">${data.careerObjective}</p>
+      </div>` : ""}
+
+      <!-- Work Experience -->
+      ${hasNonEmptyItems(data.experience) ? `
+      <div class="section" data-section="experience">
+        <div class="section-title">Work Experience</div>
+        ${getNonEmptyArray(data.experience).map((exp: any, index: number) => {
+          const dateRange = formatDateRange(exp.startDate, exp.endDate, exp.isCurrent);
+          const subtitle = formatSubtitle([exp.company, exp.location, exp.domain]);
+          
+          return `
           <div class="entry" data-section="experience" data-index="${index}">
-            <div class="entry-header" data-section="experience" data-index="${index}">
-              <div class="entry-title" data-section="experience" data-index="${index}">${
-              exp.title || "Job Title"
-            }</div>
-              <div class="entry-date" data-section="experience" data-index="${index}">${
-              exp.startDate || ""
-            } - ${exp.endDate || "Present"}</div>
+            <div class="entry-header">
+              <div class="entry-title">${exp.title || ""}</div>
+              ${dateRange ? `<div class="entry-date">${dateRange}</div>` : ""}
             </div>
-            <div class="entry-subtitle" data-section="experience" data-index="${index}">${
-              exp.company || "Company Name"
-            }${exp.location ? `, ${exp.location}` : ""}</div>
-            <div class="entry-content" data-section="experience" data-index="${index}">${
-              exp.description || ""
-            }</div>
+            ${subtitle ? `<div class="entry-subtitle">${subtitle}</div>` : ""}
+            ${exp.description ? `<div class="entry-content">${exp.description}</div>` : ""}
+            ${exp.achievements ? `<div class="entry-content" style="margin-top: 8px;"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
           </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
+        `}).join("")}
+      </div>` : ""}
 
-      ${
-        data.sectionVisibility?.education !== false &&
-        data.education &&
-        data.education.length > 0
-          ? `<div class="section" data-section="education">
-        <div class="section-title" data-section="education">Education</div>
-        ${(data.education || [])
-          .map(
-            (edu: any, index: number) => `
+      <!-- Internships -->
+      ${nonEmptyInternships.length > 0 ? `
+      <div class="section" data-section="internships">
+        <div class="section-title">Internships</div>
+        ${nonEmptyInternships.map((item: any, index: number) => {
+          const dateRange = item.duration || formatDateRange(item.startDate, item.endDate);
+          const subtitle = formatSubtitle([item.company, item.location]);
+          
+          return `
+          <div class="entry" data-section="internships" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.title || ""}</div>
+              ${dateRange ? `<div class="entry-date">${dateRange}</div>` : ""}
+            </div>
+            ${subtitle ? `<div class="entry-subtitle">${subtitle}</div>` : ""}
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+          </div>
+        `}).join("")}
+      </div>` : ""}
+
+      <!-- Training Programs -->
+      ${nonEmptyTrainingPrograms.length > 0 ? `
+      <div class="section" data-section="trainingPrograms">
+        <div class="section-title">Training Programs</div>
+        ${nonEmptyTrainingPrograms.map((item: any, index: number) => `
+          <div class="entry" data-section="trainingPrograms" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.name || ""}</div>
+              ${item.completionDate ? `<div class="entry-date">${item.completionDate}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">${formatSubtitle([item.provider || item.organization, item.duration])}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Education -->
+      ${hasNonEmptyItems(data.education) ? `
+      <div class="section" data-section="education">
+        <div class="section-title">Education</div>
+        ${getNonEmptyArray(data.education).map((edu: any, index: number) => `
           <div class="entry" data-section="education" data-index="${index}">
-            <div class="entry-header" data-section="education" data-index="${index}">
-              <div class="entry-title" data-section="education" data-index="${index}">
-                ${edu.degree || "Degree"}${
-              edu.qualification ? ` (${edu.qualification})` : ""
-            }
+            <div class="entry-header">
+              <div class="entry-title">
+                ${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}${edu.qualification ? ` (${edu.qualification})` : ""}
               </div>
-              <div class="entry-date" data-section="education" data-index="${index}">${
-              edu.graduationDate || ""
-            }</div>
+              ${edu.graduationDate ? `<div class="entry-date">${edu.graduationDate}</div>` : ""}
             </div>
             
-            ${
-              edu.field
-                ? `<div class="education-field" data-section="education" data-index="${index}">${edu.field}</div>`
-                : ""
-            }
-            ${
-              edu.school
-                ? `<div class="education-school" data-section="education" data-index="${index}">${edu.school}</div>`
-                : ""
-            }
-            ${
-              edu.location
-                ? `<div class="education-location" data-section="education" data-index="${index}">${edu.location}</div>`
-                : ""
-            }
+            ${edu.school ? `<div class="education-school">${edu.school}${edu.location ? `, ${edu.location}` : ""}</div>` : ""}
+            ${edu.grade ? `<div class="education-field">Grade: ${edu.grade}</div>` : ""}
             
-            ${
-              edu.description
-                ? `
-              <div class="education-description" data-section="education" data-index="${index}">
-                ${
-                  edu.description.includes("<ul>") ||
-                  edu.description.includes("<li>")
-                    ? edu.description
-                    : `<p>${edu.description}</p>`
-                }
+            ${edu.description ? `
+              <div class="education-description">
+                ${edu.description}
               </div>
-            `
-                : ""
-            }
+            ` : ""}
             
-            ${
-              edu.achievements && edu.achievements.length > 0
-                ? `
-              <div class="education-achievements" data-section="education" data-index="${index}">
+            ${edu.achievements && edu.achievements.length > 0 ? `
+              <div class="education-achievements">
                 <h4>Academic Recognition</h4>
                 <ul>
-                  ${edu.achievements
-                    .filter((achievement: string) => achievement.trim())
-                    .map(
-                      (achievement: string, achIndex: number) =>
-                        `<li data-section="education" data-index="${index}" data-item-index="${achIndex}">${achievement}</li>`
-                    )
-                    .join("")}
+                  ${edu.achievements.filter((achievement: string) => achievement.trim()).map((achievement: string, achIndex: number) =>
+                    `<li data-section="education" data-index="${index}" data-item-index="${achIndex}">${achievement}</li>`
+                  ).join("")}
                 </ul>
               </div>
-            `
-                : ""
-            }
+            ` : ""}
           </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
+        `).join("")}
+      </div>` : ""}
 
-      ${
-        data.sectionVisibility?.projects !== false &&
-        data.projects &&
-        data.projects.length > 0
-          ? `<div class="section" data-section="projects">
-        <div class="section-title" data-section="projects">Projects</div>
-        ${(data.projects || [])
-          .map(
-            (project: any, index: number) => `
-          <div class="entry" data-section="projects" data-index="${index}">
-            <div class="entry-header" data-section="projects" data-index="${index}">
-                <div class="entry-title" data-section="projects" data-index="${index}">${
-              project.name || "Project Name"
-            }</div>
-                ${
-                  project.startDate || project.endDate
-                    ? `<div class="entry-date" data-section="projects" data-index="${index}">${
-                        project.startDate || ""
-                      } ${project.startDate && project.endDate ? "-" : ""} ${
-                        project.endDate || ""
-                      }</div>`
-                    : ""
-                }
-            </div>
-            <div class="entry-subtitle" data-section="projects" data-index="${index}">${
-              project.technologies || ""
-            }</div>
-            <div class="entry-content" data-section="projects" data-index="${index}">${
-              project.description || ""
-            }</div>
-            ${
-              project.url
-                ? `<div class="entry-content" data-section="projects" data-index="${index}" style="margin-top: 5px;">${
-                    icons.link
-                  }<a href="${project.url}" target="_blank" style="color: ${
-                    currentTheme.primary
-                  }; text-decoration: underline;">${
-                    project.urlText || project.url
-                  }</a></div>`
-                : ""
-            }
-          </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
-
-      ${
-        data.sectionVisibility?.skills !== false && data.skills
-          ? `<div class="section" data-section="skills">
-        <div class="section-title" data-section="skills">Skills</div>
-        <div class="skills-list" data-section="skills">
-          ${(Array.isArray(data.skills)
-            ? data.skills
-            : (data.skills || "").split(",")
-          )
-            .map(
-              (skill: any, index: number) =>
-                `<div class="skill-tag" data-section="skills" data-index="${index}">${
-                  typeof skill === "string" ? skill.trim() : skill
-                }</div>`
-            )
-            .join("")}
-        </div>
-      </div>`
-          : ""
-      }
-
-       ${
-         data.sectionVisibility?.languages !== false &&
-         data.languages &&
-         data.languages.length > 0
-           ? `<div class="section" data-section="languages">
-        <div class="section-title" data-section="languages">Languages</div>
-        <div class="skills-list" data-section="languages">
-          ${(data.languages || [])
-            .map(
-              (lang: any, index: number) =>
-                `<div class="skill-tag" data-section="languages" data-index="${index}">${
-                  lang.language || lang
-                }${lang.level ? ` (${lang.level})` : ""}</div>`
-            )
-            .join("")}
-        </div>
-      </div>`
-           : ""
-       }
-
-      ${
-        data.sectionVisibility?.hobbies !== false &&
-        data.hobbies &&
-        data.hobbies.length > 0
-          ? `<div class="section" data-section="hobbies">
-        <div class="section-title" data-section="hobbies">Hobbies & Interests</div>
-        <div class="skills-list" data-section="hobbies">
-          ${(data.hobbies || [])
-            .map(
-              (hobby: any, index: number) =>
-                `<div class="skill-tag" data-section="hobbies" data-index="${index}">${hobby}</div>`
-            )
-            .join("")}
-        </div>
-      </div>`
-          : ""
-      }
-
-      ${
-        data.sectionVisibility?.socialLinks !== false &&
-        data.socialLinks &&
-        data.socialLinks.length > 0
-          ? `<div class="section" data-section="socialLinks">
-        <div class="section-title" data-section="socialLinks">Social Links</div>
-        <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px;" data-section="socialLinks">
-          ${data.socialLinks
-            .map(
-              (link: any, index: number) => `
-            <a href="${link.url}" target="_blank" style="color: ${
-                currentTheme.primary
-              }; text-decoration: none; font-weight: 500; font-size: ${baseFontSize}px;" data-section="socialLinks" data-index="${index}">${
-                link.urlText ||
-                link.url.replace("https://", "").replace("http://", "")
-              }</a>
-          `
-            )
-            .join("")}
-        </div>
-      </div>`
-          : ""
-      }
-
-      ${
-        data.sectionVisibility?.certifications !== false &&
-        data.certifications &&
-        data.certifications.length > 0
-          ? `<div class="section" data-section="certifications">
-        <div class="section-title" data-section="certifications">Certifications</div>
-        ${(data.certifications || [])
-          .map(
-            (cert: any, index: number) => `
-          <div class="entry" data-section="certifications" data-index="${index}">
-            <div class="entry-header" data-section="certifications" data-index="${index}">
-              <div class="entry-title" data-section="certifications" data-index="${index}">${
-              cert.name || ""
-            }</div>
-              <div class="entry-date" data-section="certifications" data-index="${index}">${
-              cert.date || ""
-            }</div>
-            </div>
-            <div class="entry-subtitle" data-section="certifications" data-index="${index}">${
-              cert.issuer || ""
-            }</div>
-            ${
-              cert.url
-                ? `<div class="entry-content" data-section="certifications" data-index="${index}" style="margin-top: 5px;">${icons.link}<a href="${cert.url}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: underline;">View Certificate</a></div>`
-                : ""
-            }
-          </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
-
-      ${
-        data.academicProjects && data.academicProjects.length > 0
-          ? `<div class="section" data-section="academicProjects">
-        <div class="section-title" data-section="academicProjects">Academic Projects</div>
-        ${(data.academicProjects || [])
-          .map(
-            (item: any, index: number) => `
+      <!-- Academic Projects -->
+      ${nonEmptyAcademicProjects.length > 0 ? `
+      <div class="section" data-section="academicProjects">
+        <div class="section-title">Academic Projects</div>
+        ${nonEmptyAcademicProjects.map((item: any, index: number) => `
           <div class="entry" data-section="academicProjects" data-index="${index}">
-            <div class="entry-header" data-section="academicProjects" data-index="${index}">
-              <div class="entry-title" data-section="academicProjects" data-index="${index}">${
-              item.name || item.title || "Project Name"
-            }</div>
-              <div class="entry-date" data-section="academicProjects" data-index="${index}">${
-              item.duration || ""
-            }</div>
+            <div class="entry-header">
+              <div class="entry-title">${item.name || item.title || ""}</div>
+              ${item.duration ? `<div class="entry-date">${item.duration}</div>` : ""}
             </div>
-            <div class="entry-subtitle" data-section="academicProjects" data-index="${index}">${
-              item.institution || ""
-            }</div>
-            <div class="entry-content" data-section="academicProjects" data-index="${index}">${
-              item.description || ""
-            }</div>
-            ${
-              item.technologies
-                ? `<div class="entry-content" data-section="academicProjects" data-index="${index}" style="margin-top: 5px;"><strong>Technologies:</strong> ${item.technologies}</div>`
-                : ""
-            }
+            <div class="entry-subtitle">${formatSubtitle([item.institution, item.course ? `Course: ${item.course}` : ""])}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+            ${item.technologies ? `<div class="entry-content" style="margin-top: 5px;"><strong>Technologies:</strong> ${Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}</div>` : ""}
+            ${item.url ? `<div class="entry-content" style="margin-top: 5px;">${icons.link}<a href="${item.url}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: underline;">View Project</a></div>` : ""}
           </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
+        `).join("")}
+      </div>` : ""}
 
-      ${
-        data.leadershipPositions && data.leadershipPositions.length > 0
-          ? `<div class="section" data-section="leadershipPositions">
-        <div class="section-title" data-section="leadershipPositions">Leadership & Positions</div>
-        ${(data.leadershipPositions || [])
-          .map(
-            (item: any, index: number) => `
+      <!-- Client Projects -->
+      ${nonEmptyClientProjects.length > 0 ? `
+      <div class="section" data-section="clientProjects">
+        <div class="section-title">Client Projects</div>
+        ${nonEmptyClientProjects.map((item: any, index: number) => `
+          <div class="entry" data-section="clientProjects" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.name || ""}</div>
+              ${item.duration ? `<div class="entry-date">${item.duration}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">${formatSubtitle([item.clientOrganization, item.role ? `Role: ${item.role}` : ""])}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+            ${item.toolsTechnologies ? `<div class="entry-content" style="margin-top: 5px;"><strong>Tools:</strong> ${item.toolsTechnologies}</div>` : ""}
+            ${item.projectUrl ? `<div class="entry-content" style="margin-top: 5px;">${icons.link}<a href="${item.projectUrl}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: underline;">View Project</a></div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Portfolio -->
+      ${nonEmptyPortfolio.length > 0 ? `
+      <div class="section" data-section="portfolio">
+        <div class="section-title">Portfolio</div>
+        ${nonEmptyPortfolio.map((item: any, index: number) => `
+          <div class="entry" data-section="portfolio" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.name || ""}</div>
+              ${(item.type || item.platform) ? `<div class="entry-date">${formatSubtitle([item.type, item.platform ? `on ${item.platform}` : ""])}</div>` : ""}
+            </div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+            ${item.url ? `<div class="entry-content" style="margin-top: 5px;">${icons.link}<a href="${item.url}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: underline;">View Portfolio</a></div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Projects -->
+      ${nonEmptyProjects.length > 0 ? `
+      <div class="section" data-section="projects">
+        <div class="section-title">Projects</div>
+        ${nonEmptyProjects.map((project: any, index: number) => {
+          const dateRange = formatDateRange(project.startDate, project.endDate);
+          
+          return `
+          <div class="entry" data-section="projects" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${project.name || ""}</div>
+              ${dateRange ? `<div class="entry-date">${dateRange}</div>` : ""}
+            </div>
+            ${project.technologies ? `<div class="entry-subtitle">${project.technologies}</div>` : ""}
+            ${project.description ? `<div class="entry-content">${project.description}</div>` : ""}
+            ${project.url ? `<div class="entry-content" style="margin-top: 5px;">${icons.link}<a href="${project.url}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: underline;">${project.urlText || "View Project"}</a></div>` : ""}
+          </div>
+        `}).join("")}
+      </div>` : ""}
+
+      <!-- Leadership Positions -->
+      ${nonEmptyLeadershipPositions.length > 0 ? `
+      <div class="section" data-section="leadershipPositions">
+        <div class="section-title">Leadership & Positions</div>
+        ${nonEmptyLeadershipPositions.map((item: any, index: number) => {
+          const dateRange = formatDateRange(item.startDate, item.endDate);
+          
+          return `
           <div class="entry" data-section="leadershipPositions" data-index="${index}">
-            <div class="entry-header" data-section="leadershipPositions" data-index="${index}">
-              <div class="entry-title" data-section="leadershipPositions" data-index="${index}">${
-              item.position || item.title || "Position"
-            }</div>
-              <div class="entry-date" data-section="leadershipPositions" data-index="${index}">${
-              item.startDate || ""
-            } - ${item.endDate || ""}</div>
+            <div class="entry-header">
+              <div class="entry-title">${item.position || item.title || ""}</div>
+              ${dateRange ? `<div class="entry-date">${dateRange}</div>` : ""}
             </div>
-            <div class="entry-subtitle" data-section="leadershipPositions" data-index="${index}">${
-              item.organization || ""
-            }</div>
-            <div class="entry-content" data-section="leadershipPositions" data-index="${index}">${
-              item.description || ""
-            }</div>
+            <div class="entry-subtitle">${item.organization || ""}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
           </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
+        `}).join("")}
+      </div>` : ""}
 
-      ${
-        data.trainingPrograms && data.trainingPrograms.length > 0
-          ? `<div class="section" data-section="trainingPrograms">
-        <div class="section-title" data-section="trainingPrograms">Training Programs</div>
-        ${(data.trainingPrograms || [])
-          .map(
-            (item: any, index: number) => `
-          <div class="entry" data-section="trainingPrograms" data-index="${index}">
-            <div class="entry-header" data-section="trainingPrograms" data-index="${index}">
-              <div class="entry-title" data-section="trainingPrograms" data-index="${index}">${
-              item.name || "Training Program"
-            }</div>
-              <div class="entry-date" data-section="trainingPrograms" data-index="${index}">${
-              item.completionDate || ""
-            }</div>
+      <!-- Volunteering -->
+      ${nonEmptyVolunteering.length > 0 ? `
+      <div class="section" data-section="volunteering">
+        <div class="section-title">Volunteering</div>
+        ${nonEmptyVolunteering.map((item: any, index: number) => `
+          <div class="entry" data-section="volunteering" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.role || ""}</div>
+              ${item.duration ? `<div class="entry-date">${item.duration}</div>` : ""}
             </div>
-            <div class="entry-subtitle" data-section="trainingPrograms" data-index="${index}">${
-              item.provider || item.organization || ""
-            }${item.duration ? ` | ${item.duration}` : ""}</div>
-            <div class="entry-content" data-section="trainingPrograms" data-index="${index}">${
-              item.description || ""
-            }</div>
+            <div class="entry-subtitle">${formatSubtitle([item.organization, item.causeArea])}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
           </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
+        `).join("")}
+      </div>` : ""}
 
-      ${
-        data.scholarships && data.scholarships.length > 0
-          ? `<div class="section" data-section="scholarships">
-        <div class="section-title" data-section="scholarships">Scholarships</div>
-        ${(data.scholarships || [])
-          .map(
-            (item: any, index: number) => `
+      <!-- Military Service -->
+      ${nonEmptyMilitaryService.length > 0 ? `
+      <div class="section" data-section="militaryService">
+        <div class="section-title">Military Service</div>
+        ${nonEmptyMilitaryService.map((item: any, index: number) => `
+          <div class="entry" data-section="militaryService" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.rank ? item.rank : ""}${item.rank && item.branch ? " - " : ""}${item.branch || ""}</div>
+              ${item.duration ? `<div class="entry-date">${item.duration}</div>` : ""}
+            </div>
+            ${item.specialization ? `<div class="entry-subtitle">${item.specialization}</div>` : ""}
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Teaching Experience -->
+      ${nonEmptyTeachingExperience.length > 0 ? `
+      <div class="section" data-section="teachingExperience">
+        <div class="section-title">Teaching Experience</div>
+        ${nonEmptyTeachingExperience.map((item: any, index: number) => `
+          <div class="entry" data-section="teachingExperience" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.subjectCourseTaught || item.title || ""}</div>
+              ${item.duration ? `<div class="entry-date">${item.duration}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">${formatSubtitle([item.institution])}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Mentorship Experience -->
+      ${nonEmptyMentorshipExperience.length > 0 ? `
+      <div class="section" data-section="mentorshipExperience">
+        <div class="section-title">Mentorship Experience</div>
+        ${nonEmptyMentorshipExperience.map((item: any, index: number) => `
+          <div class="entry" data-section="mentorshipExperience" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.mentorshipArea || ""}</div>
+              ${item.duration ? `<div class="entry-date">${item.duration}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">${formatSubtitle([item.organizationPlatform, item.menteeLevel ? `Mentee Level: ${item.menteeLevel}` : ""])}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Research Grants -->
+      ${nonEmptyResearchGrants.length > 0 ? `
+      <div class="section" data-section="researchGrants">
+        <div class="section-title">Research Grants</div>
+        ${nonEmptyResearchGrants.map((item: any, index: number) => `
+          <div class="entry" data-section="researchGrants" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.title || ""}</div>
+              ${item.year ? `<div class="entry-date">${item.year}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">${formatSubtitle([item.agency, item.amount ? `Amount: ${item.amount}` : ""])}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Publications -->
+      ${nonEmptyPublications.length > 0 ? `
+      <div class="section" data-section="publications">
+        <div class="section-title">Publications</div>
+        ${nonEmptyPublications.map((item: any, index: number) => `
+          <div class="entry" data-section="publications" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.title || ""}</div>
+              ${item.year ? `<div class="entry-date">${item.year}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">${formatSubtitle([item.journalPublisher, item.publicationType])}</div>
+            ${item.authors ? `<div class="entry-content"><strong>Authors:</strong> ${item.authors}</div>` : ""}
+            ${item.urlDoi ? `<div class="entry-content" style="margin-top: 5px;">${icons.link}<a href="${item.urlDoi}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: underline;">View Publication</a></div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Patents -->
+      ${nonEmptyPatents.length > 0 ? `
+      <div class="section" data-section="patents">
+        <div class="section-title">Patents</div>
+        ${nonEmptyPatents.map((item: any, index: number) => `
+          <div class="entry" data-section="patents" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.title || ""}</div>
+              ${item.year ? `<div class="entry-date">${item.year}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">${formatSubtitle([item.patentNumber ? `Patent #: ${item.patentNumber}` : "", item.issuingAuthority])}</div>
+            ${item.status ? `<div class="entry-content"><strong>Status:</strong> ${item.status}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Test Scores -->
+      ${nonEmptyTestScores.length > 0 ? `
+      <div class="section" data-section="testScores">
+        <div class="section-title">Test Scores</div>
+        ${nonEmptyTestScores.map((item: any, index: number) => `
+          <div class="entry" data-section="testScores" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.testName || ""}</div>
+              ${item.year ? `<div class="entry-date">${item.year}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">Score: ${item.score || ""}${item.percentileRank ? ` (${item.percentileRank} percentile)` : ""}</div>
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Scholarships -->
+      ${nonEmptyScholarships.length > 0 ? `
+      <div class="section" data-section="scholarships">
+        <div class="section-title">Scholarships</div>
+        ${nonEmptyScholarships.map((item: any, index: number) => `
           <div class="entry" data-section="scholarships" data-index="${index}">
-            <div class="entry-header" data-section="scholarships" data-index="${index}">
-              <div class="entry-title" data-section="scholarships" data-index="${index}">${
-              item.name || "Scholarship"
-            }</div>
-              <div class="entry-date" data-section="scholarships" data-index="${index}">${
-              item.year || ""
-            }</div>
+            <div class="entry-header">
+              <div class="entry-title">${item.name || ""}</div>
+              ${item.year ? `<div class="entry-date">${item.year}</div>` : ""}
             </div>
-            <div class="entry-subtitle" data-section="scholarships" data-index="${index}">${
-              item.provider || item.organization || ""
-            }${item.amount ? ` | ${item.amount}` : ""}</div>
-            <div class="entry-content" data-section="scholarships" data-index="${index}">${
-              item.description || ""
-            }</div>
+            <div class="entry-subtitle">${formatSubtitle([item.provider || item.organization, item.amount])}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
           </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
+        `).join("")}
+      </div>` : ""}
 
-      ${
-        data.coCurricular && data.coCurricular.length > 0
-          ? `<div class="section" data-section="coCurricular">
-        <div class="section-title" data-section="coCurricular">Co-curricular Activities</div>
-        ${(data.coCurricular || [])
-          .map(
-            (item: any, index: number) => `
+      <!-- Co-curricular Activities -->
+      ${nonEmptyCoCurricular.length > 0 ? `
+      <div class="section" data-section="coCurricular">
+        <div class="section-title">Co-curricular Activities</div>
+        ${nonEmptyCoCurricular.map((item: any, index: number) => `
           <div class="entry" data-section="coCurricular" data-index="${index}">
-            <div class="entry-header" data-section="coCurricular" data-index="${index}">
-              <div class="entry-title" data-section="coCurricular" data-index="${index}">${
-              item.activity || "Activity"
-            }</div>
-              <div class="entry-date" data-section="coCurricular" data-index="${index}">${
-              item.year ||
-              (item.startDate
-                ? `${item.startDate} - ${item.endDate || ""}`
-                : "")
-            }</div>
+            <div class="entry-header">
+              <div class="entry-title">${item.activity || ""}</div>
+              ${item.year ? `<div class="entry-date">${item.year}</div>` : ""}
             </div>
-            <div class="entry-subtitle" data-section="coCurricular" data-index="${index}">${
-              item.organization || ""
-            }${item.role ? ` | ${item.role}` : ""}</div>
-            <div class="entry-content" data-section="coCurricular" data-index="${index}">${
-              item.description || ""
-            }</div>
+            <div class="entry-subtitle">${formatSubtitle([item.organization, item.role ? `Role: ${item.role}` : ""])}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
           </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
+        `).join("")}
+      </div>` : ""}
 
-      ${
-        data.extracurricular && data.extracurricular.length > 0
-          ? `<div class="section" data-section="extracurricular">
-        <div class="section-title" data-section="extracurricular">Extracurricular Activities</div>
-        ${(data.extracurricular || [])
-          .map(
-            (item: any, index: number) => `
+      <!-- Extracurricular Activities -->
+      ${nonEmptyExtracurricular.length > 0 ? `
+      <div class="section" data-section="extracurricular">
+        <div class="section-title">Extracurricular Activities</div>
+        ${nonEmptyExtracurricular.map((item: any, index: number) => `
           <div class="entry" data-section="extracurricular" data-index="${index}">
-            <div class="entry-header" data-section="extracurricular" data-index="${index}">
-              <div class="entry-title" data-section="extracurricular" data-index="${index}">${
-              item.activity || "Activity"
-            }</div>
-              <div class="entry-date" data-section="extracurricular" data-index="${index}">${
-              item.year ||
-              (item.startDate
-                ? `${item.startDate} - ${item.endDate || ""}`
-                : "")
-            }</div>
+            <div class="entry-header">
+              <div class="entry-title">${item.activity || ""}</div>
+              ${item.year ? `<div class="entry-date">${item.year}</div>` : ""}
             </div>
-            <div class="entry-subtitle" data-section="extracurricular" data-index="${index}">${
-              item.organization || ""
-            }${item.role ? ` | ${item.role}` : ""}</div>
-            <div class="entry-content" data-section="extracurricular" data-index="${index}">${
-              item.description || ""
-            }</div>
+            <div class="entry-subtitle">${formatSubtitle([item.organization, item.role ? `Role: ${item.role}` : ""])}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
           </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
+        `).join("")}
+      </div>` : ""}
 
-      ${
-        data.keyAchievements && data.keyAchievements.length > 0
-          ? `<div class="section" data-section="keyAchievements">
-        <div class="section-title" data-section="keyAchievements">Key Achievements</div>
-        <div class="entry-content" data-section="keyAchievements">
+      <!-- Skills -->
+      ${nonEmptySkills.length > 0 ? `
+      <div class="section" data-section="skills">
+        <div class="section-title">Skills</div>
+        <div class="skills-list" data-section="skills">
+          ${nonEmptySkills.map((skill: any, index: number) =>
+            `<span class="skill-tag" data-section="skills" data-index="${index}">${typeof skill === "string" ? skill.trim() : skill}</span>`
+          ).join("")}
+        </div>
+      </div>` : ""}
+
+      <!-- Tools & Technologies -->
+      ${nonEmptyToolsTechnologies.length > 0 ? `
+      <div class="section" data-section="toolsTechnologies">
+        <div class="section-title">Tools & Technologies</div>
+        <div class="skills-list" data-section="toolsTechnologies">
+          ${nonEmptyToolsTechnologies.map((item: any, index: number) => `
+            <span class="skill-tag" data-section="toolsTechnologies" data-index="${index}">
+              ${item.name || ''}${item.proficiency ? ` (${item.proficiency})` : ''}${item.experienceDuration ? ` - ${item.experienceDuration}` : ''}
+            </span>
+          `).join("")}
+        </div>
+      </div>` : ""}
+
+      <!-- Methodologies -->
+      ${nonEmptyMethodologies.length > 0 ? `
+      <div class="section" data-section="methodologies">
+        <div class="section-title">Methodologies</div>
+        <div class="skills-list" data-section="methodologies">
+          ${nonEmptyMethodologies.map((item: any, index: number) => `
+            <span class="skill-tag" data-section="methodologies" data-index="${index}">
+              ${item.name || ''}${item.certification ? ` (${item.certification})` : ''}${item.experienceDuration ? ` - ${item.experienceDuration} years` : ''}
+            </span>
+          `).join("")}
+        </div>
+      </div>` : ""}
+
+      <!-- Industry Expertise -->
+      ${nonEmptyIndustryExpertise.length > 0 ? `
+      <div class="section" data-section="industryExpertise">
+        <div class="section-title">Industry Expertise</div>
+        <div class="skills-list" data-section="industryExpertise">
+          ${nonEmptyIndustryExpertise.map((item: any, index: number) => `
+            <span class="skill-tag" data-section="industryExpertise" data-index="${index}">
+              ${item.industry || ''}${item.domainArea ? ` - ${item.domainArea}` : ''}${item.experienceDuration ? ` (${item.experienceDuration} years)` : ''}
+            </span>
+          `).join("")}
+        </div>
+      </div>` : ""}
+
+      <!-- Languages -->
+      ${nonEmptyLanguages.length > 0 ? `
+      <div class="section" data-section="languages">
+        <div class="section-title">Languages</div>
+        <div class="skills-list" data-section="languages">
+          ${nonEmptyLanguages.map((lang: any, index: number) =>
+            `<span class="skill-tag" data-section="languages" data-index="${index}">${lang.language || lang}${lang.level ? ` (${lang.level})` : ''}${lang.capability ? ` - ${lang.capability}` : ''}</span>`
+          ).join("")}
+        </div>
+      </div>` : ""}
+
+      <!-- Hobbies -->
+      ${nonEmptyHobbies.length > 0 ? `
+      <div class="section" data-section="hobbies">
+        <div class="section-title">Hobbies & Interests</div>
+        <div class="skills-list" data-section="hobbies">
+          ${nonEmptyHobbies.map((hobby: any, index: number) =>
+            `<span class="skill-tag" data-section="hobbies" data-index="${index}">${hobby}</span>`
+          ).join("")}
+        </div>
+      </div>` : ""}
+
+      <!-- Social Links -->
+      ${nonEmptySocialLinks.length > 0 ? `
+      <div class="section" data-section="socialLinks">
+        <div class="section-title">Social Links</div>
+        <div class="tags-container" data-section="socialLinks">
+          ${nonEmptySocialLinks.map((link: any, index: number) => `
+            <a href="${link.url}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: underline; margin-right: 15px;" data-section="socialLinks" data-index="${index}">
+              ${link.urlText || link.url.replace("https://", "").replace("http://", "")}
+            </a>
+          `).join("")}
+        </div>
+      </div>` : ""}
+
+      <!-- Social Profiles -->
+      ${nonEmptySocialProfiles.length > 0 ? `
+      <div class="section" data-section="socialProfiles">
+        <div class="section-title">Social Profiles</div>
+        <div class="tags-container" data-section="socialProfiles">
+          ${nonEmptySocialProfiles.map((profile: any, index: number) => `
+            <a href="${profile.url}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: underline; margin-right: 15px;" data-section="socialProfiles" data-index="${index}">
+              ${profile.platform || "Profile"}
+            </a>
+          `).join("")}
+        </div>
+      </div>` : ""}
+
+      <!-- References -->
+      ${nonEmptyReferences.length > 0 ? `
+      <div class="section" data-section="references">
+        <div class="section-title">References</div>
+        ${nonEmptyReferences.map((ref: any, index: number) => `
+          <div class="entry" data-section="references" data-index="${index}">
+            <div class="entry-title">${ref.name || ""}</div>
+            <div class="entry-subtitle">${formatSubtitle([ref.designationRelationship, ref.organization])}</div>
+            ${ref.contactInformation ? `<div class="entry-content"><strong>Contact:</strong> ${ref.contactInformation}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Certifications -->
+      ${nonEmptyCertifications.length > 0 ? `
+      <div class="section" data-section="certifications">
+        <div class="section-title">Certifications</div>
+        ${nonEmptyCertifications.map((cert: any, index: number) => `
+          <div class="entry" data-section="certifications" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${cert.name || ""}</div>
+              ${cert.date ? `<div class="entry-date">${cert.date}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">${cert.issuer || ""}</div>
+            ${cert.description ? `<div class="entry-content">${cert.description}</div>` : ""}
+            ${cert.url ? `<div class="entry-content" style="margin-top: 5px;">${icons.link}<a href="${cert.url}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: underline;">View Certificate</a></div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Key Achievements -->
+      ${nonEmptyKeyAchievements.length > 0 ? `
+      <div class="section" data-section="keyAchievements">
+        <div class="section-title">Key Achievements</div>
+        <div class="entry-content">
           <ul data-section="keyAchievements">
-            ${(data.keyAchievements || [])
-              .map(
-                (achievement: string, index: number) =>
-                  `<li data-section="keyAchievements" data-index="${index}">${achievement}</li>`
-              )
-              .join("")}
+            ${nonEmptyKeyAchievements.map((achievement: string, index: number) =>
+              `<li data-section="keyAchievements" data-index="${index}">${achievement}</li>`
+            ).join("")}
           </ul>
         </div>
-      </div>`
-          : ""
-      }
+      </div>` : ""}
 
-
-      ${
-        (Array.isArray(data.responsibilities)
-          ? data.responsibilities
-          : (data.responsibilities || "").split("\n")
-        ).filter((line: string) => line.trim()).length > 0
-          ? `<div class="section" data-section="responsibilities">
-        <div class="section-title" data-section="responsibilities">Key Responsibilities</div>
-        <div class="entry-content" data-section="responsibilities">
+      <!-- Key Responsibilities -->
+      ${nonEmptyResponsibilities.length > 0 ? `
+      <div class="section" data-section="responsibilities">
+        <div class="section-title">Key Responsibilities</div>
+        <div class="entry-content">
           <ul data-section="responsibilities">
-            ${(Array.isArray(data.responsibilities)
-              ? data.responsibilities
-              : (data.responsibilities || "").split("\n")
-            )
-              .filter((line: string) => line.trim())
-              .map(
-                (line: string, index: number) =>
-                  `<li data-section="responsibilities" data-index="${index}">${line.trim()}</li>`
-              )
-              .join("")}
+            ${nonEmptyResponsibilities.map((line: string, index: number) =>
+              `<li data-section="responsibilities" data-index="${index}">${line.trim()}</li>`
+            ).join("")}
           </ul>
         </div>
-      </div>`
-          : ""
-      }
+      </div>` : ""}
 
-      ${
-        (Array.isArray(data.tools)
-          ? data.tools
-          : (data.tools || "").split("\n")
-        ).filter((line: string) => line.trim()).length > 0
-          ? `<div class="section" data-section="tools">
-        <div class="section-title" data-section="tools">Tools & Technologies</div>
-        <div class="entry-content" data-section="tools">
+      <!-- Tools -->
+      ${nonEmptyTools.length > 0 ? `
+      <div class="section" data-section="tools">
+        <div class="section-title">Tools & Technologies</div>
+        <div class="entry-content">
           <ul data-section="tools">
-            ${(Array.isArray(data.tools)
-              ? data.tools
-              : (data.tools || "").split("\n")
-            )
-              .filter((line: string) => line.trim())
-              .map(
-                (line: string, index: number) =>
-                  `<li data-section="tools" data-index="${index}">${line.trim()}</li>`
-              )
-              .join("")}
+            ${nonEmptyTools.map((line: string, index: number) =>
+              `<li data-section="tools" data-index="${index}">${line.trim()}</li>`
+            ).join("")}
           </ul>
         </div>
-      </div>`
-          : ""
-      }
+      </div>` : ""}
 
-
-      ${
-        data.customSections && data.customSections.length > 0
-          ? data.customSections
-              .filter((section: any) => section.isVisible)
-              .map(
-                (section: any) => `
-      <div class="section" data-section="customSections">
-        <div class="section-title" data-section="customSections">${
-          section.heading || "Custom Section"
-        }</div>
-        ${
-          section.entries && section.entries.length > 0
-            ? section.entries
-                .filter((entry: any) => entry.isVisible)
-                .map(
-                  (entry: any, entryIndex: number) => `
-          <div class="entry" data-section="customSections" data-index="${entryIndex}">
-            <div class="entry-header" data-section="customSections" data-index="${entryIndex}">
-              <div class="entry-title" data-section="customSections" data-index="${entryIndex}">${
-                    entry.title || ""
-                  }${entry.title && entry.organization ? " at " : ""}${
-                    entry.organization || ""
-                  }</div>
-              ${
-                entry.date
-                  ? `<div class="entry-date" data-section="customSections" data-index="${entryIndex}">${entry.date}</div>`
-                  : ""
-              }
+      <!-- Awards -->
+      ${nonEmptyAwards.length > 0 ? `
+      <div class="section" data-section="awards">
+        <div class="section-title">Awards</div>
+        ${nonEmptyAwards.map((award: any, index: number) => `
+          <div class="entry" data-section="awards" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${award.title || ""}</div>
+              ${award.issueYear || award.year ? `<div class="entry-date">${award.issueYear || award.year}</div>` : ""}
             </div>
-            ${
-              entry.description
-                ? `<div class="entry-content" data-section="customSections" data-index="${entryIndex}">${entry.description}</div>`
-                : ""
-            }
+            <div class="entry-subtitle">${award.organization || ""}</div>
+            ${award.description ? `<div class="entry-content">${award.description}</div>` : ""}
           </div>
-        `
-                )
-                .join("")
-            : '<div style="color: #666666; font-style: italic;">No entries in this section</div>'
-        }
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Speaking Engagements -->
+      ${nonEmptySpeakingEngagements.length > 0 ? `
+      <div class="section" data-section="speakingEngagements">
+        <div class="section-title">Speaking Engagements</div>
+        ${nonEmptySpeakingEngagements.map((item: any, index: number) => `
+          <div class="entry" data-section="speakingEngagements" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.topic || ""}</div>
+              ${item.date ? `<div class="entry-date">${item.date}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">${item.eventName || ""}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Memberships -->
+      ${nonEmptyMemberships.length > 0 ? `
+      <div class="section" data-section="memberships">
+        <div class="section-title">Memberships</div>
+        ${nonEmptyMemberships.map((item: any, index: number) => `
+          <div class="entry" data-section="memberships" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.membershipName || ""}</div>
+              ${item.year ? `<div class="entry-date">${item.year}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">${item.organizationName || ""}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Workshops -->
+      ${nonEmptyWorkshops.length > 0 ? `
+      <div class="section" data-section="workshops">
+        <div class="section-title">Workshops</div>
+        ${nonEmptyWorkshops.map((item: any, index: number) => `
+          <div class="entry" data-section="workshops" data-index="${index}">
+            <div class="entry-header">
+              <div class="entry-title">${item.programTitle || ""}</div>
+              ${item.year ? `<div class="entry-date">${item.year}</div>` : ""}
+            </div>
+            <div class="entry-subtitle">${item.conductedBy || ""}</div>
+            ${item.description ? `<div class="entry-content">${item.description}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>` : ""}
+
+      <!-- Custom Sections -->
+      ${nonEmptyCustomSections.length > 0 ? data.customSections
+        .filter((section: any) => section.isVisible && section.entries && hasNonEmptyItems(section.entries))
+        .map((section: any) => `
+      <div class="section" data-section="customSections">
+        <div class="section-title">${section.heading || "Custom Section"}</div>
+        ${section.entries && section.entries.length > 0 ? section.entries
+          .filter((entry: any) => entry.isVisible && (entry.title || entry.description))
+          .map((entry: any, entryIndex: number) => `
+          <div class="entry" data-section="customSections" data-index="${entryIndex}">
+            <div class="entry-header">
+              <div class="entry-title">${entry.title || ""}${entry.title && entry.organization ? " at " : ""}${entry.organization || ""}</div>
+              ${entry.date ? `<div class="entry-date">${entry.date}</div>` : ""}
+            </div>
+            ${entry.description ? `<div class="entry-content">${entry.description}</div>` : ""}
+          </div>
+        `).join("") : '<div style="color: #666666; font-style: italic;">No entries in this section</div>'}
       </div>
-      `
-              )
-              .join("")
-          : ""
-      }
+      `).join("") : ""}
     </div>
   </div>
 </body>

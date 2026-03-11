@@ -23,7 +23,6 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
   const hasContent = (arr: any): boolean => {
     if (!arr || !Array.isArray(arr)) return false;
     if (arr.length === 0) return false;
-    // Check if any item has non-empty content
     return arr.some((item: any) => {
       if (typeof item === "string") return item.trim().length > 0;
       if (typeof item === "object" && item !== null) {
@@ -48,6 +47,73 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
       return false;
     });
   };
+
+  // Helper to safely format subtitle with multiple fields
+  const formatSubtitle = (parts: (string | undefined | null)[]): string => {
+    const filtered = parts.filter(part => part && typeof part === "string" && part.trim().length > 0);
+    return filtered.join(" | ");
+  };
+
+  // Helper to safely format date range
+  const formatDateRange = (startDate?: string, endDate?: string): string => {
+    if (!startDate && !endDate) return "";
+    if (startDate && !endDate) return startDate;
+    if (!startDate && endDate) return endDate;
+    return `${startDate} - ${endDate}`;
+  };
+
+  // Parse skills (handles HTML string or array)
+  const parseSkills = (): any[] => {
+    if (!data.skills) return [];
+    if (Array.isArray(data.skills)) return data.skills.filter((s: any) => s && (typeof s === "string" ? s.trim() : s));
+    if (typeof data.skills === 'string') {
+      if (data.skills.includes('<ul>')) {
+        const matches = data.skills.match(/<li>(.*?)<\/li>/g);
+        if (matches) {
+          return matches.map(m => m.replace(/<\/?li>/g, '').trim());
+        }
+      }
+      return data.skills.split(',').map((s: string) => s.trim()).filter(Boolean);
+    }
+    return [];
+  };
+
+  const nonEmptySkills = parseSkills();
+  const nonEmptyInternships = getNonEmptyArray(data.internships);
+  const nonEmptyTrainingPrograms = getNonEmptyArray(data.trainingPrograms);
+  const nonEmptyAcademicProjects = getNonEmptyArray(data.academicProjects);
+  const nonEmptyClientProjects = getNonEmptyArray(data.clientProjects);
+  const nonEmptyPortfolio = getNonEmptyArray(data.portfolio);
+  const nonEmptyLeadershipPositions = getNonEmptyArray(data.leadershipPositions);
+  const nonEmptyVolunteering = getNonEmptyArray(data.volunteering);
+  const nonEmptyMilitaryService = getNonEmptyArray(data.militaryService);
+  const nonEmptyTeachingExperience = getNonEmptyArray(data.teachingExperience);
+  const nonEmptyMentorshipExperience = getNonEmptyArray(data.mentorshipExperience);
+  const nonEmptyResearchGrants = getNonEmptyArray(data.researchGrants);
+  const nonEmptyPublications = getNonEmptyArray(data.publications);
+  const nonEmptyPatents = getNonEmptyArray(data.patents);
+  const nonEmptyTestScores = getNonEmptyArray(data.testScores);
+  const nonEmptyScholarships = getNonEmptyArray(data.scholarships);
+  const nonEmptyAwards = getNonEmptyArray(data.awards);
+  const nonEmptySpeakingEngagements = getNonEmptyArray(data.speakingEngagements);
+  const nonEmptyMemberships = getNonEmptyArray(data.memberships);
+  const nonEmptyWorkshops = getNonEmptyArray(data.workshops);
+  const nonEmptyCoCurricular = getNonEmptyArray(data.coCurricular);
+  const nonEmptyExtracurricular = getNonEmptyArray(data.extracurricular);
+  const nonEmptyToolsTechnologies = getNonEmptyArray(data.toolsTechnologies);
+  const nonEmptyMethodologies = getNonEmptyArray(data.methodologies);
+  const nonEmptyIndustryExpertise = getNonEmptyArray(data.industryExpertise);
+  const nonEmptyReferences = getNonEmptyArray(data.references);
+  const nonEmptySocialProfiles = getNonEmptyArray(data.socialProfiles);
+  const nonEmptyKeyAchievements = getNonEmptyArray(data.keyAchievements);
+  const nonEmptyResponsibilities = getNonEmptyArray(
+    Array.isArray(data.responsibilities)
+      ? data.responsibilities
+      : (data.responsibilities || "").split("\n")
+  );
+  const nonEmptyTools = getNonEmptyArray(
+    Array.isArray(data.tools) ? data.tools : (data.tools || "").split("\n")
+  );
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -128,7 +194,7 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
       letter-spacing: 1px;
     }
 
-    /* Profile Image */
+    /* Profile Image - Only shown when image exists */
     .profile-image {
       position: absolute;
       top: 40px;
@@ -175,6 +241,16 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
       margin-bottom: 8px;
       font-size: ${Math.round(baseFontSize * 0.9231)}px;
       color: #ecf0f1;
+    }
+
+    .contact-item a {
+      color: #ecf0f1;
+      text-decoration: none;
+      border-bottom: 1px dotted #3498db;
+    }
+    
+    .contact-item a:hover {
+      color: #3498db;
     }
     
     /* Skills List */
@@ -483,6 +559,72 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
       margin-right: 8px;
       margin-bottom: 8px;
     }
+
+    /* Certification Styles */
+    .certification-item {
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #ecf0f1;
+    }
+
+    .certification-item:last-child {
+      border-bottom: none;
+    }
+
+    .certification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .certification-name {
+      font-weight: 600;
+      color: var(--primary-color);
+      font-size: ${Math.round(baseFontSize * 1.05)}px;
+    }
+
+    .certification-date {
+      font-size: ${Math.round(baseFontSize * 0.85)}px;
+      color: #7f8c8d;
+      font-style: italic;
+    }
+
+    .certification-issuer {
+      font-size: ${baseFontSize}px;
+      color: #3498db;
+      margin-bottom: 8px;
+    }
+
+    /* Metrics Grid for Professional Context */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .metric-item {
+      background: #f8f9fa;
+      padding: 12px;
+      border-radius: 4px;
+      border-left: 3px solid #3498db;
+    }
+
+    .metric-value {
+      font-size: ${Math.round(baseFontSize * 1.2)}px;
+      font-weight: 700;
+      color: var(--primary-color);
+      line-height: 1.2;
+    }
+
+    .metric-label {
+      font-size: ${Math.round(baseFontSize * 0.85)}px;
+      color: #7f8c8d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
     
     /* Clearfix */
     .clearfix:after {
@@ -507,6 +649,10 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
       .container {
         margin: 20px;
       }
+
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
     }
     
     @media print {
@@ -519,13 +665,13 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
   <div class="container clearfix">
     <!-- Left Sidebar -->
     <div class="sidebar">
-
+      
       <!-- Name -->
       <div class="name" data-section="personal">${
         data.personal?.name && data.personal?.name !== "undefined"
           ? data.personal.name
-          : "Debanjali Lenka"
-      }</div>
+          : "Your Name"
+      }${data.personal?.middleName ? ` ${data.personal.middleName}` : ""}</div>
       ${
         data.personal?.role
           ? `<div class="title" data-section="personal">${data.personal.role}</div>`
@@ -534,25 +680,31 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
       
       <!-- Contact Section -->
       ${
-        hasContent([
-          data.personal?.location,
-          data.personal?.country,
-          data.personal?.pinCode,
-          data.personal?.phone,
-          data.personal?.alternatePhone,
-          data.personal?.email,
-          data.personal?.linkedinUrl,
-          data.personal?.githubUrl,
-          data.personal?.portfolioUrl,
-          data.personal?.website,
-          data.personal?.twitterUrl,
-          data.personal?.facebookUrl,
-          data.personal?.instagramUrl,
-          data.personal?.behanceUrl,
-          data.personal?.dribbbleUrl,
-          data.personal?.stackoverflowUrl,
-          data.personal?.mediumUrl,
-        ])
+        data.personal?.email ||
+        data.personal?.phone ||
+        data.personal?.alternatePhone ||
+        data.personal?.location ||
+        data.personal?.fullAddress ||
+        data.personal?.country ||
+        data.personal?.pinCode ||
+        data.personal?.linkedinUrl ||
+        data.personal?.githubUrl ||
+        data.personal?.portfolioUrl ||
+        data.personal?.website ||
+        data.personal?.twitterUrl ||
+        data.personal?.facebookUrl ||
+        data.personal?.instagramUrl ||
+        data.personal?.behanceUrl ||
+        data.personal?.dribbbleUrl ||
+        data.personal?.stackoverflowUrl ||
+        data.personal?.mediumUrl ||
+        (data.personal?.personalInfoDisplay === "inline" && (
+          data.personal?.fathersName ||
+          data.personal?.dob ||
+          data.personal?.gender ||
+          data.personal?.maritalStatus ||
+          data.personal?.nationality
+        ))
           ? `
       <div class="sidebar-section">
         <div class="sidebar-title">CONTACT</div>
@@ -560,64 +712,47 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
 
         <div class="education-contact" data-section="contact">
           ${
-            data.personal?.location ||
-            data.personal?.country ||
-            data.personal?.pinCode ||
-            data.personal?.fullAddress
-              ? `<div class="contact-item" data-section="contact">${[
-                  data.personal?.location,
-                  data.personal?.country,
-                  data.personal?.pinCode,
-                  data.personal?.fullAddress,
-                ]
-                  .filter(Boolean)
-                  .join(", ")}</div>`
+            data.personal?.fullAddress || data.personal?.location || data.personal?.country || data.personal?.pinCode
+              ? (() => {
+                  const addressParts = [
+                    data.personal?.fullAddress,
+                    data.personal?.location,
+                    data.personal?.country,
+                    data.personal?.pinCode
+                  ].filter(Boolean);
+                  return `<div class="contact-item" data-section="contact">${addressParts.join(", ")}</div>`;
+                })()
               : ""
           }
           ${
             data.personal?.phone
-              ? `<div class="contact-item" data-section="contact">${data.personal.phone}</div>`
+              ? `<div class="contact-item" data-section="contact">📞 ${data.personal.phone}</div>`
               : ""
           }
           ${
             data.personal?.alternatePhone
-              ? `<div class="contact-item" data-section="contact">${data.personal.alternatePhone}</div>`
+              ? `<div class="contact-item" data-section="contact">📞 ${data.personal.alternatePhone} (Alt)</div>`
               : ""
           }
           ${
             data.personal?.email
-              ? `<div class="contact-item" data-section="contact">${data.personal.email}</div>`
+              ? `<div class="contact-item" data-section="contact">✉️ ${data.personal.email}</div>`
               : ""
           }
           ${
             data.personal?.personalInfoDisplay === "inline"
-              ? `
-          ${
-            data.personal?.fathersName
-              ? `<div class="contact-item" data-section="contact">Father's Name: ${data.personal.fathersName}</div>`
-              : ""
-          }
-          ${
-            data.personal?.dob
-              ? `<div class="contact-item" data-section="contact">DOB: ${data.personal.dob}</div>`
-              : ""
-          }
-          ${
-            data.personal?.gender
-              ? `<div class="contact-item" data-section="contact">Gender: ${data.personal.gender}</div>`
-              : ""
-          }
-          ${
-            data.personal?.maritalStatus
-              ? `<div class="contact-item" data-section="contact">Marital Status: ${data.personal.maritalStatus}</div>`
-              : ""
-          }
-          ${
-            data.personal?.nationality
-              ? `<div class="contact-item" data-section="contact">Nationality: ${data.personal.nationality}</div>`
-              : ""
-          }
-          `
+              ? (() => {
+                  const inlineItems = [];
+                  if (data.personal?.fathersName) inlineItems.push(`Father: ${data.personal.fathersName}`);
+                  if (data.personal?.dob) inlineItems.push(`DOB: ${data.personal.dob}`);
+                  if (data.personal?.gender) inlineItems.push(`Gender: ${data.personal.gender}`);
+                  if (data.personal?.maritalStatus) inlineItems.push(`Marital: ${data.personal.maritalStatus}`);
+                  if (data.personal?.nationality) inlineItems.push(`Nationality: ${data.personal.nationality}`);
+                  
+                  return inlineItems.map((item, index) => `
+                    <div class="contact-item" data-section="contact" data-index="personal-${index}">${item}</div>
+                  `).join('');
+                })()
               : ""
           }
           ${
@@ -683,22 +818,12 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
       
       <!-- Skills Section -->
       ${
-        data.sectionVisibility?.skills !== false &&
-        getNonEmptyArray(
-          Array.isArray(data.skills)
-            ? data.skills
-            : (data.skills || "").split(",")
-        ).length > 0
+        nonEmptySkills.length > 0
           ? `<div class="sidebar-section">
         <div class="sidebar-title">SKILLS</div>
 
-
         <ul class="skills-list" data-section="skills">
-          ${getNonEmptyArray(
-            Array.isArray(data.skills)
-              ? data.skills
-              : (data.skills || "").split(",")
-          )
+          ${nonEmptySkills
             .map(
               (skill: any, index: number) => `
             <li class="skill-item" data-section="skills" data-index="${index}">${
@@ -711,11 +836,209 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
       </div>`
           : ""
       }
+
+      <!-- Tools & Technologies (in sidebar) -->
+      ${
+        nonEmptyToolsTechnologies.length > 0
+          ? `<div class="sidebar-section">
+        <div class="sidebar-title">TOOLS & TECH</div>
+        <ul class="skills-list" data-section="toolsTechnologies">
+          ${nonEmptyToolsTechnologies
+            .map(
+              (item: any, index: number) => `
+            <li class="skill-item" data-section="toolsTechnologies" data-index="${index}">
+              ${item.name || ''}${item.proficiency ? ` (${item.proficiency})` : ''}${item.experienceDuration ? ` - ${item.experienceDuration}` : ''}
+            </li>
+          `
+            )
+            .join("")}
+        </ul>
+      </div>`
+          : ""
+      }
+
+      <!-- Methodologies (in sidebar) -->
+      ${
+        nonEmptyMethodologies.length > 0
+          ? `<div class="sidebar-section">
+        <div class="sidebar-title">METHODOLOGIES</div>
+        <ul class="skills-list" data-section="methodologies">
+          ${nonEmptyMethodologies
+            .map(
+              (item: any, index: number) => `
+            <li class="skill-item" data-section="methodologies" data-index="${index}">
+              ${item.name || ''}${item.certification ? ` (${item.certification})` : ''}${item.experienceDuration ? ` - ${item.experienceDuration} years` : ''}
+            </li>
+          `
+            )
+            .join("")}
+        </ul>
+      </div>`
+          : ""
+      }
+
+      <!-- Industry Expertise (in sidebar) -->
+      ${
+        nonEmptyIndustryExpertise.length > 0
+          ? `<div class="sidebar-section">
+        <div class="sidebar-title">INDUSTRY EXPERTISE</div>
+        <ul class="skills-list" data-section="industryExpertise">
+          ${nonEmptyIndustryExpertise
+            .map(
+              (item: any, index: number) => `
+            <li class="skill-item" data-section="industryExpertise" data-index="${index}">
+              ${item.industry || ''}${item.domainArea ? ` - ${item.domainArea}` : ''}${item.experienceDuration ? ` (${item.experienceDuration} years)` : ''}
+            </li>
+          `
+            )
+            .join("")}
+        </ul>
+      </div>`
+          : ""
+      }
+
+      <!-- Languages Section (in sidebar) -->
+      ${
+        data.sectionVisibility?.languages !== false &&
+        data.languages &&
+        data.languages.length > 0
+          ? `<div class="sidebar-section">
+        <div class="sidebar-title">LANGUAGES</div>
+        <ul class="skills-list" data-section="languages">
+          ${(data.languages || [])
+            .map(
+              (lang: any, index: number) => `
+            <li class="skill-item" data-section="languages" data-index="${index}">
+              ${lang.language || lang}${lang.level ? ` (${lang.level})` : ''}${lang.capability ? ` - ${lang.capability}` : ''}
+            </li>
+          `
+            )
+            .join("")}
+        </ul>
+      </div>`
+          : ""
+      }
+
+      <!-- Hobbies Section (in sidebar) -->
+      ${
+        data.sectionVisibility?.hobbies !== false &&
+        data.hobbies &&
+        data.hobbies.length > 0
+          ? `<div class="sidebar-section">
+        <div class="sidebar-title">HOBBIES</div>
+        <div>
+          ${(data.hobbies || [])
+            .map(
+              (hobby: any, index: number) => `
+            <span class="hobby-item" data-section="hobbies" data-index="${index}">${hobby}</span>
+          `
+            )
+            .join("")}
+        </div>
+      </div>`
+          : ""
+      }
+
+      <!-- Certifications (in sidebar if few) -->
+      ${
+        data.sectionVisibility?.certifications !== false &&
+        data.certifications &&
+        data.certifications.length > 0 && data.certifications.length <= 3
+          ? `<div class="sidebar-section">
+        <div class="sidebar-title">CERTIFICATIONS</div>
+        <ul class="skills-list">
+          ${(data.certifications || [])
+            .map(
+              (cert: any, index: number) => `
+            <li class="skill-item" data-section="certifications" data-index="${index}">
+              ${cert.name || ""}${cert.issuer ? ` - ${cert.issuer}` : ''}${cert.date ? ` (${cert.date})` : ''}
+            </li>
+          `
+            )
+            .join("")}
+        </ul>
+      </div>`
+          : ""
+      }
+
+      <!-- Availability & Work Authorization (in sidebar) -->
+      ${
+        data.availabilityWorkAuth && Object.values(data.availabilityWorkAuth).some(v => v)
+          ? `<div class="sidebar-section">
+        <div class="sidebar-title">AVAILABILITY</div>
+        <ul class="skills-list">
+          ${data.availabilityWorkAuth.availabilityNoticePeriod ? `<li class="skill-item">Notice: ${data.availabilityWorkAuth.availabilityNoticePeriod}</li>` : ''}
+          ${data.availabilityWorkAuth.workAuthorizationStatus ? `<li class="skill-item">Work Auth: ${data.availabilityWorkAuth.workAuthorizationStatus}</li>` : ''}
+          ${data.availabilityWorkAuth.preferredLocation ? `<li class="skill-item">Preferred: ${data.availabilityWorkAuth.preferredLocation}</li>` : ''}
+        </ul>
+      </div>`
+          : ""
+      }
+
+      <!-- Social Profiles (in sidebar) -->
+      ${
+        nonEmptySocialProfiles.length > 0
+          ? `<div class="sidebar-section">
+        <div class="sidebar-title">SOCIAL PROFILES</div>
+        <ul class="skills-list">
+          ${nonEmptySocialProfiles
+            .map(
+              (profile: any, index: number) => `
+            <li class="skill-item" data-section="socialProfiles" data-index="${index}">
+              <a href="${profile.url}" target="_blank" style="color: white;">${profile.platform || "Profile"}</a>
+            </li>
+          `
+            )
+            .join("")}
+        </ul>
+      </div>`
+          : ""
+      }
     </div>
     
     <!-- Main Content -->
     <div class="main-content">
-
+      <!-- Professional Context -->
+      ${
+        data.professionalContext && Object.values(data.professionalContext).some(v => v)
+          ? `
+      <div class="section" data-section="professionalContext">
+        <div class="section-title">PROFESSIONAL CONTEXT</div>
+        <div class="metrics-grid">
+          ${data.professionalContext.totalExperience ? `
+          <div class="metric-item">
+            <div class="metric-value">${data.professionalContext.totalExperience}</div>
+            <div class="metric-label">Total Experience</div>
+          </div>` : ''}
+          ${data.professionalContext.teamSize ? `
+          <div class="metric-item">
+            <div class="metric-value">${data.professionalContext.teamSize}</div>
+            <div class="metric-label">Team Size</div>
+          </div>` : ''}
+          ${data.professionalContext.industry ? `
+          <div class="metric-item">
+            <div class="metric-value">${data.professionalContext.industry}</div>
+            <div class="metric-label">Industry</div>
+          </div>` : ''}
+          ${data.professionalContext.functionalDomain ? `
+          <div class="metric-item">
+            <div class="metric-value">${data.professionalContext.functionalDomain}</div>
+            <div class="metric-label">Domain</div>
+          </div>` : ''}
+          ${data.professionalContext.geographicScope ? `
+          <div class="metric-item">
+            <div class="metric-value">${data.professionalContext.geographicScope}</div>
+            <div class="metric-label">Geographic Scope</div>
+          </div>` : ''}
+          ${data.professionalContext.revenueResponsibility ? `
+          <div class="metric-item">
+            <div class="metric-value">${data.professionalContext.revenueResponsibility}</div>
+            <div class="metric-label">Revenue Responsibility</div>
+          </div>` : ''}
+        </div>
+      </div>`
+          : ""
+      }
 
       <!-- Summary Section -->
       ${
@@ -742,6 +1065,7 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
           : ""
       }
 
+      <!-- Personal Details (if not inline) -->
       ${
         data.personal?.personalInfoDisplay !== "inline" &&
         (data.personal?.fathersName ||
@@ -752,44 +1076,45 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
           data.personal?.passportNo)
           ? `<div class="section" data-section="personal">
         <div class="section-title" data-section="personal">PERSONAL DETAILS</div>
-        <ul data-section="personal">
-          ${
-            data.personal?.fathersName
-              ? `<li data-section="personal"><strong>Father's Name:</strong> ${data.personal.fathersName}</li>`
-              : ""
-          }
-          ${
-            data.personal?.dob
-              ? `<li data-section="personal"><strong>Date of Birth:</strong> ${data.personal.dob}</li>`
-              : ""
-          }
-          ${
-            data.personal?.gender
-              ? `<li data-section="personal"><strong>Gender:</strong> ${data.personal.gender}</li>`
-              : ""
-          }
-          ${
-            data.personal?.maritalStatus
-              ? `<li data-section="personal"><strong>Marital Status:</strong> ${data.personal.maritalStatus}</li>`
-              : ""
-          }
-          ${
-            data.personal?.nationality
-              ? `<li data-section="personal"><strong>Nationality:</strong> ${data.personal.nationality}</li>`
-              : ""
-          }
-          ${
-            data.personal?.passportNo
-              ? `<li data-section="personal"><strong>Passport No:</strong> ${data.personal.passportNo}</li>`
-              : ""
-          }
-        </ul>
+        <div class="summary-box" style="background: #f8f9fa; padding: 15px;">
+          <ul style="list-style: none; padding-left: 0;" data-section="personal">
+            ${
+              data.personal?.fathersName
+                ? `<li style="margin-bottom: 8px;" data-section="personal"><strong>Father's Name:</strong> ${data.personal.fathersName}</li>`
+                : ""
+            }
+            ${
+              data.personal?.dob
+                ? `<li style="margin-bottom: 8px;" data-section="personal"><strong>Date of Birth:</strong> ${data.personal.dob}</li>`
+                : ""
+            }
+            ${
+              data.personal?.gender
+                ? `<li style="margin-bottom: 8px;" data-section="personal"><strong>Gender:</strong> ${data.personal.gender}</li>`
+                : ""
+            }
+            ${
+              data.personal?.maritalStatus
+                ? `<li style="margin-bottom: 8px;" data-section="personal"><strong>Marital Status:</strong> ${data.personal.maritalStatus}</li>`
+                : ""
+            }
+            ${
+              data.personal?.nationality
+                ? `<li style="margin-bottom: 8px;" data-section="personal"><strong>Nationality:</strong> ${data.personal.nationality}</li>`
+                : ""
+            }
+            ${
+              data.personal?.passportNo
+                ? `<li style="margin-bottom: 8px;" data-section="personal"><strong>Passport No:</strong> ${data.personal.passportNo}</li>`
+                : ""
+            }
+          </ul>
+        </div>
       </div>`
           : ""
       }
       
-      <!-- Experience Section -->
-
+      <!-- Work Experience -->
       ${
         data.sectionVisibility?.experience !== false &&
         data.experience &&
@@ -805,17 +1130,14 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
                 <div class="experience-title" data-section="experience" data-index="${index}">${
               exp.title || ""
             }</div>
-                <div class="experience-company" data-section="experience" data-index="${index}">${
-              exp.company || ""
-            }${exp.location ? `, ${exp.location}` : ""}</div>
+                <div class="experience-company" data-section="experience" data-index="${index}">${formatSubtitle([exp.company, exp.location])}</div>
               </div>
-              <div class="experience-date" data-section="experience" data-index="${index}">${
-              exp.startDate || ""
-            } - ${exp.endDate || "Present"}</div>
+              <div class="experience-date" data-section="experience" data-index="${index}">${formatDateRange(exp.startDate, exp.endDate)}</div>
             </div>
             <div class="experience-description" data-section="experience" data-index="${index}">${
               exp.description || ""
             }</div>
+            ${exp.achievements ? `<div class="experience-description" style="margin-top: 8px;"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
           </div>
         `
           )
@@ -826,21 +1148,46 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
       
       <!-- Internships -->
       ${
-        data.internships && data.internships.length > 0
+        nonEmptyInternships.length > 0
           ? `<div class="section" data-section="internships">
         <div class="section-title" data-section="internships">INTERNSHIPS</div>
-        ${(data.internships || [])
+        ${nonEmptyInternships
           .map(
             (item: any, index: number) => `
           <div class="experience-item" data-section="internships" data-index="${index}">
             <div class="experience-header" data-section="internships" data-index="${index}">
               <div>
                 <div class="experience-title" data-section="internships" data-index="${index}">${item.title || ""}</div>
-                <div class="experience-company" data-section="internships" data-index="${index}">${item.company || ""}${item.location ? `, ${item.location}` : ""}</div>
+                <div class="experience-company" data-section="internships" data-index="${index}">${item.company || ""}</div>
               </div>
-              <div class="experience-date" data-section="internships" data-index="${index}">${item.startDate || ""} - ${item.endDate || ""}</div>
+              <div class="experience-date" data-section="internships" data-index="${index}">${item.duration || ""}</div>
             </div>
             <div class="experience-description" data-section="internships" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+      
+      <!-- Training Programs -->
+      ${
+        nonEmptyTrainingPrograms.length > 0
+          ? `<div class="section" data-section="trainingPrograms">
+        <div class="section-title" data-section="trainingPrograms">TRAINING PROGRAMS</div>
+        ${nonEmptyTrainingPrograms
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="trainingPrograms" data-index="${index}">
+            <div class="experience-header" data-section="trainingPrograms" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="trainingPrograms" data-index="${index}">${item.name || ""}</div>
+                <div class="experience-company" data-section="trainingPrograms" data-index="${index}">${item.provider || item.organization || ""}</div>
+              </div>
+              <div class="experience-date" data-section="trainingPrograms" data-index="${index}">${item.completionDate || ""}${item.duration ? ` • ${item.duration}` : ""}</div>
+            </div>
+            <div class="experience-description" data-section="trainingPrograms" data-index="${index}">${item.description || ""}</div>
           </div>
         `
           )
@@ -862,27 +1209,18 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
           <div class="education-item" data-section="education" data-index="${index}">
             <div class="education-header" data-section="education" data-index="${index}">
               <div class="education-degree" data-section="education" data-index="${index}">
-                ${edu.degree || ""}${
-              edu.qualification ? ` (${edu.qualification})` : ""
-            }
+                ${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}${edu.qualification ? ` (${edu.qualification})` : ""}
               </div>
-              <div class="education-date" data-section="education" data-index="${index}">${
-              edu.graduationDate || ""
-            }</div>
+              <div class="education-date" data-section="education" data-index="${index}">${edu.graduationDate || ""}</div>
             </div>
             ${
               edu.school
-                ? `<div class="education-school" data-section="education" data-index="${index}">${edu.school}</div>`
+                ? `<div class="education-school" data-section="education" data-index="${index}">${edu.school}${edu.location ? `, ${edu.location}` : ""}</div>`
                 : ""
             }
             ${
-              edu.field
-                ? `<div class="education-field" data-section="education" data-index="${index}">${edu.field}</div>`
-                : ""
-            }
-            ${
-              edu.location
-                ? `<div class="education-location" data-section="education" data-index="${index}">${edu.location}</div>`
+              edu.grade
+                ? `<div class="education-field" data-section="education" data-index="${index}">Grade: ${edu.grade}</div>`
                 : ""
             }
             
@@ -890,12 +1228,7 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
               edu.description
                 ? `
               <div class="education-description" data-section="education" data-index="${index}">
-                ${
-                  edu.description.includes("<ul>") ||
-                  edu.description.includes("<li>")
-                    ? edu.description
-                    : `<p>${edu.description}</p>`
-                }
+                ${edu.description}
               </div>
             `
                 : ""
@@ -927,151 +1260,7 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
           : ""
       }
       
-      <!-- Academic Projects -->
-      ${
-        data.academicProjects && data.academicProjects.length > 0
-          ? `<div class="section" data-section="academicProjects">
-        <div class="section-title" data-section="academicProjects">ACADEMIC PROJECTS</div>
-        ${(data.academicProjects || [])
-          .map(
-            (item: any, index: number) => `
-          <div class="project-item" data-section="academicProjects" data-index="${index}">
-            <div class="project-name" data-section="academicProjects" data-index="${index}">${item.name || item.title || ""}</div>
-            <div class="project-tech" data-section="academicProjects" data-index="${index}">${item.duration || ""}${item.institution ? ` | ${item.institution}` : ""}</div>
-            <div class="project-description" data-section="academicProjects" data-index="${index}">${item.description || ""}</div>
-          </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
-
-      <!-- Leadership & Positions -->
-      ${
-        data.leadershipPositions && data.leadershipPositions.length > 0
-          ? `<div class="section" data-section="leadershipPositions">
-        <div class="section-title" data-section="leadershipPositions">LEADERSHIP & POSITIONS</div>
-        ${(data.leadershipPositions || [])
-          .map(
-            (item: any, index: number) => `
-          <div class="experience-item" data-section="leadershipPositions" data-index="${index}">
-            <div class="experience-header" data-section="leadershipPositions" data-index="${index}">
-              <div>
-                <div class="experience-title" data-section="leadershipPositions" data-index="${index}">${item.position || item.title || ""}</div>
-                <div class="experience-company" data-section="leadershipPositions" data-index="${index}">${item.organization || ""}</div>
-              </div>
-              <div class="experience-date" data-section="leadershipPositions" data-index="${index}">${item.startDate || ""} - ${item.endDate || ""}</div>
-            </div>
-            <div class="experience-description" data-section="leadershipPositions" data-index="${index}">${item.description || ""}</div>
-          </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
-
-      <!-- Training Programs -->
-      ${
-        data.trainingPrograms && data.trainingPrograms.length > 0
-          ? `<div class="section" data-section="trainingPrograms">
-        <div class="section-title" data-section="trainingPrograms">TRAINING PROGRAMS</div>
-        ${(data.trainingPrograms || [])
-          .map(
-            (item: any, index: number) => `
-          <div class="experience-item" data-section="trainingPrograms" data-index="${index}">
-            <div class="experience-header" data-section="trainingPrograms" data-index="${index}">
-              <div>
-                <div class="experience-title" data-section="trainingPrograms" data-index="${index}">${item.name || ""}</div>
-                <div class="experience-company" data-section="trainingPrograms" data-index="${index}">${item.provider || item.organization || ""}</div>
-              </div>
-            </div>
-            <div class="experience-description" data-section="trainingPrograms" data-index="${index}">${item.description || ""}</div>
-          </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
-
-      <!-- Scholarships -->
-      ${
-        data.scholarships && data.scholarships.length > 0
-          ? `<div class="section" data-section="scholarships">
-        <div class="section-title" data-section="scholarships">SCHOLARSHIPS</div>
-        ${(data.scholarships || [])
-          .map(
-            (item: any, index: number) => `
-          <div class="experience-item" data-section="scholarships" data-index="${index}">
-            <div class="experience-header" data-section="scholarships" data-index="${index}">
-              <div>
-                <div class="experience-title" data-section="scholarships" data-index="${index}">${item.name || ""}</div>
-                <div class="experience-company" data-section="scholarships" data-index="${index}">${item.provider || item.organization || ""}</div>
-              </div>
-            </div>
-            <div class="experience-description" data-section="scholarships" data-index="${index}">${item.description || ""}</div>
-          </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
-
-      <!-- Co-curricular Activities -->
-      ${
-        data.coCurricular && data.coCurricular.length > 0
-          ? `<div class="section" data-section="coCurricular">
-        <div class="section-title" data-section="coCurricular">CO-CURRICULAR ACTIVITIES</div>
-        ${(data.coCurricular || [])
-          .map(
-            (item: any, index: number) => `
-          <div class="experience-item" data-section="coCurricular" data-index="${index}">
-            <div class="experience-header" data-section="coCurricular" data-index="${index}">
-              <div>
-                <div class="experience-title" data-section="coCurricular" data-index="${index}">${item.activity || ""}</div>
-                <div class="experience-company" data-section="coCurricular" data-index="${index}">${item.organization || ""}</div>
-              </div>
-              <div class="experience-date" data-section="coCurricular" data-index="${index}">${item.year || ""}</div>
-            </div>
-            <div class="experience-description" data-section="coCurricular" data-index="${index}">${item.description || ""}</div>
-          </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
-
-      <!-- Extracurricular Activities -->
-      ${
-        data.extracurricular && data.extracurricular.length > 0
-          ? `<div class="section" data-section="extracurricular">
-        <div class="section-title" data-section="extracurricular">EXTRACURRICULAR ACTIVITIES</div>
-        ${(data.extracurricular || [])
-          .map(
-            (item: any, index: number) => `
-          <div class="experience-item" data-section="extracurricular" data-index="${index}">
-            <div class="experience-header" data-section="extracurricular" data-index="${index}">
-              <div>
-                <div class="experience-title" data-section="extracurricular" data-index="${index}">${item.activity || ""}</div>
-                <div class="experience-company" data-section="extracurricular" data-index="${index}">${item.organization || ""}</div>
-              </div>
-              <div class="experience-date" data-section="extracurricular" data-index="${index}">${item.year || ""}</div>
-            </div>
-            <div class="experience-description" data-section="extracurricular" data-index="${index}">${item.description || ""}</div>
-          </div>
-        `
-          )
-          .join("")}
-      </div>`
-          : ""
-      }
-
-      <!-- Projects Section -->
-
+      <!-- Projects -->
       ${
         data.sectionVisibility?.projects !== false &&
         data.projects &&
@@ -1081,24 +1270,14 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
         ${(data.projects || [])
           .map(
             (project: any, index: number) => `
-
           <div class="project-item" data-section="projects" data-index="${index}">
             <div class="project-name" data-section="projects" data-index="${index}">${
               project.name || ""
             }</div>
-            ${
-              project.startDate || project.endDate
-                ? `<div class="project-tech" data-section="projects" data-index="${index}" style="margin-bottom: 5px;">${
-                    project.startDate || ""
-                  } ${
-                    project.startDate && project.endDate
-                      ? `- ${project.endDate}`
-                      : project.endDate
-                      ? `- ${project.endDate}`
-                      : ""
-                  }</div>`
-                : ""
-            }
+            ${(() => {
+              const dateRange = formatDateRange(project.startDate, project.endDate);
+              return dateRange ? `<div class="project-tech" data-section="projects" data-index="${index}" style="margin-bottom: 5px;">${dateRange}</div>` : "";
+            })()}
             ${
               project.technologies
                 ? `<div class="project-tech" data-section="projects" data-index="${index}">${project.technologies}</div>`
@@ -1128,82 +1307,324 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
           : ""
       }
 
-
-
+      <!-- Academic Projects -->
       ${
-        data.sectionVisibility?.languages !== false &&
-        data.languages &&
-        data.languages.length > 0
-          ? `<div class="section">
-        <div class="section-title">LANGUAGES</div>
-        <div class="languages-list" data-section="languages">
-          ${(data.languages || [])
-            .map(
-              (lang: any, index: number) => `
-            <div class="language-item" data-section="languages" data-index="${index}">${
-                lang.language || lang
-              }${lang.level ? ` (${lang.level})` : ""}</div>
-          `
-            )
-            .join("")}
-        </div>
+        nonEmptyAcademicProjects.length > 0
+          ? `<div class="section" data-section="academicProjects">
+        <div class="section-title" data-section="academicProjects">ACADEMIC PROJECTS</div>
+        ${nonEmptyAcademicProjects
+          .map(
+            (item: any, index: number) => `
+          <div class="project-item" data-section="academicProjects" data-index="${index}">
+            <div class="project-name" data-section="academicProjects" data-index="${index}">${item.name || item.title || ""}</div>
+            <div class="project-tech" data-section="academicProjects" data-index="${index}">${formatSubtitle([item.duration, item.institution, item.course ? `Course: ${item.course}` : ""])}</div>
+            <div class="project-description" data-section="academicProjects" data-index="${index}">${item.description || ""}</div>
+            ${
+              item.technologies
+                ? `<div class="project-description" style="margin-top: 5px;"><strong>Technologies:</strong> ${Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}</div>`
+                : ""
+            }
+            ${
+              item.url
+                ? `<div style="margin-top: 5px;"><a href="${item.url}" target="_blank" style="color: #3498db;">View Project</a></div>`
+                : ""
+            }
+          </div>
+        `
+          )
+          .join("")}
       </div>`
           : ""
       }
 
-
-
+      <!-- Client Projects -->
       ${
-        data.sectionVisibility?.hobbies !== false &&
-        data.hobbies &&
-        data.hobbies.length > 0
-          ? `<div class="section">
-        <div class="section-title">HOBBIES & INTERESTS</div>
-        <div class="hobbies-list" data-section="hobbies">
-          ${(data.hobbies || [])
-            .map(
-              (hobby: any, index: number) => `
-            <div class="hobby-item" data-section="hobbies" data-index="${index}">${hobby}</div>
-          `
-            )
-            .join("")}
-        </div>
+        nonEmptyClientProjects.length > 0
+          ? `<div class="section" data-section="clientProjects">
+        <div class="section-title" data-section="clientProjects">CLIENT PROJECTS</div>
+        ${nonEmptyClientProjects
+          .map(
+            (item: any, index: number) => `
+          <div class="project-item" data-section="clientProjects" data-index="${index}">
+            <div class="project-name" data-section="clientProjects" data-index="${index}">${item.name || ""}</div>
+            <div class="project-tech" data-section="clientProjects" data-index="${index}">${formatSubtitle([item.clientOrganization, item.role ? `Role: ${item.role}` : "", item.duration])}</div>
+            <div class="project-description" data-section="clientProjects" data-index="${index}">${item.description || ""}</div>
+            ${
+              item.toolsTechnologies
+                ? `<div class="project-description" style="margin-top: 5px;"><strong>Tools:</strong> ${item.toolsTechnologies}</div>`
+                : ""
+            }
+            ${
+              item.projectUrl
+                ? `<div style="margin-top: 5px;"><a href="${item.projectUrl}" target="_blank" style="color: #3498db;">View Project</a></div>`
+                : ""
+            }
+          </div>
+        `
+          )
+          .join("")}
       </div>`
           : ""
       }
 
-
-
+      <!-- Portfolio -->
       ${
-        data.sectionVisibility?.socialLinks !== false &&
-        data.socialLinks &&
-        data.socialLinks.length > 0
-          ? `<div class="section">
-        <div class="section-title">SOCIAL LINKS</div>
-        <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px;" data-section="socialLinks">
-          ${data.socialLinks
-            .map(
-              (link: any, index: number) => `
-            <a href="${
-              link.url
-            }" target="_blank" style="color: #3498db; text-decoration: none; font-weight: 500; font-size: ${baseFontSize}px;" data-section="socialLinks" data-index="${index}">${
-                link.urlText ||
-                link.url.replace("https://", "").replace("http://", "")
-              }</a>
-          `
-            )
-            .join("")}
-        </div>
+        nonEmptyPortfolio.length > 0
+          ? `<div class="section" data-section="portfolio">
+        <div class="section-title" data-section="portfolio">PORTFOLIO</div>
+        ${nonEmptyPortfolio
+          .map(
+            (item: any, index: number) => `
+          <div class="project-item" data-section="portfolio" data-index="${index}">
+            <div class="project-name" data-section="portfolio" data-index="${index}">${item.name || ""}</div>
+            <div class="project-tech" data-section="portfolio" data-index="${index}">${formatSubtitle([item.type, item.platform])}</div>
+            <div class="project-description" data-section="portfolio" data-index="${index}">${item.description || ""}</div>
+            ${
+              item.url
+                ? `<div style="margin-top: 5px;"><a href="${item.url}" target="_blank" style="color: #3498db;">View Portfolio</a></div>`
+                : ""
+            }
+          </div>
+        `
+          )
+          .join("")}
       </div>`
           : ""
       }
 
+      <!-- Leadership & Positions -->
+      ${
+        nonEmptyLeadershipPositions.length > 0
+          ? `<div class="section" data-section="leadershipPositions">
+        <div class="section-title" data-section="leadershipPositions">LEADERSHIP & POSITIONS</div>
+        ${nonEmptyLeadershipPositions
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="leadershipPositions" data-index="${index}">
+            <div class="experience-header" data-section="leadershipPositions" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="leadershipPositions" data-index="${index}">${item.position || item.title || ""}</div>
+                <div class="experience-company" data-section="leadershipPositions" data-index="${index}">${item.organization || ""}</div>
+              </div>
+              <div class="experience-date" data-section="leadershipPositions" data-index="${index}">${formatDateRange(item.startDate, item.endDate)}</div>
+            </div>
+            <div class="experience-description" data-section="leadershipPositions" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
 
+      <!-- Volunteering -->
+      ${
+        nonEmptyVolunteering.length > 0
+          ? `<div class="section" data-section="volunteering">
+        <div class="section-title" data-section="volunteering">VOLUNTEERING</div>
+        ${nonEmptyVolunteering
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="volunteering" data-index="${index}">
+            <div class="experience-header" data-section="volunteering" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="volunteering" data-index="${index}">${item.role || ""}</div>
+                <div class="experience-company" data-section="volunteering" data-index="${index}">${formatSubtitle([item.organization, item.causeArea])}</div>
+              </div>
+              <div class="experience-date" data-section="volunteering" data-index="${index}">${item.duration || ""}</div>
+            </div>
+            <div class="experience-description" data-section="volunteering" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
 
+      <!-- Military Service -->
+      ${
+        nonEmptyMilitaryService.length > 0
+          ? `<div class="section" data-section="militaryService">
+        <div class="section-title" data-section="militaryService">MILITARY SERVICE</div>
+        ${nonEmptyMilitaryService
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="militaryService" data-index="${index}">
+            <div class="experience-header" data-section="militaryService" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="militaryService" data-index="${index}">${item.rank ? `${item.rank} - ${item.branch}` : item.branch || ""}</div>
+                <div class="experience-company" data-section="militaryService" data-index="${index}">${item.specialization || ""}</div>
+              </div>
+              <div class="experience-date" data-section="militaryService" data-index="${index}">${item.duration || ""}</div>
+            </div>
+            <div class="experience-description" data-section="militaryService" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Teaching Experience -->
+      ${
+        nonEmptyTeachingExperience.length > 0
+          ? `<div class="section" data-section="teachingExperience">
+        <div class="section-title" data-section="teachingExperience">TEACHING EXPERIENCE</div>
+        ${nonEmptyTeachingExperience
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="teachingExperience" data-index="${index}">
+            <div class="experience-header" data-section="teachingExperience" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="teachingExperience" data-index="${index}">${item.title || ""}</div>
+                <div class="experience-company" data-section="teachingExperience" data-index="${index}">${formatSubtitle([item.institution, item.subjectCourseTaught])}</div>
+              </div>
+              <div class="experience-date" data-section="teachingExperience" data-index="${index}">${item.duration || ""}</div>
+            </div>
+            <div class="experience-description" data-section="teachingExperience" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Mentorship Experience -->
+      ${
+        nonEmptyMentorshipExperience.length > 0
+          ? `<div class="section" data-section="mentorshipExperience">
+        <div class="section-title" data-section="mentorshipExperience">MENTORSHIP EXPERIENCE</div>
+        ${nonEmptyMentorshipExperience
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="mentorshipExperience" data-index="${index}">
+            <div class="experience-header" data-section="mentorshipExperience" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="mentorshipExperience" data-index="${index}">${item.mentorshipArea || ""}</div>
+                <div class="experience-company" data-section="mentorshipExperience" data-index="${index}">${formatSubtitle([item.organizationPlatform, item.menteeLevel ? `Mentee Level: ${item.menteeLevel}` : ""])}</div>
+              </div>
+              <div class="experience-date" data-section="mentorshipExperience" data-index="${index}">${item.duration || ""}</div>
+            </div>
+            <div class="experience-description" data-section="mentorshipExperience" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Research Grants -->
+      ${
+        nonEmptyResearchGrants.length > 0
+          ? `<div class="section" data-section="researchGrants">
+        <div class="section-title" data-section="researchGrants">RESEARCH GRANTS</div>
+        ${nonEmptyResearchGrants
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="researchGrants" data-index="${index}">
+            <div class="experience-header" data-section="researchGrants" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="researchGrants" data-index="${index}">${item.title || ""}</div>
+                <div class="experience-company" data-section="researchGrants" data-index="${index}">${formatSubtitle([item.agency, item.amount])}</div>
+              </div>
+              <div class="experience-date" data-section="researchGrants" data-index="${index}">${item.year || ""}</div>
+            </div>
+            <div class="experience-description" data-section="researchGrants" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Publications -->
+      ${
+        nonEmptyPublications.length > 0
+          ? `<div class="section" data-section="publications">
+        <div class="section-title" data-section="publications">PUBLICATIONS</div>
+        ${nonEmptyPublications
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="publications" data-index="${index}">
+            <div class="experience-header" data-section="publications" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="publications" data-index="${index}">${item.title || ""}</div>
+                <div class="experience-company" data-section="publications" data-index="${index}">${formatSubtitle([item.journalPublisher, item.publicationType])}</div>
+              </div>
+              <div class="experience-date" data-section="publications" data-index="${index}">${item.year || ""}</div>
+            </div>
+            ${item.authors ? `<div class="experience-description"><strong>Authors:</strong> ${item.authors}</div>` : ""}
+            ${
+              item.urlDoi
+                ? `<div style="margin-top: 5px;"><a href="${item.urlDoi}" target="_blank" style="color: #3498db;">View Publication</a></div>`
+                : ""
+            }
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Patents -->
+      ${
+        nonEmptyPatents.length > 0
+          ? `<div class="section" data-section="patents">
+        <div class="section-title" data-section="patents">PATENTS</div>
+        ${nonEmptyPatents
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="patents" data-index="${index}">
+            <div class="experience-header" data-section="patents" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="patents" data-index="${index}">${item.title || ""}</div>
+                <div class="experience-company" data-section="patents" data-index="${index}">${formatSubtitle([item.patentNumber, item.issuingAuthority])}</div>
+              </div>
+              <div class="experience-date" data-section="patents" data-index="${index}">${item.year || ""} • Status: ${item.status || ""}</div>
+            </div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Test Scores -->
+      ${
+        nonEmptyTestScores.length > 0
+          ? `<div class="section" data-section="testScores">
+        <div class="section-title" data-section="testScores">TEST SCORES</div>
+        ${nonEmptyTestScores
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="testScores" data-index="${index}">
+            <div class="experience-header" data-section="testScores" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="testScores" data-index="${index}">${item.testName || ""}</div>
+                <div class="experience-company" data-section="testScores" data-index="${index}">Score: ${item.score || ""}${item.percentileRank ? ` (${item.percentileRank} percentile)` : ""}</div>
+              </div>
+              <div class="experience-date" data-section="testScores" data-index="${index}">${item.year || ""}</div>
+            </div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Certifications (if many, show in main content) -->
       ${
         data.sectionVisibility?.certifications !== false &&
         data.certifications &&
-        data.certifications.length > 0
+        data.certifications.length > 3
           ? `<div class="section">
         <div class="section-title">CERTIFICATIONS</div>
         ${(data.certifications || [])
@@ -1221,6 +1642,7 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
             <div class="certification-issuer" data-section="certifications" data-index="${index}">${
               cert.issuer || ""
             }</div>
+            ${cert.description ? `<div class="experience-description">${cert.description}</div>` : ""}
             ${
               cert.url
                 ? `<div style="margin-top: 8px;">
@@ -1240,19 +1662,284 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
           : ""
       }
 
-
-
-
-
+      <!-- Scholarships -->
       ${
-        data.keyAchievements && data.keyAchievements.length > 0
+        nonEmptyScholarships.length > 0
+          ? `<div class="section" data-section="scholarships">
+        <div class="section-title" data-section="scholarships">SCHOLARSHIPS</div>
+        ${nonEmptyScholarships
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="scholarships" data-index="${index}">
+            <div class="experience-header" data-section="scholarships" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="scholarships" data-index="${index}">${item.name || ""}</div>
+                <div class="experience-company" data-section="scholarships" data-index="${index}">${formatSubtitle([item.provider || item.organization, item.amount])}</div>
+              </div>
+              <div class="experience-date" data-section="scholarships" data-index="${index}">${item.year || ""}</div>
+            </div>
+            <div class="experience-description" data-section="scholarships" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Awards -->
+      ${
+        nonEmptyAwards.length > 0
+          ? `<div class="section" data-section="awards">
+        <div class="section-title" data-section="awards">AWARDS</div>
+        ${nonEmptyAwards
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="awards" data-index="${index}">
+            <div class="experience-header" data-section="awards" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="awards" data-index="${index}">${item.title || ""}</div>
+                <div class="experience-company" data-section="awards" data-index="${index}">${item.organization || ""}</div>
+              </div>
+              <div class="experience-date" data-section="awards" data-index="${index}">${item.issueYear || ""}</div>
+            </div>
+            <div class="experience-description" data-section="awards" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Speaking Engagements -->
+      ${
+        nonEmptySpeakingEngagements.length > 0
+          ? `<div class="section" data-section="speakingEngagements">
+        <div class="section-title" data-section="speakingEngagements">SPEAKING ENGAGEMENTS</div>
+        ${nonEmptySpeakingEngagements
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="speakingEngagements" data-index="${index}">
+            <div class="experience-header" data-section="speakingEngagements" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="speakingEngagements" data-index="${index}">${item.topic || ""}</div>
+                <div class="experience-company" data-section="speakingEngagements" data-index="${index}">${item.eventName || ""}</div>
+              </div>
+              <div class="experience-date" data-section="speakingEngagements" data-index="${index}">${item.date || ""}</div>
+            </div>
+            <div class="experience-description" data-section="speakingEngagements" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Memberships -->
+      ${
+        nonEmptyMemberships.length > 0
+          ? `<div class="section" data-section="memberships">
+        <div class="section-title" data-section="memberships">MEMBERSHIPS</div>
+        ${nonEmptyMemberships
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="memberships" data-index="${index}">
+            <div class="experience-header" data-section="memberships" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="memberships" data-index="${index}">${item.membershipName || ""}</div>
+                <div class="experience-company" data-section="memberships" data-index="${index}">${item.organizationName || ""}</div>
+              </div>
+              <div class="experience-date" data-section="memberships" data-index="${index}">${item.year || ""}</div>
+            </div>
+            <div class="experience-description" data-section="memberships" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Workshops -->
+      ${
+        nonEmptyWorkshops.length > 0
+          ? `<div class="section" data-section="workshops">
+        <div class="section-title" data-section="workshops">WORKSHOPS</div>
+        ${nonEmptyWorkshops
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="workshops" data-index="${index}">
+            <div class="experience-header" data-section="workshops" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="workshops" data-index="${index}">${item.programTitle || ""}</div>
+                <div class="experience-company" data-section="workshops" data-index="${index}">${item.conductedBy || ""}</div>
+              </div>
+              <div class="experience-date" data-section="workshops" data-index="${index}">${item.year || ""}</div>
+            </div>
+            <div class="experience-description" data-section="workshops" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Co-curricular Activities -->
+      ${
+        nonEmptyCoCurricular.length > 0
+          ? `<div class="section" data-section="coCurricular">
+        <div class="section-title" data-section="coCurricular">CO-CURRICULAR ACTIVITIES</div>
+        ${nonEmptyCoCurricular
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="coCurricular" data-index="${index}">
+            <div class="experience-header" data-section="coCurricular" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="coCurricular" data-index="${index}">${item.activity || ""}</div>
+                <div class="experience-company" data-section="coCurricular" data-index="${index}">${formatSubtitle([item.organization, item.role])}</div>
+              </div>
+              <div class="experience-date" data-section="coCurricular" data-index="${index}">${item.year || ""}</div>
+            </div>
+            <div class="experience-description" data-section="coCurricular" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Extracurricular Activities -->
+      ${
+        nonEmptyExtracurricular.length > 0
+          ? `<div class="section" data-section="extracurricular">
+        <div class="section-title" data-section="extracurricular">EXTRACURRICULAR ACTIVITIES</div>
+        ${nonEmptyExtracurricular
+          .map(
+            (item: any, index: number) => `
+          <div class="experience-item" data-section="extracurricular" data-index="${index}">
+            <div class="experience-header" data-section="extracurricular" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="extracurricular" data-index="${index}">${item.activity || ""}</div>
+                <div class="experience-company" data-section="extracurricular" data-index="${index}">${formatSubtitle([item.organization, item.role])}</div>
+              </div>
+              <div class="experience-date" data-section="extracurricular" data-index="${index}">${item.year || ""}</div>
+            </div>
+            <div class="experience-description" data-section="extracurricular" data-index="${index}">${item.description || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Languages (if not in sidebar) -->
+      ${
+        data.sectionVisibility?.languages !== false &&
+        data.languages &&
+        data.languages.length > 0 && data.languages.length > 5
+          ? `<div class="section">
+        <div class="section-title">LANGUAGES</div>
+        <div class="languages-list" data-section="languages">
+          ${(data.languages || [])
+            .map(
+              (lang: any, index: number) => `
+            <div class="language-item" data-section="languages" data-index="${index}">${
+                lang.language || lang
+              }${lang.level ? ` (${lang.level})` : ''}${lang.capability ? ` - ${lang.capability}` : ''}</div>
+          `
+            )
+            .join("")}
+        </div>
+      </div>`
+          : ""
+      }
+
+      <!-- Hobbies (if not in sidebar) -->
+      ${
+        data.sectionVisibility?.hobbies !== false &&
+        data.hobbies &&
+        data.hobbies.length > 0 && data.hobbies.length > 8
+          ? `<div class="section">
+        <div class="section-title">HOBBIES & INTERESTS</div>
+        <div class="hobbies-list" data-section="hobbies">
+          ${(data.hobbies || [])
+            .map(
+              (hobby: any, index: number) => `
+            <div class="hobby-item" data-section="hobbies" data-index="${index}">${hobby}</div>
+          `
+            )
+            .join("")}
+        </div>
+      </div>`
+          : ""
+      }
+
+      <!-- Social Links -->
+      ${
+        data.sectionVisibility?.socialLinks !== false &&
+        data.socialLinks &&
+        data.socialLinks.length > 0
+          ? `<div class="section">
+        <div class="section-title">SOCIAL LINKS</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px;" data-section="socialLinks">
+          ${data.socialLinks
+            .map(
+              (link: any, index: number) => `
+            <a href="${
+              link.url
+            }" target="_blank" style="color: #3498db; text-decoration: none; font-weight: 500; font-size: ${baseFontSize}px; border-bottom: 1px dotted #3498db;" data-section="socialLinks" data-index="${index}">${
+                link.urlText ||
+                link.url.replace("https://", "").replace("http://", "")
+              }</a>
+          `
+            )
+            .join("")}
+        </div>
+      </div>`
+          : ""
+      }
+
+      <!-- References -->
+      ${
+        nonEmptyReferences.length > 0
+          ? `<div class="section" data-section="references">
+        <div class="section-title" data-section="references">REFERENCES</div>
+        ${nonEmptyReferences
+          .map(
+            (ref: any, index: number) => `
+          <div class="experience-item" data-section="references" data-index="${index}">
+            <div class="experience-header" data-section="references" data-index="${index}">
+              <div>
+                <div class="experience-title" data-section="references" data-index="${index}">${ref.name || ""}</div>
+                <div class="experience-company" data-section="references" data-index="${index}">${formatSubtitle([ref.designationRelationship, ref.organization])}</div>
+              </div>
+            </div>
+            <div class="experience-description" data-section="references" data-index="${index}">${ref.contactInformation || ""}</div>
+          </div>
+        `
+          )
+          .join("")}
+      </div>`
+          : ""
+      }
+
+      <!-- Key Achievements -->
+      ${
+        nonEmptyKeyAchievements.length > 0
           ? `<div class="section" data-section="keyAchievements">
         <div class="section-title" data-section="keyAchievements">KEY ACHIEVEMENTS</div>
-        <ul data-section="keyAchievements">
-          ${(data.keyAchievements || [])
+        <ul style="list-style: none; padding-left: 0;" data-section="keyAchievements">
+          ${nonEmptyKeyAchievements
             .map(
               (achievement: string, index: number) =>
-                `<li data-section="keyAchievements" data-index="${index}" style="margin-bottom: 8px; color: #34495e;">${achievement}</li>`
+                `<li style="margin-bottom: 8px; color: #34495e; position: relative; padding-left: 15px;" data-section="keyAchievements" data-index="${index}">
+                  <span style="position: absolute; left: 0; color: #3498db;">•</span> ${achievement}
+                </li>`
             )
             .join("")}
         </ul>
@@ -1260,28 +1947,18 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
           : ""
       }
 
-
-
-
-
-
+      <!-- Key Responsibilities -->
       ${
-        getNonEmptyArray(
-          Array.isArray(data.responsibilities)
-            ? data.responsibilities
-            : (data.responsibilities || "").split("\n")
-        ).length > 0
+        nonEmptyResponsibilities.length > 0
           ? `<div class="section" data-section="responsibilities">
         <div class="section-title" data-section="responsibilities">KEY RESPONSIBILITIES</div>
-        <ul data-section="responsibilities">
-          ${getNonEmptyArray(
-            Array.isArray(data.responsibilities)
-              ? data.responsibilities
-              : (data.responsibilities || "").split("\n")
-          )
+        <ul style="list-style: none; padding-left: 0;" data-section="responsibilities">
+          ${nonEmptyResponsibilities
             .map(
               (line: string, index: number) =>
-                `<li data-section="responsibilities" data-index="${index}" style="margin-bottom: 8px; color: #34495e;">${line.trim()}</li>`
+                `<li style="margin-bottom: 8px; color: #34495e; position: relative; padding-left: 15px;" data-section="responsibilities" data-index="${index}">
+                  <span style="position: absolute; left: 0; color: #3498db;">•</span> ${line.trim()}
+                </li>`
             )
             .join("")}
         </ul>
@@ -1289,31 +1966,24 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
           : ""
       }
 
-
-
-
-
-
+      <!-- Tools (Simple List) -->
       ${
-        hasContent(data.tools)
+        nonEmptyTools.length > 0
           ? `<div class="section" data-section="tools">
-        <div class="section-title" data-section="tools">TOOLS & TECHNOLOGIES</div>
-        <ul data-section="tools">
-          ${getNonEmptyArray(
-            Array.isArray(data.tools)
-              ? data.tools
-              : (data.tools || "").split("\n")
-          )
+        <div class="section-title" data-section="tools">TOOLS</div>
+        <ul style="list-style: none; padding-left: 0;" data-section="tools">
+          ${nonEmptyTools
             .map(
               (line: string, index: number) =>
-                `<li data-section="tools" data-index="${index}" style="margin-bottom: 8px; color: #34495e;">${line.trim()}</li>`
+                `<li style="margin-bottom: 8px; color: #34495e; position: relative; padding-left: 15px;" data-section="tools" data-index="${index}">
+                  <span style="position: absolute; left: 0; color: #3498db;">•</span> ${line.trim()}
+                </li>`
             )
             .join("")}
         </ul>
       </div>`
           : ""
       }
-
 
       <!-- Custom Sections -->
       ${
@@ -1321,9 +1991,9 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
           ? data.customSections
               .filter((section: any) => section.isVisible)
               .map(
-                (section: any) => `
-        <div class="section" data-section="customSections">
-          <div class="section-title" data-section="customSections">${
+                (section: any, sectionIndex: number) => `
+        <div class="section" data-section="custom-${sectionIndex}">
+          <div class="section-title" data-section="custom-${sectionIndex}">${
             section.heading || "Custom Section"
           }</div>
           ${
@@ -1332,13 +2002,12 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
                   .filter((entry: any) => entry.isVisible)
                   .map(
                     (entry: any, entryIndex: number) => `
-            <div class="experience-item" data-section="customSections" data-index="${entryIndex}">
-              <div class="experience-header" data-section="customSections" data-index="${entryIndex}">
+            <div class="experience-item" data-section="custom-${sectionIndex}" data-index="${entryIndex}">
+              <div class="experience-header" data-section="custom-${sectionIndex}" data-index="${entryIndex}">
                 <div>
-
                   ${
                     entry.title || entry.organization
-                      ? `<div class="experience-title" data-section="customSections" data-index="${entryIndex}">${
+                      ? `<div class="experience-title" data-section="custom-${sectionIndex}" data-index="${entryIndex}">${
                           entry.title || ""
                         }${entry.title && entry.organization ? " at " : ""}${
                           entry.organization || ""
@@ -1348,20 +2017,20 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
                 </div>
                 ${
                   entry.date
-                    ? `<div class="experience-date" data-section="customSections" data-index="${entryIndex}">${entry.date}</div>`
+                    ? `<div class="experience-date" data-section="custom-${sectionIndex}" data-index="${entryIndex}">${entry.date}</div>`
                     : ""
                 }
               </div>
               ${
                 entry.description
-                  ? `<div class="experience-description" data-section="customSections" data-index="${entryIndex}">${entry.description}</div>`
+                  ? `<div class="experience-description" data-section="custom-${sectionIndex}" data-index="${entryIndex}">${entry.description}</div>`
                   : ""
               }
             </div>
           `
                   )
                   .join("")
-              : '<div style="color: #7f8c8d; font-style: italic;">No entries in this section</div>'
+              : '<div style="color: #7f8c8d; font-style: italic; padding: 15px 0;">No entries in this section</div>'
           }
         </div>
       `

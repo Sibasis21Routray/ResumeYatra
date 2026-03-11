@@ -676,17 +676,16 @@ export async function getResume(req: Request, res: Response) {
         }));
 
         (latestVersion.data as any).publications = publications.map(
-          (p: any) => ({
-            id: p._id.toString(),
-            title: p.title,
-            authors: p.authors,
-            journal: p.journal,
-            conference: p.conference,
-            publicationDate: p.publicationDate,
-            doi: p.doi,
-            url: p.url,
-          })
-        );
+  (p: any) => ({
+    id: p._id.toString(),
+    title: p.title,
+    journalPublisher: p.journal,
+    publicationType: p.conference,
+    year: p.publicationDate,
+    urlDoi: p.doi,
+    authors: p.authors,
+  })
+);
 
         (latestVersion.data as any).patents = patents.map((p: any) => ({
           id: p._id.toString(),
@@ -1352,22 +1351,24 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle publications if provided
-      if (data.publications && Array.isArray(data.publications)) {
-        await Publication.deleteMany({ resumeId: version._id });
-        if (data.publications.length > 0) {
-          const docs = data.publications.map((item: any) => ({
-            resumeId: version._id,
-            title: item.title,
-            authors: item.authors,
-            journal: item.journal,
-            conference: item.conference,
-            publicationDate: item.publicationDate,
-            doi: item.doi,
-            url: item.url,
-          }));
-          await Publication.insertMany(docs);
-        }
-      }
+     if (data.publications && Array.isArray(data.publications)) {
+  await Publication.deleteMany({ resumeId: version._id });
+
+  if (data.publications.length > 0) {
+    const docs = data.publications.map((item: any) => ({
+      resumeId: version._id,
+      title: item.title,
+      journal: item.journalPublisher,      // map frontend → backend
+      conference: item.publicationType,    // map frontend → backend
+      publicationDate: item.year,          // map frontend → backend
+      doi: item.urlDoi,                    // map frontend → backend
+      url: item.urlDoi,
+      authors: item.authors || "",
+    }));
+
+    await Publication.insertMany(docs);
+  }
+}
 
       // Handle patents if provided
       if (data.patents && Array.isArray(data.patents)) {
