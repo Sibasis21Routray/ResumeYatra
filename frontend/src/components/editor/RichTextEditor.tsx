@@ -541,40 +541,38 @@ export function RichTextEditor({
 
   /* -------- Ensure spellcheck is enabled at DOM level -------- */
   useEffect(() => {
-    const el = editorRef.current;
-    if (el) {
-      // Set spellcheck using property (more reliable than attribute)
+  const el = editorRef.current;
+  if (!el) return;
+
+  // enable spellcheck
+  el.spellcheck = true;
+  el.setAttribute("spellcheck", "true");
+  el.setAttribute("lang", "en");
+
+  // force browser spellcheck refresh
+  const refreshSpellcheck = () => {
+    const selection = window.getSelection();
+    const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+
+    el.spellcheck = false;
+
+    requestAnimationFrame(() => {
       el.spellcheck = true;
-      el.setAttribute("spellcheck", "true");
-      el.setAttribute("lang", "en");
-      el.setAttribute("xml:lang", "en");
 
-      // Force browser to recognize spellcheck after DOM changes
-      const forceSpellcheck = () => {
-        // Toggle spellcheck to force re-evaluation
-        el.spellcheck = false;
-        requestAnimationFrame(() => {
-          el.spellcheck = true;
-          el.setAttribute("spellcheck", "true");
-        });
-      };
+      // restore cursor
+      if (range && selection) {
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    });
+  };
 
-      // Periodic reinforcement of spellcheck (less frequent to avoid re-renders)
-      const intervalId = setInterval(() => {
-        if (el && document.activeElement === el) {
-          el.spellcheck = true;
-          el.setAttribute("spellcheck", "true");
-        }
-      }, 2000); // Changed from 500ms to 2000ms
+  el.addEventListener("input", refreshSpellcheck);
 
-      el.addEventListener("input", forceSpellcheck);
-
-      return () => {
-        el.removeEventListener("input", forceSpellcheck);
-        clearInterval(intervalId);
-      };
-    }
-  }, []);
+  return () => {
+    el.removeEventListener("input", refreshSpellcheck);
+  };
+}, []);
 
   /* ---------------- Commands ---------------- */
   const exec = (command: string, value?: string) => {
@@ -796,7 +794,7 @@ export function RichTextEditor({
           ref={editorRef}
           contentEditable
           lang="en"
-          spellCheck="true"
+          spellCheck={true}
           suppressContentEditableWarning
           onInput={handleInput}
           onPaste={handlePaste}
