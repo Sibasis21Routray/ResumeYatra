@@ -11,10 +11,9 @@ const toastStyle = {
 };
 
 interface LanguageItem {
-  language: string;
-  proficiency?: string; // Made optional - Native/Bilingual, Full Professional, Professional Working, Limited Working, Elementary
-  capability?: string; // Made optional - Speak, Read & Write, Read, Write & Speak
-  levelType: 'proficiency' | 'capability'; // New field to track which type is selected
+  language: string; // Will store formatted string like "English - Full Professional"
+  proficiency?: string; // Native/Bilingual, Full Professional, Professional Working, Limited Working, Elementary
+  capability?: string; // Speak, Read & Write, Read, Write & Speak
 }
 
 const ALL_LANGUAGES = [
@@ -338,12 +337,16 @@ const LanguageCard = ({ language, index, onEdit, onDelete }: {
   onEdit: () => void; 
   onDelete: () => void;
 }) => {
-  // Determine which level to display
-  const levelDisplay = language.levelType === 'proficiency' 
-    ? language.proficiency 
-    : language.capability;
-  
-  const levelLabel = language.levelType === 'proficiency' ? 'Proficiency' : 'Capability';
+  // Parse the language string to extract base language if it contains a dash
+  const displayLanguage = language.language.includes(' - ') 
+    ? language.language.split(' - ')[0] 
+    : language.language;
+    
+  const levelDisplay = language.language.includes(' - ') 
+    ? language.language.split(' - ')[1] 
+    : (language.proficiency || language.capability || '');
+
+  const levelLabel = language.proficiency ? 'Proficiency' : 'Capability';
 
   return (
     <div className="bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 hover:shadow-md transition-shadow">
@@ -352,7 +355,7 @@ const LanguageCard = ({ language, index, onEdit, onDelete }: {
           <div className="flex items-center gap-2 mb-2">
             <Globe className="w-5 h-5 text-accent dark:text-dark-accent" />
             <h3 className="font-semibold text-lg text-text-primary dark:text-dark-text-primary">
-              {language.language}
+              {displayLanguage}
             </h3>
           </div>
           
@@ -363,7 +366,7 @@ const LanguageCard = ({ language, index, onEdit, onDelete }: {
           </div>
 
           {/* Progress bars - only show for proficiency type */}
-          {language.levelType === 'proficiency' && language.proficiency && (
+          {language.proficiency && (
             <div className="flex gap-1 mt-2">
               {Array.from({ length: 5 }).map((_, idx) => (
                 <div
@@ -412,8 +415,13 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
   
   const [languages, setLanguages] = useState<LanguageItem[]>(data?.languages || []);
   const [isEditing, setIsEditing] = useState(false);
-  const [tempLang, setTempLang] = useState<LanguageItem>({ 
-    language: "", 
+  const [tempLang, setTempLang] = useState<{ 
+    baseLanguage: string; 
+    proficiency?: string; 
+    capability?: string;
+    levelType: 'proficiency' | 'capability';
+  }>({ 
+    baseLanguage: "", 
     proficiency: "", 
     capability: "",
     levelType: 'proficiency' // Default to proficiency
@@ -436,8 +444,8 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!tempLang.language?.trim()) {
-      newErrors.language = "Language is required";
+    if (!tempLang.baseLanguage?.trim()) {
+      newErrors.baseLanguage = "Language is required";
     }
 
     // Validate based on selected level type
@@ -464,7 +472,7 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
   };
 
   const isFormValid = () => {
-    if (!tempLang.language?.trim()) return false;
+    if (!tempLang.baseLanguage?.trim()) return false;
     
     if (tempLang.levelType === 'proficiency') {
       return tempLang.proficiency !== "";
@@ -476,7 +484,7 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
   const startAdding = () => {
     setEditingIndex(null);
     setTempLang({ 
-      language: "", 
+      baseLanguage: "", 
       proficiency: "", 
       capability: "",
       levelType: 'proficiency' 
@@ -490,7 +498,7 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
     setIsEditing(false);
     setEditingIndex(null);
     setTempLang({ 
-      language: "", 
+      baseLanguage: "", 
       proficiency: "", 
       capability: "",
       levelType: 'proficiency' 
@@ -501,7 +509,7 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
 
   const saveLanguage = () => {
     setTouched({
-      language: true,
+      baseLanguage: true,
       proficiency: true,
       capability: true,
       levelType: true
@@ -511,27 +519,45 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
       return;
     }
 
-    // Check for duplicate language (case insensitive)
-    const isDuplicate = languages.some(
-      (lang, index) => 
-        lang.language.toLowerCase() === tempLang.language.toLowerCase() && 
-        index !== editingIndex
-    );
+    // Create the formatted language string
+    let formattedLanguage = tempLang.baseLanguage;
+    if (tempLang.levelType === 'proficiency' && tempLang.proficiency) {
+      formattedLanguage = `${tempLang.baseLanguage} - ${tempLang.proficiency}`;
+    }
+
+    // Create language item to save
+    const languageToSave: LanguageItem = {
+      language: formattedLanguage,
+      proficiency: tempLang.levelType === 'proficiency' ? tempLang.proficiency : undefined,
+      capability: tempLang.levelType === 'capability' ? tempLang.capability : undefined
+    };
+
+    // Check for duplicate language (case insensitive, compare base language and level)
+    const isDuplicate = languages.some((lang, index) => {
+      const existingBaseLang = lang.language.includes(' - ') 
+        ? lang.language.split(' - ')[0] 
+        : lang.language;
+      
+      const existingLevel = lang.language.includes(' - ') 
+        ? lang.language.split(' - ')[1] 
+        : (lang.proficiency || lang.capability || '');
+
+      const newLevel = tempLang.levelType === 'proficiency' 
+        ? tempLang.proficiency 
+        : tempLang.capability;
+
+      return existingBaseLang.toLowerCase() === tempLang.baseLanguage.toLowerCase() &&
+             existingLevel === newLevel &&
+             index !== editingIndex;
+    });
 
     if (isDuplicate) {
-      toast.error('This language has already been added', {
+      toast.error('This language with the same level has already been added', {
         style: toastStyle.error,
         duration: 3000,
       });
       return;
     }
-
-    // Clear the unused field based on level type
-    const languageToSave = {
-      ...tempLang,
-      proficiency: tempLang.levelType === 'proficiency' ? tempLang.proficiency : undefined,
-      capability: tempLang.levelType === 'capability' ? tempLang.capability : undefined
-    };
 
     let newLanguages;
     if (editingIndex !== null) {
@@ -553,7 +579,7 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
     
     setEditingIndex(null);
     setTempLang({ 
-      language: "", 
+      baseLanguage: "", 
       proficiency: "", 
       capability: "",
       levelType: 'proficiency' 
@@ -574,7 +600,20 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
 
   const editLanguage = (index: number) => {
     const lang = languages[index];
-    setTempLang({ ...lang });
+    // Parse the language string to extract base language and level
+    const parts = lang.language.split(' - ');
+    const baseLanguage = parts[0];
+    const level = parts.length > 1 ? parts[1] : '';
+    
+    // Determine if it's proficiency or capability based on stored fields
+    const levelType = lang.proficiency ? 'proficiency' : 'capability';
+    
+    setTempLang({ 
+      baseLanguage,
+      proficiency: lang.proficiency || (levelType === 'proficiency' ? level : ''),
+      capability: lang.capability || (levelType === 'capability' ? level : ''),
+      levelType
+    });
     setEditingIndex(index);
     setIsEditing(true);
     setErrors({});
@@ -623,14 +662,14 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
   };
 
   const handleLanguageSelect = (language: string) => {
-    updateField("language", language);
+    updateField("baseLanguage", language);
   };
 
   const handleBlur = (field: string) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
     
-    if (field === "language" && !tempLang.language?.trim()) {
-      setErrors((prev) => ({ ...prev, language: "Language is required" }));
+    if (field === "baseLanguage" && !tempLang.baseLanguage?.trim()) {
+      setErrors((prev) => ({ ...prev, baseLanguage: "Language is required" }));
     }
     if (field === "proficiency" && tempLang.levelType === 'proficiency' && !tempLang.proficiency) {
       setErrors((prev) => ({ ...prev, proficiency: "Proficiency is required" }));
@@ -679,13 +718,13 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
             <LanguageInputWithAutocomplete
               label="Language"
               placeholder="Start typing to search for a language..."
-              value={tempLang.language}
-              onChange={(e) => updateField("language", e.target.value)}
+              value={tempLang.baseLanguage}
+              onChange={(e) => updateField("baseLanguage", e.target.value)}
               onSelect={handleLanguageSelect}
-              onBlur={() => handleBlur("language")}
+              onBlur={() => handleBlur("baseLanguage")}
               required
               icon={<Globe className="w-4 h-4" />}
-              error={touched.language ? errors.language : ""}
+              error={touched.baseLanguage ? errors.baseLanguage : ""}
               suggestions={ALL_LANGUAGES}
             />
 
