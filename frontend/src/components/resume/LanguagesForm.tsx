@@ -11,9 +11,9 @@ const toastStyle = {
 };
 
 interface LanguageItem {
-  language: string; // Will store formatted string like "English - Full Professional"
-  proficiency?: string; // Native/Bilingual, Full Professional, Professional Working, Limited Working, Elementary
-  capability?: string; // Speak, Read & Write, Read, Write & Speak
+  language: string; // Will be either just language name or "language - proficiency"
+  capability?: string; // Only present for capability type
+  // Note: proficiency is not stored as a separate field, it's part of the language string
 }
 
 const ALL_LANGUAGES = [
@@ -344,9 +344,14 @@ const LanguageCard = ({ language, index, onEdit, onDelete }: {
     
   const levelDisplay = language.language.includes(' - ') 
     ? language.language.split(' - ')[1] 
-    : (language.proficiency || language.capability || '');
+    : language.capability || '';
 
-  const levelLabel = language.proficiency ? 'Proficiency' : 'Capability';
+  const levelLabel = language.language.includes(' - ') ? 'Proficiency' : 'Capability';
+
+  // Get proficiency level for progress bars
+  const proficiencyLevel = language.language.includes(' - ') 
+    ? language.language.split(' - ')[1] 
+    : '';
 
   return (
     <div className="bg-bg-primary dark:bg-dark-bg-primary border border-light-border dark:border-dark-border rounded-xl p-5 hover:shadow-md transition-shadow">
@@ -366,13 +371,13 @@ const LanguageCard = ({ language, index, onEdit, onDelete }: {
           </div>
 
           {/* Progress bars - only show for proficiency type */}
-          {language.proficiency && (
+          {language.language.includes(' - ') && proficiencyLevel && (
             <div className="flex gap-1 mt-2">
               {Array.from({ length: 5 }).map((_, idx) => (
                 <div
                   key={idx}
                   className={`h-2 flex-1 rounded-full ${
-                    idx < PROFICIENCY_LEVEL_MAP[language.proficiency || '']
+                    idx < PROFICIENCY_LEVEL_MAP[proficiencyLevel]
                       ? "bg-accent dark:bg-dark-accent"
                       : "bg-light-border dark:bg-dark-border"
                   }`}
@@ -519,36 +524,43 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
       return;
     }
 
-    // Create the formatted language string
-    let formattedLanguage = tempLang.baseLanguage;
-    if (tempLang.levelType === 'proficiency' && tempLang.proficiency) {
-      formattedLanguage = `${tempLang.baseLanguage} - ${tempLang.proficiency}`;
+    // Create the language item based on level type
+    let languageItem: LanguageItem;
+    
+    if (tempLang.levelType === 'proficiency') {
+      // For proficiency: store as "Language - Proficiency"
+      languageItem = {
+        language: `${tempLang.baseLanguage} - ${tempLang.proficiency}`
+        // No capability field
+      };
+    } else {
+      // For capability: store as just the language name with capability field
+      languageItem = {
+        language: tempLang.baseLanguage,
+        capability: tempLang.capability
+      };
     }
 
-    // Create language item to save
-    const languageToSave: LanguageItem = {
-      language: formattedLanguage,
-      proficiency: tempLang.levelType === 'proficiency' ? tempLang.proficiency : undefined,
-      capability: tempLang.levelType === 'capability' ? tempLang.capability : undefined
-    };
-
-    // Check for duplicate language (case insensitive, compare base language and level)
+    // Check for duplicate language
     const isDuplicate = languages.some((lang, index) => {
-      const existingBaseLang = lang.language.includes(' - ') 
-        ? lang.language.split(' - ')[0] 
-        : lang.language;
-      
-      const existingLevel = lang.language.includes(' - ') 
-        ? lang.language.split(' - ')[1] 
-        : (lang.proficiency || lang.capability || '');
-
-      const newLevel = tempLang.levelType === 'proficiency' 
-        ? tempLang.proficiency 
-        : tempLang.capability;
-
-      return existingBaseLang.toLowerCase() === tempLang.baseLanguage.toLowerCase() &&
-             existingLevel === newLevel &&
-             index !== editingIndex;
+      if (tempLang.levelType === 'proficiency') {
+        // For proficiency: check if same language and proficiency exists
+        const existingBaseLang = lang.language.includes(' - ') 
+          ? lang.language.split(' - ')[0] 
+          : lang.language;
+        const existingProficiency = lang.language.includes(' - ') 
+          ? lang.language.split(' - ')[1] 
+          : '';
+        
+        return existingBaseLang.toLowerCase() === tempLang.baseLanguage.toLowerCase() &&
+               existingProficiency === tempLang.proficiency &&
+               index !== editingIndex;
+      } else {
+        // For capability: check if same language with capability exists
+        return lang.language.toLowerCase() === tempLang.baseLanguage.toLowerCase() &&
+               lang.capability === tempLang.capability &&
+               index !== editingIndex;
+      }
     });
 
     if (isDuplicate) {
@@ -562,13 +574,13 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
     let newLanguages;
     if (editingIndex !== null) {
       newLanguages = [...languages];
-      newLanguages[editingIndex] = languageToSave;
+      newLanguages[editingIndex] = languageItem;
       toast.success('Language updated successfully!', {
         style: toastStyle.success,
         duration: 2000,
       });
     } else {
-      newLanguages = [...languages, languageToSave];
+      newLanguages = [...languages, languageItem];
       toast.success('Language added successfully!', {
         style: toastStyle.success,
         duration: 2000,
@@ -600,20 +612,29 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
 
   const editLanguage = (index: number) => {
     const lang = languages[index];
-    // Parse the language string to extract base language and level
-    const parts = lang.language.split(' - ');
-    const baseLanguage = parts[0];
-    const level = parts.length > 1 ? parts[1] : '';
     
-    // Determine if it's proficiency or capability based on stored fields
-    const levelType = lang.proficiency ? 'proficiency' : 'capability';
+    // Check if it's proficiency type (has dash in language)
+    if (lang.language.includes(' - ')) {
+      const parts = lang.language.split(' - ');
+      const baseLanguage = parts[0];
+      const proficiency = parts[1];
+      
+      setTempLang({ 
+        baseLanguage,
+        proficiency,
+        capability: "",
+        levelType: 'proficiency'
+      });
+    } else {
+      // Capability type
+      setTempLang({ 
+        baseLanguage: lang.language,
+        proficiency: "",
+        capability: lang.capability || "",
+        levelType: 'capability'
+      });
+    }
     
-    setTempLang({ 
-      baseLanguage,
-      proficiency: lang.proficiency || (levelType === 'proficiency' ? level : ''),
-      capability: lang.capability || (levelType === 'capability' ? level : ''),
-      levelType
-    });
     setEditingIndex(index);
     setIsEditing(true);
     setErrors({});
@@ -681,18 +702,18 @@ export const LanguagesForm: React.FC<LanguagesFormProps> = ({
 
   const handleBack = () => {
     if (onNavigateToSection) {
-            onNavigateToSection("customSections");
-        } else if (onBack) {
-            onBack();
-        }
+      onNavigateToSection("customSections");
+    } else if (onBack) {
+      onBack();
+    }
   };
 
   const handleContinue = () => {
-     if (onNavigateToSection) {
-            onNavigateToSection("customSections");
-        } else {
-            navigate(`/preview/${id}`);
-        }
+    if (onNavigateToSection) {
+      onNavigateToSection("customSections");
+    } else {
+      navigate(`/preview/${id}`);
+    }
   };
 
   return (
