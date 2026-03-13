@@ -649,7 +649,7 @@ export function buildBlastoiseTemplate(data: any, theme?: any): string {
               <div class="exp-company">${e.school || ""}${e.location ? `, ${e.location}` : ""}</div>
               <div class="exp-date">${e.graduationDate || ""}</div>
             </div>
-            ${e.grade ? `<div class="exp-description"><strong>Grade:</strong> ${e.grade}</div>` : ""}
+            ${e.grade ? `<div class="exp-description"><strong></strong> ${e.grade}</div>` : ""}
             ${e.description ? `<p class="exp-description">${e.description}</p>` : ""}
             ${e.achievements && e.achievements.length > 0 ? `
               <ul class="exp-achievements">

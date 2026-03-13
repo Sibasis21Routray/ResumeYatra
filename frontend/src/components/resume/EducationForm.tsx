@@ -464,7 +464,7 @@ export const EducationForm: React.FC<EducationFormProps> = ({
   onBack,
   onOpenAIModal,
 }) => {
-  const { data, updateData,save } = useResumeStore();
+  const { data, updateData, save } = useResumeStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -516,19 +516,37 @@ export const EducationForm: React.FC<EducationFormProps> = ({
   }, []);
 
   // Initialize selectedGradeType based on existing data when editing
-  useEffect(() => {
-    if (editingId && currentEducation) {
-      if (currentEducation.cgpa) {
-        setSelectedGradeType('cgpa');
-      } else if (currentEducation.percentage) {
-        setSelectedGradeType('percentage');
-      } else if (currentEducation.grade) {
-        setSelectedGradeType('grade');
-      } else {
-        setSelectedGradeType(null);
-      }
+ // Initialize selectedGradeType based on existing data when editing
+useEffect(() => {
+  if (editingId && currentEducation) {
+    const grade = currentEducation.grade;
+    if (!grade) {
+      setSelectedGradeType(null);
+      return;
     }
-  }, [editingId]);
+    
+    // Parse the prefixed grade string
+    if (grade.startsWith('CGPA:')) {
+      setSelectedGradeType('cgpa');
+      setTempEducation((prev: any) => ({
+        ...prev,
+        cgpa: grade.replace('CGPA:', '').trim()
+      }));
+    } else if (grade.startsWith('Percentage:')) {
+      setSelectedGradeType('percentage');
+      setTempEducation((prev: any) => ({
+        ...prev,
+        percentage: grade.replace('Percentage:', '').trim()
+      }));
+    } else if (grade.startsWith('Grade:')) {
+      setSelectedGradeType('grade');
+      setTempEducation((prev: any) => ({
+        ...prev,
+        grade: grade.replace('Grade:', '').trim()
+      }));
+    }
+  }
+}, [editingId]);
 
   // Initial setup
   useEffect(() => {
@@ -558,26 +576,28 @@ export const EducationForm: React.FC<EducationFormProps> = ({
     return Object.keys(errors).length === 0;
   };
 
-   const handleSubmit = async () => {
+ const handleSubmit = async () => {
   const isValid = validateData();
   if (!isValid) {
     return;
   }
 
   try {
-    // Create a clean education object with only the selected grade type
+    // Create a clean education object
     const updatedEducation = { ...tempEducation };
-
+    
+    // Remove any existing grade fields
     delete updatedEducation.cgpa;
     delete updatedEducation.percentage;
     delete updatedEducation.grade;
 
+    // Set the grade field based on selected type with prefix
     if (selectedGradeType === "cgpa" && tempEducation.cgpa) {
-      updatedEducation.cgpa = tempEducation.cgpa;
+      updatedEducation.grade = `CGPA: ${tempEducation.cgpa}`;
     } else if (selectedGradeType === "percentage" && tempEducation.percentage) {
-      updatedEducation.percentage = tempEducation.percentage;
+      updatedEducation.grade = `Percentage: ${tempEducation.percentage}`;
     } else if (selectedGradeType === "grade" && tempEducation.grade) {
-      updatedEducation.grade = tempEducation.grade;
+      updatedEducation.grade = `Grade: ${tempEducation.grade}`;
     }
 
     updateData((draft) => {
@@ -681,14 +701,23 @@ export const EducationForm: React.FC<EducationFormProps> = ({
 
   // Function to get the display value for grade based on what's available
   const getGradeDisplayValue = (education: any) => {
-    if (education.cgpa) {
-      return `CGPA: ${education.cgpa}`;
-    } else if (education.percentage) {
-      return `Percentage: ${education.percentage}`;
-    } else if (education.grade) {
-      return `Grade: ${education.grade}`;
+    if (!education.grade) return null;
+    
+    // Try to determine the type based on the value format
+    const grade = education.grade;
+    
+    // Check if it's a percentage (contains %)
+    if (typeof grade === 'string' && grade.includes('%')) {
+      return `Percentage: ${grade}`;
     }
-    return null;
+    
+    // Check if it's a CGPA (numeric with possible decimal)
+    if (!isNaN(parseFloat(grade)) && !grade.includes('%')) {
+      return `CGPA: ${grade}`;
+    }
+    
+    // Default to letter grade
+    return `Grade: ${grade}`;
   };
 
   const renderSummary = () => (
@@ -985,8 +1014,19 @@ export const EducationForm: React.FC<EducationFormProps> = ({
     </div>
   );
 
+  // Calculate the highest z-index among open dropdowns
+  const getHighestZIndex = () => {
+    let highest = 40; // Base z-index
+    if (isDegreeDropdownOpen) highest = 50;
+    if (isCgpaDropdownOpen) highest = 51;
+    if (isGradeDropdownOpen) highest = 52;
+    if (isStartDateOpen) highest = 53;
+    if (isEndDateOpen) highest = 54;
+    return highest;
+  };
+
   return (
-    <div className="w-full mx-auto px-4">
+    <div className="w-full mx-auto px-4" style={{ position: 'relative', zIndex: 1 }}>
       {isSummaryView ? renderSummary() : renderForm()}
 
       {/* Footer */}

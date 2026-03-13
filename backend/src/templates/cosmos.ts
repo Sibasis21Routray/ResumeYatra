@@ -423,7 +423,7 @@ export function buildCosmosTemplate(data: any, theme?: any): string {
                   ${edu.school ? edu.school : ""}${edu.location ? `, ${edu.location}` : ""}
                 </div>
                 ${edu.startDate && edu.startDate.trim() ? `<div class="entry-detail"><strong>Start Date:</strong> ${edu.startDate}</div>` : ""}
-                ${edu.grade && edu.grade.trim() ? `<div class="entry-detail"><strong>Grade:</strong> ${edu.grade}</div>` : ""}
+                ${edu.grade && edu.grade.trim() ? `<div class="entry-detail"><strong></strong> ${edu.grade}</div>` : ""}
                 ${edu.description && edu.description.trim() ? `<div class="description-text">${edu.description}</div>` : ""}
               </div>
             `).join("")}

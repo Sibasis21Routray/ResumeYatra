@@ -1220,7 +1220,7 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
             }
             ${
               edu.grade
-                ? `<div class="education-field" data-section="education" data-index="${index}">Grade: ${edu.grade}</div>`
+                ? `<div class="education-field" data-section="education" data-index="${index}"> ${edu.grade}</div>`
                 : ""
             }
             

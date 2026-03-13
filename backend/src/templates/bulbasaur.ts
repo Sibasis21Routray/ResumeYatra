@@ -640,7 +640,7 @@ export function buildBulbasaurTemplate(data: any, theme?: any): string {
               </div>
               
               ${edu.school ? `<div class="education-school-enhanced">${edu.school}${edu.location ? `, ${edu.location}` : ''}</div>` : ''}
-              ${edu.grade ? `<div class="education-field">Grade: ${edu.grade}</div>` : ''}
+              ${edu.grade ? `<div class="education-field"> ${edu.grade}</div>` : ''}
               <div class="edu-date">${edu.graduationDate || ''}</div>
               
               ${edu.description ? `

@@ -453,7 +453,7 @@ export function buildSaanviPatelTemplate(data: any, theme?: any): string {
         <!-- Header with Personal Info -->
         <header class="header">
           <div class="header-left">
-            <h1 class="name">${(personal.name || "SAMANANDA MOHAN RAO").toUpperCase()}${personal.middleName ? ` ${personal.middleName}` : ""}</h1>
+            <h1 class="name">${(personal.name || "SAMANANDA MOHAN RAO").toUpperCase()}</h1>
             ${personal.jobTitle ? `<div class="job-title">${personal.jobTitle}</div>` : ""}
             ${personal.role ? `<div class="job-title">${personal.role}</div>` : ""}
           </div>
@@ -613,25 +613,26 @@ export function buildSaanviPatelTemplate(data: any, theme?: any): string {
           </div>
         ` : ""}
 
-        <!-- Education -->
-        ${nonEmptyEducation.length > 0 ? `
-          <div class="section" data-section="education">
-            <h2 class="section-title">Education</h2>
-            ${nonEmptyEducation.map((edu: any, index: number) => `
-              <div class="entry" data-section="education" data-index="${index}">
-                <div class="entry-header">
-                  <span class="entry-title">${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}</span>
-                  <span class="entry-date">${edu.graduationDate || ""}</span>
-                </div>
-                <div class="entry-subtitle">
-                  ${edu.school || ""}${edu.location ? `, ${edu.location}` : ""}
-                </div>
-                ${edu.grade && edu.grade.trim() ? `<div class="entry-detail"><strong>Grade:</strong> ${edu.grade}</div>` : ""}
-                ${edu.description && edu.description.trim() ? `<div class="description">${edu.description}</div>` : ""}
-              </div>
-            `).join("")}
-          </div>
-        ` : ""}
+       <!-- Education -->
+${nonEmptyEducation.length > 0 ? `
+  <div class="section" data-section="education">
+    <h2 class="section-title">Education</h2>
+    ${nonEmptyEducation.map((edu: any, index: number) => `
+      <div class="entry" data-section="education" data-index="${index}">
+        <div class="entry-header">
+          <span class="entry-title">${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}</span>
+          <span class="entry-date">${edu.graduationDate || ""}</span>
+        </div>
+        <div class="entry-subtitle">
+          ${edu.school || ""}${edu.location ? `, ${edu.location}` : ""}
+        </div>
+        ${edu.startDate ? `<div class="entry-detail"><strong>Start Date:</strong> ${edu.startDate}</div>` : ""}
+        ${edu.grade && edu.grade.trim() ? `<div class="entry-detail"><strong></strong> ${edu.grade}</div>` : ""}
+        ${edu.description && edu.description.trim() ? `<div class="description">${edu.description}</div>` : ""}
+      </div>
+    `).join("")}
+  </div>
+` : ""}
 
         <!-- Internships -->
         ${nonEmptyInternships.length > 0 ? `

@@ -552,7 +552,7 @@ body {
           </div>
           ${edu.school ? `<div class="education-school" data-section="education" data-index="${index}">${edu.school}${edu.location ? `, ${edu.location}` : ''}</div>` : ''}
           ${edu.graduationDate ? `<div class="education-date" data-section="education" data-index="${index}">${edu.graduationDate}</div>` : ''}
-          ${edu.grade ? `<div class="education-field" data-section="education" data-index="${index}">Grade: ${edu.grade}</div>` : ''}
+          ${edu.grade ? `<div class="education-field" data-section="education" data-index="${index}"> ${edu.grade}</div>` : ''}
           
           ${edu.description ? `
             <div class="education-description" data-section="education" data-index="${index}">

@@ -591,7 +591,7 @@ export function buildPikachuTemplate(data: any, theme?: any): string {
           <div class="entry" data-section="education" data-index="${index}">
             <span class="entry-title-bold">${edu.school || ''}</span>
             <div>${edu.degree || ''} ${edu.field ? `in ${edu.field}` : ''} ${edu.graduationDate ? `(${edu.graduationDate})` : ''}</div>
-            ${edu.grade ? `<div>Grade: ${edu.grade}</div>` : ''}
+            ${edu.grade ? `<div> ${edu.grade}</div>` : ''}
             ${edu.description ? `<div style="font-style: italic; font-size: 0.9em; margin-top:5px;">${edu.description}</div>` : ''}
           </div>
         `).join('')}

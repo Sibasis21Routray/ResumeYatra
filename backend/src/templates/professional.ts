@@ -1071,7 +1071,7 @@ export function buildProfessionalTemplate(data: any, theme?: any): string {
             <div class="item-subtitle" data-section="education">${
               edu.school || ""
             }${edu.location ? `, ${edu.location}` : ""}</div>
-            <div class="item-date" data-section="education">${edu.graduationDate || ""}${edu.grade ? ` | Grade: ${edu.grade}` : ""}</div>
+            <div class="item-date" data-section="education">${edu.graduationDate || ""}${edu.grade ? ` |  ${edu.grade}` : ""}</div>
             ${
               edu.description
                 ? `<div class="item-description" data-section="education">${

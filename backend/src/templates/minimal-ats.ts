@@ -600,7 +600,7 @@ export function buildMinimalAtsTemplate(data: any, theme?: any): string {
           </div>
           <div class="exp-sub" data-section="education" data-index="${index}">${
             edu.school || ''
-          }${edu.location ? `, ${edu.location}` : ''}${edu.grade ? ` | Grade: ${edu.grade}` : ''}</div>
+          }${edu.location ? `, ${edu.location}` : ''}${edu.grade ? ` |  ${edu.grade}` : ''}</div>
           ${edu.description ? `<div class="exp-details">${edu.description}</div>` : ''}
         </div>
       `

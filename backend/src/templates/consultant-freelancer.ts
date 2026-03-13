@@ -547,7 +547,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
         
         ${edu.school ? `<div class="education-school" data-section="education" data-index="${index}">${edu.school}</div>` : ''}
         ${edu.location ? `<div class="education-location" data-section="education" data-index="${index}">${edu.location}</div>` : ''}
-        <div class="education-date" data-section="education" data-index="${index}">${edu.graduationDate || ''}${edu.grade ? ` | Grade: ${edu.grade}` : ''}</div>
+        <div class="education-date" data-section="education" data-index="${index}">${edu.graduationDate || ''}${edu.grade ? ` |  ${edu.grade}` : ''}</div>
         
         ${edu.description ? `
           <div class="education-description" data-section="education" data-index="${index}">

@@ -814,7 +814,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
             </div>
             ${edu.graduationDate ? `<div class="item-date" data-section="education">${edu.graduationDate}</div>` : ""}
           </div>
-          ${edu.grade ? `<div class="item-description" data-section="education"><strong>Grade:</strong> ${edu.grade}</div>` : ""}
+          ${edu.grade ? `<div class="item-description" data-section="education"><strong></strong> ${edu.grade}</div>` : ""}
           ${edu.description ? `<div class="item-description" data-section="education">${edu.description}</div>` : ""}
         </div>
       `).join("")}

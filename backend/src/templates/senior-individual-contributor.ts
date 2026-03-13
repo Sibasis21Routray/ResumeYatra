@@ -998,7 +998,7 @@ export function buildSeniorIndividualContributorTemplate(
           <div class="education-item" data-index="${index}">
             <div class="education-degree">${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}</div>
             <div class="education-school">${edu.school || ""}${edu.location ? `, ${edu.location}` : ""}</div>
-            <div class="education-date">${edu.graduationDate || ""}${edu.grade ? ` | Grade: ${edu.grade}` : ""}</div>
+            <div class="education-date">${edu.graduationDate || ""}${edu.grade ? ` |  ${edu.grade}` : ""}</div>
             ${
               edu.description
                 ? `<div style="font-size: 10pt; margin-top: 4px;">${edu.description}</div>`

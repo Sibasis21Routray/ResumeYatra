@@ -18,6 +18,7 @@ import CustomSectionEntry from "../models/CustomSectionEntry";
 import ResumeFile from "../models/ResumeFile";
 import * as resumeService from "../services/resume.service";
 import mongoose from "mongoose";
+import merge from "lodash.merge";
 
 // New model imports for sub-sections
 import ClientProject from "../models/ClientProject";
@@ -167,7 +168,6 @@ export async function listResumes(req: Request, res: Response) {
     res.status(500).json({ error: err.message || "internal error" });
   }
 }
-
 export async function getResume(req: Request, res: Response) {
   try {
     const id = getStringParam(req.params.id);
@@ -190,10 +190,10 @@ export async function getResume(req: Request, res: Response) {
       return res.status(403).json({ error: "Access denied" });
     }
 
-    const item = await resumeService.get(id, resume.ownerId.toString()); // Use actual owner for data retrieval
+    const item = await resumeService.get(id, resume.ownerId.toString());
     if (!item) return res.status(404).json({ error: "not found" });
 
-    // Include languages and hobbies in the response
+    // Get the latest version
     const latestVersion = (item.versions as any)?.sort(
       (a: any, b: any) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -204,215 +204,97 @@ export async function getResume(req: Request, res: Response) {
         "[getResume] Latest version data keys:",
         Object.keys(latestVersion.data || {})
       );
-      console.log(
-        "[getResume] Certifications in data:",
-        (latestVersion.data as any)?.certifications
-      );
-      console.log(
-        "[getResume] CustomSections in data:",
-        (latestVersion.data as any)?.customSections
-      );
-      const languages = await Language.find({
-        resumeId: latestVersion._id,
-      }).select("name proficiency capability");
 
-      const hobbies = await Hobby.find({ resumeId: latestVersion._id }).select(
-        "name"
-      );
-
-      const keyAchievements = await KeyAchievement.find({
-        resumeId: latestVersion._id,
-      }).select("description");
-
-      const responsibilities = await Responsibility.find({
-        resumeId: latestVersion._id,
-      }).select("description");
-
-      const tools = await Tool.find({ resumeId: latestVersion._id }).select(
-        "name"
-      );
-
-      const socialLinks = await SocialLink.find({
-        resumeId: latestVersion._id,
-      }).select("text url");
-      console.log("[getResume] fetched socialLinks count:", socialLinks.length);
-
-      const certifications = await Certification.find({
-        resumeId: latestVersion._id,
-      }).select("name issuer date url");
-
-      const awards = await Award.find({
-        resumeId: latestVersion._id,
-      }).select("title organization issueYear description");
-
-      const speakingEngagements = await SpeakingEngagement.find({
-        resumeId: latestVersion._id,
-      }).select("topic eventName organization date location description url");
-
-      const memberships = await Membership.find({
-        resumeId: latestVersion._id,
-      }).select(
-        "organization membershipType startDate endDate description url"
-      );
-
-      const workshops = await Workshop.find({
-        resumeId: latestVersion._id,
-      }).select(
-        "title instructor organization date location description certificateUrl"
-      );
-
-      const customSections = await CustomSection.find({
-        resumeId: latestVersion._id,
-      }).populate("entries");
-
-      // Fetch new sub-section data
-      const clientProjects = await ClientProject.find({
-        resumeId: latestVersion._id,
-      });
-
-      const portfolio = await Portfolio.find({
-        resumeId: latestVersion._id,
-      });
-
-      const volunteering = await Volunteering.find({
-        resumeId: latestVersion._id,
-      });
-
-      const militaryService = await MilitaryService.find({
-        resumeId: latestVersion._id,
-      });
-
-      const toolTechnologies = await ToolTechnology.find({
-        resumeId: latestVersion._id,
-      });
-
-      const methodologies = await Methodology.find({
-        resumeId: latestVersion._id,
-      });
-
-      const industryExpertise = await IndustryExpertise.find({
-        resumeId: latestVersion._id,
-      });
-
-      const references = await Reference.find({
-        resumeId: latestVersion._id,
-      });
-
-      const socialProfiles = await SocialProfile.find({
-        resumeId: latestVersion._id,
-      });
-
-      const availabilityWorkAuth = await AvailabilityWorkAuth.find({
-        resumeId: latestVersion._id,
-      });
-
-      const internships = await Internship.find({
-        resumeId: latestVersion._id,
-      });
-
-      const academicProjects = await AcademicProject.find({
-        resumeId: latestVersion._id,
-      });
-
-      const leadershipPositions = await LeadershipPosition.find({
-        resumeId: latestVersion._id,
-      });
-
-      const trainingPrograms = await TrainingProgram.find({
-        resumeId: latestVersion._id,
-      });
-
-      const scholarships = await Scholarship.find({
-        resumeId: latestVersion._id,
-      });
-
-      const coCurricular = await CoCurricular.find({
-        resumeId: latestVersion._id,
-      });
-
-      const extracurricular = await Extracurricular.find({
-        resumeId: latestVersion._id,
-      });
-
-      const careerObjective = await CareerObjective.find({
-        resumeId: latestVersion._id,
-      });
-
-      const teachingExperience = await TeachingExperience.find({
-        resumeId: latestVersion._id,
-      });
-
-      const mentorshipExperience = await MentorshipExperience.find({
-        resumeId: latestVersion._id,
-      });
-
-      const researchGrants = await ResearchGrant.find({
-        resumeId: latestVersion._id,
-      });
-
-      const testScores = await TestScore.find({
-        resumeId: latestVersion._id,
-      });
-
-      const publications = await Publication.find({
-        resumeId: latestVersion._id,
-      });
-
-      const patents = await Patent.find({
-        resumeId: latestVersion._id,
-      });
-
-      const professionalContext = await ProfessionalContext.findOne({
-        resumeVersion: latestVersion._id,
-      });
-
-      // Add all data to the response
-      if (latestVersion.data && typeof latestVersion.data === "object") {
-        (latestVersion.data as any).languages = languages.map((l: any) => ({
+      // IMPORTANT: We need to populate ALL the referenced data
+      // Instead of creating enrichedData, we should fetch all related data
+      // and attach it to the version object itself
+      
+      // Fetch all related data using the IDs stored in the version
+      
+      // Languages
+      if (latestVersion.languages && latestVersion.languages.length > 0) {
+        const languages = await Language.find({
+          _id: { $in: latestVersion.languages }
+        }).select("name proficiency capability");
+        
+        // Add to the data object
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.languages = languages.map((l: any) => ({
           language: l.name,
           level: l.proficiency || "Intermediate",
           capability: l.capability || "",
         }));
-        (latestVersion.data as any).hobbies = hobbies.map((h: any) => h.name);
-        (latestVersion.data as any).keyAchievements = keyAchievements.map(
-          (k: any) => k.description
-        );
-        (latestVersion.data as any).responsibilities = responsibilities.map(
-          (r: any) => r.description
-        );
-        (latestVersion.data as any).tools = tools.map((t: any) => t.name);
-        (latestVersion.data as any).socialLinks = socialLinks.map((l: any) => ({
-          urlText: l.text,
-          url: l.url,
+      }
+
+      // Hobbies
+      if (latestVersion.hobbies && latestVersion.hobbies.length > 0) {
+        const hobbies = await Hobby.find({
+          _id: { $in: latestVersion.hobbies }
+        }).select("name");
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.hobbies = hobbies.map((h: any) => h.name);
+      }
+
+      // Certifications
+      if (latestVersion.certifications && latestVersion.certifications.length > 0) {
+        const certifications = await Certification.find({
+          _id: { $in: latestVersion.certifications }
+        }).select("name issuer date url");
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.certifications = certifications.map((c: any) => ({
+          id: c._id.toString(),
+          name: c.name,
+          issuer: c.issuer,
+          date: c.date,
+          url: c.url,
         }));
-        (latestVersion.data as any).certifications = certifications.map(
-          (c: any) => ({
-            id: c._id.toString(),
-            name: c.name,
-            issuer: c.issuer,
-            date: c.date,
-            url: c.url,
-          })
-        );
-        (latestVersion.data as any).awards = awards.map((a: any) => ({
+      }
+
+      // Awards
+      if (latestVersion.awards && latestVersion.awards.length > 0) {
+        const awards = await Award.find({
+          _id: { $in: latestVersion.awards }
+        }).select("title organization issueYear description");
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.awards = awards.map((a: any) => ({
           id: a._id.toString(),
           title: a.title,
           organization: a.organization,
           issueYear: a.issueYear,
           description: a.description,
         }));
-        (latestVersion.data as any).speakingEngagements =
-          speakingEngagements.map((s: any) => ({
-            id: s._id.toString(),
-            topic: s.topic,
-            eventName: s.eventName,
-            organization: s.organization,
-            date: s.date,
-            location: s.location,
-            description: s.description,
-            url: s.url,
-          }));
-        (latestVersion.data as any).memberships = memberships.map((m: any) => ({
+      }
+
+      // Speaking Engagements
+      if (latestVersion.speakingEngagements && latestVersion.speakingEngagements.length > 0) {
+        const speakingEngagements = await SpeakingEngagement.find({
+          _id: { $in: latestVersion.speakingEngagements }
+        }).select("topic eventName organization date location description url");
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.speakingEngagements = speakingEngagements.map((s: any) => ({
+          id: s._id.toString(),
+          topic: s.topic,
+          eventName: s.eventName,
+          organization: s.organization,
+          date: s.date,
+          location: s.location,
+          description: s.description,
+          url: s.url,
+        }));
+      }
+
+      // Memberships
+      if (latestVersion.memberships && latestVersion.memberships.length > 0) {
+        const memberships = await Membership.find({
+          _id: { $in: latestVersion.memberships }
+        }).select("organization membershipType startDate endDate description url");
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.memberships = memberships.map((m: any) => ({
           id: m._id.toString(),
           organization: m.organization,
           membershipType: m.membershipType,
@@ -421,7 +303,16 @@ export async function getResume(req: Request, res: Response) {
           description: m.description,
           url: m.url,
         }));
-        (latestVersion.data as any).workshops = workshops.map((w: any) => ({
+      }
+
+      // Workshops
+      if (latestVersion.workshops && latestVersion.workshops.length > 0) {
+        const workshops = await Workshop.find({
+          _id: { $in: latestVersion.workshops }
+        }).select("title instructor organization date location description certificateUrl");
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.workshops = workshops.map((w: any) => ({
           id: w._id.toString(),
           title: w.title,
           instructor: w.instructor,
@@ -431,93 +322,55 @@ export async function getResume(req: Request, res: Response) {
           description: w.description,
           certificateUrl: w.certificateUrl,
         }));
-        (latestVersion.data as any).customSections = customSections.map(
-          (cs: any) => ({
-            heading: cs.title,
-            isVisible: cs.isVisible,
-            entries: cs.entries.map((entry: any) => ({
-              title: entry.title,
-              organization: entry.organization,
-              date: entry.date,
-              description: entry.description,
-              isVisible: entry.isVisible,
-            })),
-          })
-        );
+      }
 
-        // Add new sub-section data to response
-        (latestVersion.data as any).clientProjects = clientProjects.map(
-          (p: any) => ({
-            id: p._id.toString(),
-            name: p.name,
-            client: p.client,
-            role: p.role,
-            startDate: p.startDate,
-            endDate: p.endDate,
-            description: p.description,
-            technologies: p.technologies,
-            url: p.url,
-          })
-        );
+      // Custom Sections with entries
+      if (latestVersion.customSections && latestVersion.customSections.length > 0) {
+        const customSections = await CustomSection.find({
+          _id: { $in: latestVersion.customSections }
+        }).populate("entries");
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.customSections = customSections.map((cs: any) => ({
+          heading: cs.title,
+          isVisible: cs.isVisible,
+          entries: cs.entries.map((entry: any) => ({
+            title: entry.title,
+            organization: entry.organization,
+            date: entry.date,
+            description: entry.description,
+            isVisible: entry.isVisible,
+          })),
+        }));
+      }
 
-       (latestVersion.data as any).portfolio = portfolio.map((p: any) => ({
-  id: p._id.toString(),
-  name: p.name,
-  type: p.type,
-  platform: p.platform,
-  description: p.description,
-  url: p.url
-}));
+      // INTERNSHIPS - FIXED with all fields
+      if (latestVersion.internships && latestVersion.internships.length > 0) {
+        const internships = await Internship.find({
+          _id: { $in: latestVersion.internships }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.internships = internships.map((i: any) => ({
+          id: i._id.toString(),
+          title: i.title,
+          company: i.company,
+          location: i.location,
+          startDate: i.startDate,
+          endDate: i.endDate,
+          description: i.description,
+          duration: i.duration
+        }));
+      }
 
-        (latestVersion.data as any).volunteering = volunteering.map(
-          (v: any) => ({
-            id: v._id.toString(),
-            organization: v.organization,
-            role: v.role,
-            startDate: v.startDate,
-            endDate: v.endDate,
-            description: v.description,
-          })
-        );
-
-        (latestVersion.data as any).militaryService = militaryService.map(
-          (m: any) => ({
-            id: m._id.toString(),
-            branch: m.branch,
-            rank: m.rank,
-            unit: m.unit,
-            startDate: m.startDate,
-            endDate: m.endDate,
-            description: m.description,
-          })
-        );
-
-        (latestVersion.data as any).toolTechnologies = toolTechnologies.map(
-          (t: any) => ({
-            id: t._id.toString(),
-            name: t.name,
-            category: t.category,
-          })
-        );
-
-        (latestVersion.data as any).methodologies = methodologies.map(
-          (m: any) => ({
-            id: m._id.toString(),
-            name: m.name,
-            description: m.description,
-          })
-        );
-
-        (latestVersion.data as any).industryExpertise = industryExpertise.map(
-          (i: any) => ({
-            id: i._id.toString(),
-            industry: i.industry,
-            years: i.years,
-            description: i.description,
-          })
-        );
-
-        (latestVersion.data as any).references = references.map((r: any) => ({
+      // REFERENCES - FIXED with all fields
+      if (latestVersion.references && latestVersion.references.length > 0) {
+        const references = await Reference.find({
+          _id: { $in: latestVersion.references }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.references = references.map((r: any) => ({
           id: r._id.toString(),
           name: r.name,
           title: r.title,
@@ -525,169 +378,212 @@ export async function getResume(req: Request, res: Response) {
           email: r.email,
           phone: r.phone,
           relationship: r.relationship,
+          designationRelationship: r.designationRelationship,
+          contactInformation: r.contactInformation
         }));
+      }
 
-        (latestVersion.data as any).socialProfiles = socialProfiles.map(
-          (s: any) => ({
-            id: s._id.toString(),
-            platform: s.platform,
-            url: s.url,
-          })
-        );
+      // CLIENT PROJECTS - FIXED with all fields
+      if (latestVersion.clientProjects && latestVersion.clientProjects.length > 0) {
+        const clientProjects = await ClientProject.find({
+          _id: { $in: latestVersion.clientProjects }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.clientProjects = clientProjects.map((p: any) => ({
+          id: p._id.toString(),
+          name: p.name,
+          client: p.client,
+          role: p.role,
+          startDate: p.startDate,
+          endDate: p.endDate,
+          description: p.description,
+          technologies: p.technologies,
+          url: p.url,
+          clientOrganization: p.clientOrganization,
+          duration: p.duration,
+          toolsTechnologies: p.toolsTechnologies,
+          projectUrl: p.projectUrl
+        }));
+      }
 
-        (latestVersion.data as any).availabilityWorkAuth =
-          availabilityWorkAuth.map((a: any) => ({
-            id: a._id.toString(),
-            status: a.status,
-            noticePeriod: a.noticePeriod,
-            workLocation: a.workLocation,
-            visaStatus: a.visaStatus,
-          }));
+      // PORTFOLIO - FIXED with all fields
+      if (latestVersion.portfolio && latestVersion.portfolio.length > 0) {
+        const portfolio = await Portfolio.find({
+          _id: { $in: latestVersion.portfolio }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.portfolio = portfolio.map((p: any) => ({
+          id: p._id.toString(),
+          name: p.name,
+          type: p.type,
+          platform: p.platform,
+          description: p.description,
+          url: p.url
+        }));
+      }
 
-        (latestVersion.data as any).internships = internships.map((i: any) => ({
+      // METHODOLOGIES - FIXED with all fields
+      if (latestVersion.methodologies && latestVersion.methodologies.length > 0) {
+        const methodologies = await Methodology.find({
+          _id: { $in: latestVersion.methodologies }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.methodologies = methodologies.map((m: any) => ({
+          id: m._id.toString(),
+          name: m.name,
+          description: m.description,
+          certification: m.certification,
+          experienceDuration: m.experienceDuration
+        }));
+      }
+
+      // INDUSTRY EXPERTISE - FIXED with all fields
+      if (latestVersion.industryExpertise && latestVersion.industryExpertise.length > 0) {
+        const industryExpertise = await IndustryExpertise.find({
+          _id: { $in: latestVersion.industryExpertise }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.industryExpertise = industryExpertise.map((i: any) => ({
           id: i._id.toString(),
-          title: i.title,
-          company: i.company,
-          startDate: i.startDate,
-          endDate: i.endDate,
-          location: i.location,
+          industry: i.industry,
+          years: i.years,
           description: i.description,
+          domainArea: i.domainArea,
+          experienceDuration: i.experienceDuration
         }));
+      }
 
-        (latestVersion.data as any).academicProjects = academicProjects.map(
-          (p: any) => ({
-            id: p._id.toString(),
-            name: p.title,
-            course: p.course,
-            institution: p.institution,
-            duration: p.duration,
-            startDate: p.startDate,
-            endDate: p.endDate,
-            description: p.description,
-            technologies: Array.isArray(p.technologies) ? p.technologies : [],
-            url: p.url,
-          })
-        );
+      // VOLUNTEERING - FIXED with all fields
+      if (latestVersion.volunteering && latestVersion.volunteering.length > 0) {
+        const volunteering = await Volunteering.find({
+          _id: { $in: latestVersion.volunteering }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.volunteering = volunteering.map((v: any) => ({
+          id: v._id.toString(),
+          organization: v.organization,
+          role: v.role,
+          startDate: v.startDate,
+          endDate: v.endDate,
+          description: v.description,
+          causeArea: v.causeArea,
+          duration: v.duration
+        }));
+      }
 
-        (latestVersion.data as any).leadershipPositions =
-          leadershipPositions.map((l: any) => ({
-            id: l._id.toString(),
-            position: l.title, // Map "title" (DB) to "position" (frontend)
-            organization: l.organization,
-            startDate: l.startDate,
-            endDate: l.endDate,
-            description: l.description,
-          }));
+      // MILITARY SERVICE - FIXED with all fields
+      if (latestVersion.militaryService && latestVersion.militaryService.length > 0) {
+        const militaryService = await MilitaryService.find({
+          _id: { $in: latestVersion.militaryService }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.militaryService = militaryService.map((m: any) => ({
+          id: m._id.toString(),
+          branch: m.branch,
+          rank: m.rank,
+          unit: m.unit,
+          startDate: m.startDate,
+          endDate: m.endDate,
+          description: m.description,
+          duration: m.duration,
+          specialization: m.specialization
+        }));
+      }
 
-        (latestVersion.data as any).trainingPrograms = trainingPrograms.map(
-          (t: any) => ({
-            id: t._id.toString(),
-            name: t.name,
-            provider: t.organization,
-            completionDate: t.completionDate,
-            duration: t.duration,
-            description: t.description,
-          })
-        );
+      // TEACHING EXPERIENCE - FIXED with all fields
+      if (latestVersion.teachingExperience && latestVersion.teachingExperience.length > 0) {
+        const teachingExperience = await TeachingExperience.find({
+          _id: { $in: latestVersion.teachingExperience }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.teachingExperience = teachingExperience.map((t: any) => ({
+          id: t._id.toString(),
+          title: t.title,
+          institution: t.institution,
+          course: t.course,
+          startDate: t.startDate,
+          endDate: t.endDate,
+          description: t.description,
+          subjectCourseTaught: t.subjectCourseTaught,
+          duration: t.duration
+        }));
+      }
 
-        (latestVersion.data as any).scholarships = scholarships.map(
-          (s: any) => ({
-            id: s._id.toString(),
-            name: s.name,
-            provider: s.provider,
-            organization: s.provider,
-            year: s.year,
-            amount: s.amount,
-            description: s.description,
-          })
-        );
+      // MENTORSHIP EXPERIENCE - FIXED with all fields
+      if (latestVersion.mentorshipExperience && latestVersion.mentorshipExperience.length > 0) {
+        const mentorshipExperience = await MentorshipExperience.find({
+          _id: { $in: latestVersion.mentorshipExperience }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.mentorshipExperience = mentorshipExperience.map((m: any) => ({
+          id: m._id.toString(),
+          menteeName: m.menteeName,
+          menteeCount: m.menteeCount,
+          program: m.program,
+          organization: m.organization,
+          startDate: m.startDate,
+          endDate: m.endDate,
+          description: m.description,
+          mentorshipArea: m.mentorshipArea,
+          organizationPlatform: m.organizationPlatform,
+          menteeLevel: m.menteeLevel,
+          duration: m.duration
+        }));
+      }
 
-        (latestVersion.data as any).coCurricular = coCurricular.map(
-          (c: any) => ({
-            id: c._id.toString(),
-            activity: c.activity,
-            role: c.role,
-            organization: c.organization,
-            year: c.year,
-            startDate: c.startDate,
-            endDate: c.endDate,
-            description: c.description,
-          })
-        );
+      // RESEARCH GRANTS - FIXED with all fields
+      if (latestVersion.researchGrants && latestVersion.researchGrants.length > 0) {
+        const researchGrants = await ResearchGrant.find({
+          _id: { $in: latestVersion.researchGrants }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.researchGrants = researchGrants.map((r: any) => ({
+          id: r._id.toString(),
+          title: r.title,
+          agency: r.agency,
+          amount: r.amount,
+          startDate: r.startDate,
+          endDate: r.endDate,
+          description: r.description,
+          year: r.year
+        }));
+      }
 
-        (latestVersion.data as any).extracurricular = extracurricular.map(
-          (e: any) => ({
-            id: e._id.toString(),
-            activity: e.activity,
-            role: e.role,
-            organization: e.organization,
-            year: e.year,
-            startDate: e.startDate,
-            endDate: e.endDate,
-            description: e.description,
-          })
-        );
-
-        (latestVersion.data as any).careerObjective =
-          careerObjective.length > 0 ? careerObjective[0].objective : "";
-
-        (latestVersion.data as any).teachingExperience = teachingExperience.map(
-          (t: any) => ({
-            id: t._id.toString(),
-            title: t.title,
-            institution: t.institution,
-            course: t.course,
-            startDate: t.startDate,
-            endDate: t.endDate,
-            description: t.description,
-          })
-        );
-
-        (latestVersion.data as any).mentorshipExperience =
-          mentorshipExperience.map((m: any) => ({
-            id: m._id.toString(),
-            menteeName: m.menteeName,
-            menteeCount: m.menteeCount,
-            program: m.program,
-            organization: m.organization,
-            startDate: m.startDate,
-            endDate: m.endDate,
-            description: m.description,
-          }));
-
-        (latestVersion.data as any).researchGrants = researchGrants.map(
-          (r: any) => ({
-            id: r._id.toString(),
-            title: r.title,
-            agency: r.agency,
-            amount: r.amount,
-            startDate: r.startDate,
-            endDate: r.endDate,
-            description: r.description,
-          })
-        );
-
-        (latestVersion.data as any).testScores = testScores.map((t: any) => ({
+      // TEST SCORES - FIXED with all fields
+      if (latestVersion.testScores && latestVersion.testScores.length > 0) {
+        const testScores = await TestScore.find({
+          _id: { $in: latestVersion.testScores }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.testScores = testScores.map((t: any) => ({
           id: t._id.toString(),
           testName: t.testName,
           score: t.score,
           maxScore: t.maxScore,
           date: t.date,
+          percentileRank: t.percentileRank,
+          year: t.year
         }));
+      }
 
-        (latestVersion.data as any).publications = publications.map(
-  (p: any) => ({
-    id: p._id.toString(),
-    title: p.title,
-    journalPublisher: p.journal,
-    publicationType: p.conference,
-    year: p.publicationDate,
-    urlDoi: p.doi,
-    authors: p.authors,
-  })
-);
-
-        (latestVersion.data as any).patents = patents.map((p: any) => ({
+      // PATENTS - FIXED with all fields
+      if (latestVersion.patents && latestVersion.patents.length > 0) {
+        const patents = await Patent.find({
+          _id: { $in: latestVersion.patents }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.patents = patents.map((p: any) => ({
           id: p._id.toString(),
           title: p.title,
           inventors: p.inventors,
@@ -695,26 +591,55 @@ export async function getResume(req: Request, res: Response) {
           filingDate: p.filingDate,
           issueDate: p.issueDate,
           status: p.status,
+          issuingAuthority: p.issuingAuthority,
+          year: p.year
         }));
-
-        // Add professionalContext to response
-        (latestVersion.data as any).professionalContext =
-          professionalContext
-            ? {
-                id: professionalContext._id.toString(),
-                totalExperience: professionalContext.totalExperience,
-                teamSize: professionalContext.teamSize,
-                industry: professionalContext.industry,
-                industryCustom: professionalContext.industryCustom,
-                functionalDomain: professionalContext.functionalDomain,
-                functionalDomainCustom:
-                  professionalContext.functionalDomainCustom,
-                geographicScope: professionalContext.geographicScope,
-                revenueResponsibility:
-                  professionalContext.revenueResponsibility,
-              }
-            : {};
       }
+
+      // PUBLICATIONS
+      if (latestVersion.publications && latestVersion.publications.length > 0) {
+        const publications = await Publication.find({
+          _id: { $in: latestVersion.publications }
+        });
+        
+        if (!latestVersion.data) latestVersion.data = {};
+        latestVersion.data.publications = publications.map((p: any) => ({
+          id: p._id.toString(),
+          title: p.title,
+          journalPublisher: p.journal,
+          publicationType: p.conference,
+          year: p.publicationDate,
+          urlDoi: p.doi,
+          authors: p.authors,
+        }));
+      }
+
+      // PROFESSIONAL CONTEXT
+      if (latestVersion.professionalContext && latestVersion.professionalContext.length > 0) {
+        const professionalContext = await ProfessionalContext.find({
+          _id: { $in: latestVersion.professionalContext }
+        });
+        
+        if (professionalContext.length > 0 && !latestVersion.data) {
+          latestVersion.data = {};
+        }
+        
+        if (professionalContext.length > 0) {
+          const pc = professionalContext[0];
+          latestVersion.data.professionalContext = {
+            id: pc._id.toString(),
+            totalExperience: pc.totalExperience,
+            teamSize: pc.teamSize,
+            industry: pc.industry,
+            industryCustom: pc.industryCustom,
+            functionalDomain: pc.functionalDomain,
+            functionalDomainCustom: pc.functionalDomainCustom,
+            geographicScope: pc.geographicScope,
+            revenueResponsibility: pc.revenueResponsibility,
+          };
+        }
+      }
+
       console.log(
         "[getResume] Final data keys:",
         Object.keys(latestVersion.data || {})
@@ -727,7 +652,6 @@ export async function getResume(req: Request, res: Response) {
     res.status(500).json({ error: err.message || "internal error" });
   }
 }
-
 export async function updateResume(req: Request, res: Response) {
   try {
     const id = getStringParam(req.params.id);
@@ -770,10 +694,19 @@ export async function updateResume(req: Request, res: Response) {
 
     // Create new version if data is provided
     if (data) {
+
+      // Get the latest version of this resume
+      const lastVersion = await ResumeVersion
+        .findOne({ resumeId: id })
+        .sort({ createdAt: -1 });
+
+      // Merge previous data with new incoming data
+    const mergedData = merge({}, lastVersion?.data || {}, data);
+
       const version = new ResumeVersion({
         resumeId: id,
         resume: id,
-        data,
+        data: mergedData,
       });
       await version.save();
       resume.versions.push(version._id);
@@ -784,17 +717,17 @@ export async function updateResume(req: Request, res: Response) {
       );
       console.log(
         "[updateResume] careerObjective in data:",
-        data.careerObjective
+        mergedData.careerObjective  // Changed from data to mergedData
       );
 
       // Handle languages if provided
-      if (data.languages && Array.isArray(data.languages)) {
+      if (mergedData.languages && Array.isArray(mergedData.languages)) {  // Changed from data to mergedData
         // Delete existing languages for this version
         await Language.deleteMany({ resumeId: version._id });
 
         // Create new languages
-        if (data.languages.length > 0) {
-          const langDocs = data.languages.map((lang: any) => ({
+        if (mergedData.languages.length > 0) {  // Changed from data to mergedData
+          const langDocs = mergedData.languages.map((lang: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             resumeVersion: version._id,
             name: lang.language,
@@ -806,13 +739,13 @@ export async function updateResume(req: Request, res: Response) {
       }
 
       // Handle hobbies if provided
-      if (data.hobbies && Array.isArray(data.hobbies)) {
+      if (mergedData.hobbies && Array.isArray(mergedData.hobbies)) {  // Changed from data to mergedData
         // Delete existing hobbies for this version
         await Hobby.deleteMany({ resumeId: version._id });
 
         // Create new hobbies
-        if (data.hobbies.length > 0) {
-          const hobbyDocs = data.hobbies.map((hobby: string) => ({
+        if (mergedData.hobbies.length > 0) {  // Changed from data to mergedData
+          const hobbyDocs = mergedData.hobbies.map((hobby: string) => ({  // Changed from data to mergedData
             resumeId: version._id,
             resumeVersion: version._id,
             name: hobby,
@@ -822,13 +755,13 @@ export async function updateResume(req: Request, res: Response) {
       }
 
       // Handle keyAchievements if provided
-      if (data.keyAchievements && Array.isArray(data.keyAchievements)) {
+      if (mergedData.keyAchievements && Array.isArray(mergedData.keyAchievements)) {  // Changed from data to mergedData
         // Delete existing keyAchievements for this version
         await KeyAchievement.deleteMany({ resumeId: version._id });
 
         // Create new keyAchievements
-        if (data.keyAchievements.length > 0) {
-          const achDocs = data.keyAchievements.map((achievement: string) => ({
+        if (mergedData.keyAchievements.length > 0) {  // Changed from data to mergedData
+          const achDocs = mergedData.keyAchievements.map((achievement: string) => ({  // Changed from data to mergedData
             resumeId: version._id,
             resumeVersion: version._id,
             description: achievement,
@@ -838,13 +771,13 @@ export async function updateResume(req: Request, res: Response) {
       }
 
       // Handle responsibilities if provided
-      if (data.responsibilities && Array.isArray(data.responsibilities)) {
+      if (mergedData.responsibilities && Array.isArray(mergedData.responsibilities)) {  // Changed from data to mergedData
         // Delete existing responsibilities for this version
         await Responsibility.deleteMany({ resumeId: version._id });
 
         // Create new responsibilities
-        if (data.responsibilities.length > 0) {
-          const respDocs = data.responsibilities.map(
+        if (mergedData.responsibilities.length > 0) {  // Changed from data to mergedData
+          const respDocs = mergedData.responsibilities.map(  // Changed from data to mergedData
             (responsibility: string) => ({
               resumeId: version._id,
               resumeVersion: version._id,
@@ -856,13 +789,13 @@ export async function updateResume(req: Request, res: Response) {
       }
 
       // Handle tools if provided
-      if (data.tools && Array.isArray(data.tools)) {
+      if (mergedData.tools && Array.isArray(mergedData.tools)) {  // Changed from data to mergedData
         // Delete existing tools for this version
         await Tool.deleteMany({ resumeId: version._id });
 
         // Create new tools
-        if (data.tools.length > 0) {
-          const toolDocs = data.tools.map((tool: string) => ({
+        if (mergedData.tools.length > 0) {  // Changed from data to mergedData
+          const toolDocs = mergedData.tools.map((tool: string) => ({  // Changed from data to mergedData
             resumeId: version._id,
             resumeVersion: version._id,
             name: tool,
@@ -872,13 +805,13 @@ export async function updateResume(req: Request, res: Response) {
       }
 
       // Handle socialLinks if provided
-      if (data.socialLinks && Array.isArray(data.socialLinks)) {
-        console.log("[updateResume] socialLinks data:", data.socialLinks);
+      if (mergedData.socialLinks && Array.isArray(mergedData.socialLinks)) {  // Changed from data to mergedData
+        console.log("[updateResume] socialLinks data:", mergedData.socialLinks);  // Changed from data to mergedData
         // Delete existing socialLinks for this version
         await SocialLink.deleteMany({ resumeId: version._id });
 
         // Filter out social links with empty URLs before saving
-        const validSocialLinks = data.socialLinks.filter(
+        const validSocialLinks = mergedData.socialLinks.filter(  // Changed from data to mergedData
           (link: any) => link.urlText && link.url && link.url.trim() !== ""
         );
 
@@ -905,13 +838,13 @@ export async function updateResume(req: Request, res: Response) {
       }
 
       // Handle certifications if provided
-      if (data.certifications && Array.isArray(data.certifications)) {
+      if (mergedData.certifications && Array.isArray(mergedData.certifications)) {  // Changed from data to mergedData
         // Delete existing certifications for this version
         await Certification.deleteMany({ resumeId: version._id });
 
         // Create new certifications
-        if (data.certifications.length > 0) {
-          const certDocs = data.certifications.map((cert: any) => ({
+        if (mergedData.certifications.length > 0) {  // Changed from data to mergedData
+          const certDocs = mergedData.certifications.map((cert: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             resumeVersion: version._id,
             name: cert.name,
@@ -924,14 +857,14 @@ export async function updateResume(req: Request, res: Response) {
       }
 
       // Handle customSections if provided
-      if (data.customSections && Array.isArray(data.customSections)) {
-        console.log("[updateResume] customSections data:", data.customSections);
+      if (mergedData.customSections && Array.isArray(mergedData.customSections)) {  // Changed from data to mergedData
+        console.log("[updateResume] customSections data:", mergedData.customSections);  // Changed from data to mergedData
         // Delete existing customSections for this version
         await CustomSection.deleteMany({ resumeId: version._id });
 
         // Create new customSections
-        if (data.customSections.length > 0) {
-          for (const section of data.customSections) {
+        if (mergedData.customSections.length > 0) {  // Changed from data to mergedData
+          for (const section of mergedData.customSections) {  // Changed from data to mergedData
             console.log("[updateResume] processing section:", section);
             const sectionDoc = new CustomSection({
               resumeId: version._id,
@@ -960,10 +893,10 @@ export async function updateResume(req: Request, res: Response) {
       }
 
       // Handle clientProjects if provided
-      if (data.clientProjects && Array.isArray(data.clientProjects)) {
+      if (mergedData.clientProjects && Array.isArray(mergedData.clientProjects)) {  // Changed from data to mergedData
         await ClientProject.deleteMany({ resumeId: version._id });
-        if (data.clientProjects.length > 0) {
-          const docs = data.clientProjects.map((item: any) => ({
+        if (mergedData.clientProjects.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.clientProjects.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             name: item.name,
             client: item.client,
@@ -979,29 +912,28 @@ export async function updateResume(req: Request, res: Response) {
       }
 
       // Handle portfolio if provided
-     // Handle portfolio if provided
-if (data.portfolio && Array.isArray(data.portfolio)) {
-  await Portfolio.deleteMany({ resumeId: version._id });
+      if (mergedData.portfolio && Array.isArray(mergedData.portfolio)) {  // Changed from data to mergedData
+        await Portfolio.deleteMany({ resumeId: version._id });
 
-  if (data.portfolio.length > 0) {
-    const docs = data.portfolio.map((item: any) => ({
-      resumeId: version._id,
-      name: item.name,
-      type: item.type,
-      platform: item.platform,
-      description: item.description,
-      url: item.url
-    }));
+        if (mergedData.portfolio.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.portfolio.map((item: any) => ({  // Changed from data to mergedData
+            resumeId: version._id,
+            name: item.name,
+            type: item.type,
+            platform: item.platform,
+            description: item.description,
+            url: item.url
+          }));
 
-    await Portfolio.insertMany(docs);
-  }
-}
+          await Portfolio.insertMany(docs);
+        }
+      }
 
       // Handle volunteering if provided
-      if (data.volunteering && Array.isArray(data.volunteering)) {
+      if (mergedData.volunteering && Array.isArray(mergedData.volunteering)) {  // Changed from data to mergedData
         await Volunteering.deleteMany({ resumeId: version._id });
-        if (data.volunteering.length > 0) {
-          const docs = data.volunteering.map((item: any) => ({
+        if (mergedData.volunteering.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.volunteering.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             organization: item.organization,
             role: item.role,
@@ -1014,10 +946,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle militaryService if provided
-      if (data.militaryService && Array.isArray(data.militaryService)) {
+      if (mergedData.militaryService && Array.isArray(mergedData.militaryService)) {  // Changed from data to mergedData
         await MilitaryService.deleteMany({ resumeId: version._id });
-        if (data.militaryService.length > 0) {
-          const docs = data.militaryService.map((item: any) => ({
+        if (mergedData.militaryService.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.militaryService.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             branch: item.branch,
             rank: item.rank,
@@ -1031,10 +963,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle toolTechnologies if provided
-      if (data.toolTechnologies && Array.isArray(data.toolTechnologies)) {
+      if (mergedData.toolTechnologies && Array.isArray(mergedData.toolTechnologies)) {  // Changed from data to mergedData
         await ToolTechnology.deleteMany({ resumeId: version._id });
-        if (data.toolTechnologies.length > 0) {
-          const docs = data.toolTechnologies.map((item: any) => ({
+        if (mergedData.toolTechnologies.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.toolTechnologies.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             name: item.name,
             category: item.category,
@@ -1044,10 +976,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle methodologies if provided
-      if (data.methodologies && Array.isArray(data.methodologies)) {
+      if (mergedData.methodologies && Array.isArray(mergedData.methodologies)) {  // Changed from data to mergedData
         await Methodology.deleteMany({ resumeId: version._id });
-        if (data.methodologies.length > 0) {
-          const docs = data.methodologies.map((item: any) => ({
+        if (mergedData.methodologies.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.methodologies.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             name: item.name,
             description: item.description,
@@ -1057,10 +989,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle industryExpertise if provided
-      if (data.industryExpertise && Array.isArray(data.industryExpertise)) {
+      if (mergedData.industryExpertise && Array.isArray(mergedData.industryExpertise)) {  // Changed from data to mergedData
         await IndustryExpertise.deleteMany({ resumeId: version._id });
-        if (data.industryExpertise.length > 0) {
-          const docs = data.industryExpertise.map((item: any) => ({
+        if (mergedData.industryExpertise.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.industryExpertise.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             industry: item.industry,
             years: item.years,
@@ -1071,10 +1003,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle references if provided
-      if (data.references && Array.isArray(data.references)) {
+      if (mergedData.references && Array.isArray(mergedData.references)) {  // Changed from data to mergedData
         await Reference.deleteMany({ resumeId: version._id });
-        if (data.references.length > 0) {
-          const docs = data.references.map((item: any) => ({
+        if (mergedData.references.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.references.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             name: item.name,
             title: item.title,
@@ -1088,10 +1020,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle socialProfiles if provided
-      if (data.socialProfiles && Array.isArray(data.socialProfiles)) {
+      if (mergedData.socialProfiles && Array.isArray(mergedData.socialProfiles)) {  // Changed from data to mergedData
         await SocialProfile.deleteMany({ resumeId: version._id });
-        if (data.socialProfiles.length > 0) {
-          const docs = data.socialProfiles.map((item: any) => ({
+        if (mergedData.socialProfiles.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.socialProfiles.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             platform: item.platform,
             url: item.url,
@@ -1102,12 +1034,12 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
 
       // Handle availabilityWorkAuth if provided
       if (
-        data.availabilityWorkAuth &&
-        Array.isArray(data.availabilityWorkAuth)
+        mergedData.availabilityWorkAuth &&  // Changed from data to mergedData
+        Array.isArray(mergedData.availabilityWorkAuth)  // Changed from data to mergedData
       ) {
         await AvailabilityWorkAuth.deleteMany({ resumeId: version._id });
-        if (data.availabilityWorkAuth.length > 0) {
-          const docs = data.availabilityWorkAuth.map((item: any) => ({
+        if (mergedData.availabilityWorkAuth.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.availabilityWorkAuth.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             status: item.status,
             noticePeriod: item.noticePeriod,
@@ -1119,10 +1051,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle internships if provided
-      if (data.internships && Array.isArray(data.internships)) {
+      if (mergedData.internships && Array.isArray(mergedData.internships)) {  // Changed from data to mergedData
         await Internship.deleteMany({ resumeId: version._id });
-        if (data.internships.length > 0) {
-          const docs = data.internships.map((item: any) => ({
+        if (mergedData.internships.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.internships.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             title: item.title,
             company: item.company,
@@ -1136,19 +1068,19 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle academicProjects if provided
-      if (data.academicProjects && Array.isArray(data.academicProjects)) {
+      if (mergedData.academicProjects && Array.isArray(mergedData.academicProjects)) {  // Changed from data to mergedData
         console.log(
           "[updateResume] academicProjects received:",
-          JSON.stringify(data.academicProjects)
+          JSON.stringify(mergedData.academicProjects)  // Changed from data to mergedData
         );
         await AcademicProject.deleteMany({ resumeId: version._id });
-        if (data.academicProjects.length > 0) {
+        if (mergedData.academicProjects.length > 0) {  // Changed from data to mergedData
           console.log(
             "[updateResume] Saving academicProjects:",
-            data.academicProjects.length,
+            mergedData.academicProjects.length,  // Changed from data to mergedData
             "items"
           );
-          const docs = data.academicProjects.map((item: any) => ({
+          const docs = mergedData.academicProjects.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             title: item.name || item.title,
             course: item.course,
@@ -1174,10 +1106,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle leadershipPositions if provided
-      if (data.leadershipPositions && Array.isArray(data.leadershipPositions)) {
+      if (mergedData.leadershipPositions && Array.isArray(mergedData.leadershipPositions)) {  // Changed from data to mergedData
         await LeadershipPosition.deleteMany({ resumeId: version._id });
-        if (data.leadershipPositions.length > 0) {
-          const docs = data.leadershipPositions.map((item: any) => ({
+        if (mergedData.leadershipPositions.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.leadershipPositions.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             title: item.position || item.title, // Support both "position" (frontend) and "title" (backend)
             organization: item.organization,
@@ -1190,10 +1122,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle trainingPrograms if provided
-      if (data.trainingPrograms && Array.isArray(data.trainingPrograms)) {
+      if (mergedData.trainingPrograms && Array.isArray(mergedData.trainingPrograms)) {  // Changed from data to mergedData
         await TrainingProgram.deleteMany({ resumeId: version._id });
-        if (data.trainingPrograms.length > 0) {
-          const docs = data.trainingPrograms.map((item: any) => ({
+        if (mergedData.trainingPrograms.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.trainingPrograms.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             name: item.name,
             organization: item.provider, // Map frontend "provider" to database "organization"
@@ -1206,10 +1138,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle scholarships if provided
-      if (data.scholarships && Array.isArray(data.scholarships)) {
+      if (mergedData.scholarships && Array.isArray(mergedData.scholarships)) {  // Changed from data to mergedData
         await Scholarship.deleteMany({ resumeId: version._id });
-        if (data.scholarships.length > 0) {
-          const docs = data.scholarships.map((item: any) => ({
+        if (mergedData.scholarships.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.scholarships.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             name: item.name,
             provider: item.provider, // Use provider for "Awarding Body"
@@ -1222,10 +1154,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle coCurricular if provided
-      if (data.coCurricular && Array.isArray(data.coCurricular)) {
+      if (mergedData.coCurricular && Array.isArray(mergedData.coCurricular)) {  // Changed from data to mergedData
         await CoCurricular.deleteMany({ resumeId: version._id });
-        if (data.coCurricular.length > 0) {
-          const docs = data.coCurricular.map((item: any) => ({
+        if (mergedData.coCurricular.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.coCurricular.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             activity: item.activity,
             role: item.role,
@@ -1240,10 +1172,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle extracurricular if provided
-      if (data.extracurricular && Array.isArray(data.extracurricular)) {
+      if (mergedData.extracurricular && Array.isArray(mergedData.extracurricular)) {  // Changed from data to mergedData
         await Extracurricular.deleteMany({ resumeId: version._id });
-        if (data.extracurricular.length > 0) {
-          const docs = data.extracurricular.map((item: any) => ({
+        if (mergedData.extracurricular.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.extracurricular.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             activity: item.activity,
             role: item.role,
@@ -1258,16 +1190,16 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle careerObjective if provided
-      if (data.careerObjective && typeof data.careerObjective === "string") {
+      if (mergedData.careerObjective && typeof mergedData.careerObjective === "string") {  // Changed from data to mergedData
         console.log(
           "[updateResume] Handling careerObjective:",
-          data.careerObjective
+          mergedData.careerObjective  // Changed from data to mergedData
         );
         await CareerObjective.deleteMany({ resumeId: version._id });
-        if (data.careerObjective.trim()) {
+        if (mergedData.careerObjective.trim()) {  // Changed from data to mergedData
           const doc = new CareerObjective({
             resumeId: version._id,
-            objective: data.careerObjective,
+            objective: mergedData.careerObjective,  // Changed from data to mergedData
           });
           await doc.save();
           console.log("[updateResume] CareerObjective saved successfully");
@@ -1281,10 +1213,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle teachingExperience if provided
-      if (data.teachingExperience && Array.isArray(data.teachingExperience)) {
+      if (mergedData.teachingExperience && Array.isArray(mergedData.teachingExperience)) {  // Changed from data to mergedData
         await TeachingExperience.deleteMany({ resumeId: version._id });
-        if (data.teachingExperience.length > 0) {
-          const docs = data.teachingExperience.map((item: any) => ({
+        if (mergedData.teachingExperience.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.teachingExperience.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             title: item.title,
             institution: item.institution,
@@ -1299,12 +1231,12 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
 
       // Handle mentorshipExperience if provided
       if (
-        data.mentorshipExperience &&
-        Array.isArray(data.mentorshipExperience)
+        mergedData.mentorshipExperience &&  // Changed from data to mergedData
+        Array.isArray(mergedData.mentorshipExperience)  // Changed from data to mergedData
       ) {
         await MentorshipExperience.deleteMany({ resumeId: version._id });
-        if (data.mentorshipExperience.length > 0) {
-          const docs = data.mentorshipExperience.map((item: any) => ({
+        if (mergedData.mentorshipExperience.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.mentorshipExperience.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             menteeName: item.menteeName,
             menteeCount: item.menteeCount,
@@ -1319,10 +1251,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle researchGrants if provided
-      if (data.researchGrants && Array.isArray(data.researchGrants)) {
+      if (mergedData.researchGrants && Array.isArray(mergedData.researchGrants)) {  // Changed from data to mergedData
         await ResearchGrant.deleteMany({ resumeId: version._id });
-        if (data.researchGrants.length > 0) {
-          const docs = data.researchGrants.map((item: any) => ({
+        if (mergedData.researchGrants.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.researchGrants.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             title: item.title,
             agency: item.agency,
@@ -1336,10 +1268,10 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle testScores if provided
-      if (data.testScores && Array.isArray(data.testScores)) {
+      if (mergedData.testScores && Array.isArray(mergedData.testScores)) {  // Changed from data to mergedData
         await TestScore.deleteMany({ resumeId: version._id });
-        if (data.testScores.length > 0) {
-          const docs = data.testScores.map((item: any) => ({
+        if (mergedData.testScores.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.testScores.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             testName: item.testName,
             score: item.score,
@@ -1351,30 +1283,30 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
       }
 
       // Handle publications if provided
-     if (data.publications && Array.isArray(data.publications)) {
-  await Publication.deleteMany({ resumeId: version._id });
+      if (mergedData.publications && Array.isArray(mergedData.publications)) {  // Changed from data to mergedData
+        await Publication.deleteMany({ resumeId: version._id });
 
-  if (data.publications.length > 0) {
-    const docs = data.publications.map((item: any) => ({
-      resumeId: version._id,
-      title: item.title,
-      journal: item.journalPublisher,      // map frontend → backend
-      conference: item.publicationType,    // map frontend → backend
-      publicationDate: item.year,          // map frontend → backend
-      doi: item.urlDoi,                    // map frontend → backend
-      url: item.urlDoi,
-      authors: item.authors || "",
-    }));
+        if (mergedData.publications.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.publications.map((item: any) => ({  // Changed from data to mergedData
+            resumeId: version._id,
+            title: item.title,
+            journal: item.journalPublisher,      // map frontend → backend
+            conference: item.publicationType,    // map frontend → backend
+            publicationDate: item.year,          // map frontend → backend
+            doi: item.urlDoi,                    // map frontend → backend
+            url: item.urlDoi,
+            authors: item.authors || "",
+          }));
 
-    await Publication.insertMany(docs);
-  }
-}
+          await Publication.insertMany(docs);
+        }
+      }
 
       // Handle patents if provided
-      if (data.patents && Array.isArray(data.patents)) {
+      if (mergedData.patents && Array.isArray(mergedData.patents)) {  // Changed from data to mergedData
         await Patent.deleteMany({ resumeId: version._id });
-        if (data.patents.length > 0) {
-          const docs = data.patents.map((item: any) => ({
+        if (mergedData.patents.length > 0) {  // Changed from data to mergedData
+          const docs = mergedData.patents.map((item: any) => ({  // Changed from data to mergedData
             resumeId: version._id,
             title: item.title,
             inventors: item.inventors,
@@ -1389,12 +1321,12 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
 
       // Handle professionalContext if provided
       if (
-        data.professionalContext &&
-        typeof data.professionalContext === "object"
+        mergedData.professionalContext &&  // Changed from data to mergedData
+        typeof mergedData.professionalContext === "object"  // Changed from data to mergedData
       ) {
         console.log(
           "[updateResume] Handling professionalContext:",
-          data.professionalContext
+          mergedData.professionalContext  // Changed from data to mergedData
         );
         await ProfessionalContext.deleteMany({ resumeVersion: version._id });
         const {
@@ -1406,7 +1338,7 @@ if (data.portfolio && Array.isArray(data.portfolio)) {
           functionalDomainCustom,
           geographicScope,
           revenueResponsibility,
-        } = data.professionalContext;
+        } = mergedData.professionalContext;  // Changed from data to mergedData
 
         if (
           totalExperience ||

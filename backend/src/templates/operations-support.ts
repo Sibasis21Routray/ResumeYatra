@@ -1007,7 +1007,7 @@ export function buildOperationsSupportTemplate(data: any, theme?: any): string {
               </div>
               <div class="item-date">${edu.graduationDate || ""}</div>
             </div>
-            ${edu.grade ? `<div class="item-subtitle">Grade: ${edu.grade}</div>` : ""}
+            ${edu.grade ? `<div class="item-subtitle"> ${edu.grade}</div>` : ""}
             ${edu.description ? `<p>${edu.description}</p>` : ""}
             ${edu.achievements && edu.achievements.length > 0 ? `
               <ul>

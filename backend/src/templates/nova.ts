@@ -511,7 +511,7 @@ export function buildNovaTemplate(data: any, theme?: any): string {
                   ${edu.school ? edu.school : ""}${edu.location ? `, ${edu.location}` : ""}
                 </div>
                 ${edu.startDate ? `<div class="entry-detail"><strong>Start Date:</strong> ${edu.startDate}</div>` : ""}
-                ${edu.grade ? `<div class="entry-detail"><strong>Grade:</strong> ${edu.grade}</div>` : ""}
+                ${edu.grade ? `<div class="entry-detail"><strong></strong> ${edu.grade}</div>` : ""}
                 ${edu.description && edu.description.trim() ? `<div class="entry-content">${edu.description}</div>` : ""}
               </div>
             `).join("")}

@@ -278,7 +278,7 @@ export function buildClassicProfessionalTemplate(data: any, theme?: any): string
             ${hasValue(edu.percentage)   ? `<div class="education-gpa" data-section="education" data-index="${index}">Score: ${s(edu.percentage)}%</div>` : ''}
             ${hasValue(edu.cgpa)         ? `<div class="education-gpa" data-section="education" data-index="${index}">CGPA: ${s(edu.cgpa)}</div>` : ''}
             ${hasValue(edu.gpa)          ? `<div class="education-gpa" data-section="education" data-index="${index}">GPA: ${s(edu.gpa)}</div>` : ''}
-            ${hasValue(edu.grade)        ? `<div class="education-gpa" data-section="education" data-index="${index}">Grade: ${s(edu.grade)}</div>` : ''}
+            ${hasValue(edu.grade)        ? `<div class="education-gpa" data-section="education" data-index="${index}"> ${s(edu.grade)}</div>` : ''}
             ${hasValue(edu.description)  ? `
               <div class="education-description" data-section="education" data-index="${index}">
                 ${edu.description.includes('<ul>') || edu.description.includes('<li>')

@@ -253,7 +253,7 @@ li { font-size: ${bodyFontSize}; margin-bottom: 4px; color: var(--primary); }
         ${hasValue(edu.percentage) ? `<div style="font-size:9pt;color:var(--secondary);">Score: ${s(edu.percentage)}%</div>` : ''}
         ${hasValue(edu.cgpa)       ? `<div style="font-size:9pt;color:var(--secondary);">CGPA: ${s(edu.cgpa)}</div>` : ''}
         ${hasValue(edu.gpa)        ? `<div style="font-size:9pt;color:var(--secondary);">GPA: ${s(edu.gpa)}</div>` : ''}
-        ${hasValue(edu.grade)      ? `<div style="font-size:9pt;color:var(--secondary);">Grade: ${s(edu.grade)}</div>` : ''}
+        ${hasValue(edu.grade)      ? `<div style="font-size:9pt;color:var(--secondary);"> ${s(edu.grade)}</div>` : ''}
         ${hasValue(edu.description) ? `<div style="font-size:9pt;margin-bottom:10px;">${s(edu.description)}</div>` : ''}
         ${(Array.isArray(edu.achievements) && edu.achievements.filter((a: string) => a.trim()).length > 0) ? `
           <ul>${edu.achievements.filter((a: string) => a.trim()).map((a: string) => `<li>${a}</li>`).join('')}</ul>` : ''}

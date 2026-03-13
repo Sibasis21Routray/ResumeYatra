@@ -684,7 +684,7 @@ export function buildAlakazamTemplate(data: any, theme?: any): string {
             <div class="entry-details">
               <div class="entry-header">${edu.degree || ''}${edu.field ? ` in ${edu.field}` : ''}${edu.qualification ? ` (${edu.qualification})` : ''}</div>
               <div class="entry-sub">${formatSubtitle([edu.school, edu.location])}</div>
-              ${edu.grade ? `<div class="entry-sub">Grade: ${edu.grade}</div>` : ''}
+              ${edu.grade ? `<div class="entry-sub"> ${edu.grade}</div>` : ''}
               ${edu.description ? `<div class="entry-desc">${edu.description}</div>` : ''}
             </div>
           </div>

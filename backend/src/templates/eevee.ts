@@ -641,7 +641,7 @@ export function buildEeveeTemplate(data: any, theme?: any): string {
             </div>
             
             ${edu.school ? `<div class="education-school">${edu.school}${edu.location ? `, ${edu.location}` : ''}</div>` : ''}
-            ${edu.grade ? `<div class="education-field">Grade: ${edu.grade}</div>` : ''}
+            ${edu.grade ? `<div class="education-field"> ${edu.grade}</div>` : ''}
             
             ${edu.description ? `
               <div class="education-description">

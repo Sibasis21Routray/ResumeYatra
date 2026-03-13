@@ -513,7 +513,7 @@ li {
           ${getNonEmptyArray(data.education).map((edu: any, i: number) => {
             const degree = edu.degree ? edu.degree : "";
             const field = edu.field ? ` in ${edu.field}` : "";
-            const metaParts = formatSubtitle([edu.school, edu.location, edu.grade ? `Grade: ${edu.grade}` : ""]);
+            const metaParts = formatSubtitle([edu.school, edu.location, edu.grade ? ` ${edu.grade}` : ""]);
             
             return `
             <div class="timeline-item" data-section="education" data-index="${i}">

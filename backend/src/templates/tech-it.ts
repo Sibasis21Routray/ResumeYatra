@@ -584,7 +584,7 @@ export function buildTechItTemplate(data: any, theme?: any): string {
         <div class="item-left">${edu.graduationDate || ''}</div>
         <div class="item-right">
           <div class="item-title">${edu.degree || ''}${edu.field ? ` in ${edu.field}` : ''}${edu.qualification ? ` (${edu.qualification})` : ''}</div>
-          <div class="item-subtitle">${edu.school || ''}${edu.location ? `, ${edu.location}` : ''}${edu.grade ? ` | Grade: ${edu.grade}` : ''}</div>
+          <div class="item-subtitle">${edu.school || ''}${edu.location ? `, ${edu.location}` : ''}${edu.grade ? ` |  ${edu.grade}` : ''}</div>
           ${edu.description ? `<p style="font-size: 9pt; color: var(--secondary-color); margin-top: 5px;">${edu.description}</p>` : ''}
         </div>
       </div>

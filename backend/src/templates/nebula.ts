@@ -729,7 +729,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
           <div class="entry-subtitle">
             <span class="entry-company">${escapeHtml(edu.school || "")}${edu.location ? `, ${escapeHtml(edu.location)}` : ""}</span>
           </div>
-          ${edu.grade ? `<div class="entry-content">Grade: ${escapeHtml(edu.grade)}</div>` : ""}
+          ${edu.grade ? `<div class="entry-content"> ${escapeHtml(edu.grade)}</div>` : ""}
           ${edu.description ? `<div class="entry-content">${escapeHtml(edu.description)}</div>` : ""}
         </div>
       `

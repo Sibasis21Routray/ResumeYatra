@@ -759,7 +759,7 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
           }
           ${
             edu.grade
-              ? `<div class="education-field">Grade: ${edu.grade}</div>`
+              ? `<div class="education-field"> ${edu.grade}</div>`
               : ""
           }
           

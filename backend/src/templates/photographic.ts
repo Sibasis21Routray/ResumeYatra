@@ -813,7 +813,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
             }
             ${
               edu.graduationDate || edu.grade
-                ? `<div class="education-date">${edu.graduationDate || ''}${edu.grade ? ` | Grade: ${edu.grade}` : ''}</div>`
+                ? `<div class="education-date">${edu.graduationDate || ''}${edu.grade ? ` |  ${edu.grade}` : ''}</div>`
                 : ""
             }
             

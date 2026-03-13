@@ -35,12 +35,12 @@ const DatePicker = ({
   const pickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-  if (value) {
-    setSelectedDate(new Date(value));
-  } else {
-    setSelectedDate(null);
-  }
-}, [value]);
+    if (value) {
+      setSelectedDate(new Date(value));
+    } else {
+      setSelectedDate(null);
+    }
+  }, [value]);
 
   // Close picker when clicking outside
   useEffect(() => {
@@ -87,20 +87,20 @@ const DatePicker = ({
     }
   };
 
-const handleDateSelect = (day: number) => {
-  const newDate = new Date(
-    currentMonth.getFullYear(),
-    currentMonth.getMonth(),
-    day
-  );
+  const handleDateSelect = (day: number) => {
+    const newDate = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      day
+    );
 
-  const formattedDate = newDate.toLocaleDateString("en-CA");
+    const formattedDate = newDate.toLocaleDateString("en-CA");
 
-  setSelectedDate(newDate);
-  onChange(formattedDate);
-  setIsOpen(false);
-  setViewMode("days");
-};
+    setSelectedDate(newDate);
+    onChange(formattedDate);
+    setIsOpen(false);
+    setViewMode("days");
+  };
 
   const handleMonthSelect = (monthIndex: number) => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), monthIndex, 1));
@@ -525,7 +525,7 @@ export function Heading({
   onNext,
   onBack,
 }: PersonalInfoFormProps) {
-  const { updateData,save } = useResumeStore();
+  const { updateData, save } = useResumeStore();
   const { markSectionCompleted } = useUIStore();
   const {
     validateField,
@@ -541,12 +541,25 @@ export function Heading({
     phone?: string;
     email?: string;
   }>({});
-  const [personal, setPersonal] = useState(
-    data.personal || {
+  
+  // Initialize personal state with proper name parsing
+  const [personal, setPersonal] = useState(() => {
+    const personalData = data.personal || {
       fathersName: undefined,
       nationality: undefined,
+    };
+    
+    // Extract middle name from full name if not provided
+    if (personalData.name && !personalData.middleName) {
+      const nameParts = personalData.name.trim().split(" ");
+      if (nameParts.length > 2) {
+        // If there are more than 2 parts, the middle part(s) are the middle name
+        personalData.middleName = nameParts.slice(1, -1).join(" ");
+      }
     }
-  );
+    
+    return personalData;
+  });
 
   const validateData = () => {
     const errors: typeof formErrors = {};
@@ -591,33 +604,33 @@ export function Heading({
     return Object.keys(errors).length === 0;
   };
 
- const handleContinue = async () => {
-  const isValid = validateData();
-  if (!isValid) return;
+  const handleContinue = async () => {
+    const isValid = validateData();
+    if (!isValid) return;
 
-  try {
-    // update store
-    updateData((draft) => {
-      draft.personal = personal;
-    });
+    try {
+      // update store
+      updateData((draft) => {
+        draft.personal = personal;
+      });
 
-    // CALL API
-    await save();
+      // CALL API
+      await save();
 
-    markSectionCompleted("personal");
+      markSectionCompleted("personal");
 
-    toast.success("Personal information saved successfully!", {
-      style: toastStyle.success,
-      duration: 3000,
-    });
+      toast.success("Personal information saved successfully!", {
+        style: toastStyle.success,
+        duration: 3000,
+      });
 
-    onNext?.(); // navigate only after save
-  } catch (error) {
-    toast.error("Failed to save data", {
-      style: toastStyle.error,
-    });
-  }
-};
+      onNext?.(); // navigate only after save
+    } catch (error) {
+      toast.error("Failed to save data", {
+        style: toastStyle.error,
+      });
+    }
+  };
 
   const handleFieldChange = (fieldPath: string, value: any) => {
     setPersonal((prev) => ({ ...prev, [fieldPath]: value }));
@@ -703,11 +716,6 @@ export function Heading({
     return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
   };
 
-  // Image section class
-  const imageSectionClass = `w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-accent/20 to-accent/5 border-2 border-dashed border-light-border dark:border-dark-border overflow-hidden flex items-center justify-center relative rounded-xl cursor-pointer group shadow-md hover:shadow-lg transition-all duration-300 ${
-    personal.image ? 'border-solid border-accent' : ''
-  }`;
-
   return (
     <div className="w-full min-h-screen pb-8">
       {/* Header */}
@@ -727,129 +735,195 @@ export function Heading({
       </div>
 
       {/* Main Content */}
-      <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Single Card with Photo and Form */}
-        <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl  shadow-sm">
+        <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl shadow-sm">
           <div className="p-4 sm:p-6">
             {/* Profile Photo Section */}
-<div className="flex items-center gap-6 mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-6 mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
+              {/* Avatar */}
+              <div
+                className="relative w-28 h-28 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-center"
+                onMouseEnter={() => setIsImageHovered(true)}
+                onMouseLeave={() => setIsImageHovered(false)}
+              >
+                {personal.image ? (
+                  <>
+                    <img
+                      src={personal.image}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
 
-  {/* Avatar */}
-  <div
-    className="relative w-28 h-28 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex items-center justify-center"
-    onMouseEnter={() => setIsImageHovered(true)}
-    onMouseLeave={() => setIsImageHovered(false)}
-  >
-    {personal.image ? (
-      <>
-        <img
-          src={personal.image}
-          alt="Profile"
-          className="w-full h-full object-cover"
-        />
+                    {/* Hover overlay */}
+                    {isImageHovered && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-3">
+                        <button
+                          onClick={handleEditImage}
+                          className="p-2 bg-white rounded-lg shadow hover:bg-gray-100 transition"
+                          title="Edit photo"
+                        >
+                          <Edit2 className="w-4 h-4 text-gray-800" />
+                        </button>
 
-        {/* Hover overlay */}
-        {isImageHovered && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-3">
-            <button
-              onClick={handleEditImage}
-              className="p-2 bg-white rounded-lg shadow hover:bg-gray-100 transition"
-              title="Edit photo"
-            >
-              <Edit2 className="w-4 h-4 text-gray-800" />
-            </button>
+                        <button
+                          onClick={handleRemoveImage}
+                          className="p-2 bg-red-500 rounded-lg shadow hover:bg-red-600 transition"
+                          title="Remove photo"
+                        >
+                          <Trash className="w-4 h-4 text-white" />
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center text-gray-400 dark:text-gray-500">
+                    <Camera className="w-10 h-10" />
+                  </div>
+                )}
+              </div>
 
-            <button
-              onClick={handleRemoveImage}
-              className="p-2 bg-red-500 rounded-lg shadow hover:bg-red-600 transition"
-              title="Remove photo"
-            >
-              <Trash className="w-4 h-4 text-white" />
-            </button>
-          </div>
-        )}
-      </>
-    ) : (
-      <div className="flex items-center justify-center text-gray-400 dark:text-gray-500">
-        <Camera className="w-10 h-10" />
-      </div>
-    )}
-  </div>
+              {/* Upload Controls */}
+              <div className="flex flex-col gap-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
 
-  {/* Upload Controls */}
-  <div className="flex flex-col gap-2">
+                <button
+                  onClick={triggerFileUpload}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-accent hover:bg-accent-hover dark:bg-dark-accent dark:hover:bg-dark-accent-hover rounded-lg transition shadow-sm"
+                >
+                  <Camera className="w-4 h-4" />
+                  {personal.image ? "Change Photo" : "Upload Photo"}
+                </button>
 
-    <input
-      type="file"
-      accept="image/*"
-      ref={fileInputRef}
-      onChange={handleFileUpload}
-      className="hidden"
-    />
-
-    <button
-      onClick={triggerFileUpload}
-      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-accent hover:bg-accent-hover dark:bg-dark-accent dark:hover:bg-dark-accent-hover rounded-lg transition shadow-sm"
-    >
-      <Camera className="w-4 h-4" />
-      {personal.image ? "Change Photo" : "Upload Photo"}
-    </button>
-
-    <span className="text-xs text-gray-500 dark:text-gray-400">
-      JPG, PNG, WebP • Max size 5MB
-    </span>
-
-  </div>
-
-</div>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  JPG, PNG, WebP • Max size 5MB
+                </span>
+              </div>
+            </div>
 
             {/* Form Fields - Compact Grid with Clean Placeholders */}
             <div className="space-y-4">
-              {/* Name Row */}
+              {/* Name Row - FIXED VERSION */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <StyledInput
-                  label="First Name"
-                  placeholder="John"
-                  value={(() => {
-                    if (!personal.name) return "";
-                    return personal.name.split(" ")[0] || "";
-                  })()}
-                  onChange={(e) => {
-                    const parts = personal.name?.split(" ") || [];
-                    const middle = personal.middleName || "";
-                    const last = parts.slice(2).join(" ");
-                    handleFieldChange("name", `${e.target.value} ${middle} ${last}`.trim());
-                  }}
-                  onBlur={() => handleFieldBlur("personal.name")}
-                  required
-                  icon={<User className="w-4 h-4" />}
-                  error={formErrors.firstName}
-                />
+  label="First Name"
+  placeholder="John"
+  value={(() => {
+    if (!personal.name) return "";
+    const nameParts = personal.name.trim().split(" ");
+    return nameParts[0] || "";
+  })()}
+  onChange={(e) => {
+    const firstName = e.target.value;
+    const nameParts = personal.name?.trim().split(" ") || [];
+    
+    // Get middle name from either personal.middleName or from the name parts
+    let middleName = personal.middleName || "";
+    if (!middleName && nameParts.length > 2) {
+      middleName = nameParts.slice(1, -1).join(" ");
+    }
+    
+    // Get last name from name parts
+    const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+    
+    // Construct the full name
+    let fullName = firstName;
+    
+    // Only add middle name if first name is not empty
+    if (firstName.trim() && middleName) {
+      fullName += ` ${middleName}`;
+    } else if (!firstName.trim()) {
+      // If first name is empty, don't include middle name
+      fullName = "";
+    }
+    
+    // Only add last name if we have a first name and last name exists
+    if (firstName.trim() && lastName && lastName !== middleName) {
+      fullName += ` ${lastName}`;
+    }
+    
+    handleFieldChange("name", fullName.trim());
+    
+    // Clear first name error if it exists
+    if (formErrors.firstName) {
+      setFormErrors(prev => ({ ...prev, firstName: undefined }));
+    }
+  }}
+  onBlur={() => handleFieldBlur("personal.name")}
+  required
+  icon={<User className="w-4 h-4" />}
+  error={formErrors.firstName}
+/>
 
-                <StyledInput
-                  label="Middle Name"
-                  placeholder="Michael"
-                  value={personal.middleName || ""}
-                  onChange={(e) => {
-                    const first = personal.name?.split(" ")[0] || "";
-                    const last = personal.name?.split(" ").slice(2).join(" ") || "";
-                    handleFieldChange("middleName", e.target.value);
-                    handleFieldChange("name", `${first} ${e.target.value} ${last}`.trim());
-                  }}
-                  icon={<User className="w-4 h-4" />}
-                />
+               {/* Middle Name */}
+<StyledInput
+  label="Middle Name"
+  placeholder="Michael"
+  value={(() => {
+    if (!personal.name) return personal.middleName || "";
+    const nameParts = personal.name.trim().split(" ");
+    if (nameParts.length > 2) {
+      return nameParts.slice(1, -1).join(" ");
+    }
+    return personal.middleName || "";
+  })()}
+  onChange={(e) => {
+    const middleName = e.target.value;
+    const nameParts = personal.name?.trim().split(" ") || [];
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+    
+    // Construct the full name - only if first name exists
+    let fullName = firstName;
+    if (firstName) {
+      if (middleName) fullName += ` ${middleName}`;
+      if (lastName && lastName !== middleName) fullName += ` ${lastName}`;
+    } else {
+      // If no first name, don't store anything
+      fullName = "";
+    }
+    
+    handleFieldChange("name", fullName.trim());
+    handleFieldChange("middleName", middleName);
+  }}
+  icon={<User className="w-4 h-4" />}
+/>
 
-                <StyledInput
-                  label="Last Name"
-                  placeholder="Doe"
-                  value={personal.name?.split(" ").slice(2).join(" ") || ""}
-                  onChange={(e) => {
-                    const first = personal.name?.split(" ")[0] || "";
-                    const middle = personal.middleName || "";
-                    handleFieldChange("name", `${first} ${middle} ${e.target.value}`.trim());
-                  }}
-                  icon={<User className="w-4 h-4" />}
-                />
+{/* Last Name */}
+<StyledInput
+  label="Last Name"
+  placeholder="Doe"
+  value={(() => {
+    if (!personal.name) return "";
+    const nameParts = personal.name.trim().split(" ");
+    return nameParts.length > 1 ? nameParts[nameParts.length - 1] : "";
+  })()}
+  onChange={(e) => {
+    const lastName = e.target.value;
+    const nameParts = personal.name?.trim().split(" ") || [];
+    const firstName = nameParts[0] || "";
+    const middleName = personal.middleName || (nameParts.length > 2 ? nameParts.slice(1, -1).join(" ") : "");
+    
+    // Construct the full name - only if first name exists
+    let fullName = firstName;
+    if (firstName) {
+      if (middleName) fullName += ` ${middleName}`;
+      if (lastName) fullName += ` ${lastName}`;
+    } else {
+      // If no first name, don't store anything
+      fullName = "";
+    }
+    
+    handleFieldChange("name", fullName.trim());
+  }}
+  icon={<User className="w-4 h-4" />}
+/>
               </div>
 
               {/* Contact Row */}
