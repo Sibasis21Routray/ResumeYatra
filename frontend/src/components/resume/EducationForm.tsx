@@ -708,7 +708,7 @@ useEffect(() => {
     
     // Check if it's a percentage (contains %)
     if (typeof grade === 'string' && grade.includes('%')) {
-      return `Percentage: ${grade}`;
+      return ` ${grade}`;
     }
     
     // Check if it's a CGPA (numeric with possible decimal)
