@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const payment_controller_1 = require("../controllers/payment.controller");
+const pricing_controller_1 = require("../controllers/pricing.controller");
+const auth_middleware_1 = require("../middleware/auth.middleware");
+const router = (0, express_1.Router)();
+router.post("/create-order", payment_controller_1.createOrder);
+router.post("/verify", payment_controller_1.verifyPayment);
+router.get("/pricing", pricing_controller_1.getPricing);
+router.post("/toggle-autopay", auth_middleware_1.authMiddleware, payment_controller_1.toggleAutoPay);
+router.get("/autopay-status", auth_middleware_1.authMiddleware, payment_controller_1.getAutoPayStatus);
+router.post("/webhook", payment_controller_1.handleWebhook);
+router.get("/invoice/:resumeId", payment_controller_1.getInvoiceByResume);
+exports.default = router;
