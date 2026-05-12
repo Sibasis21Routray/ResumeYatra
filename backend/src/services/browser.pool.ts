@@ -39,7 +39,7 @@ export async function renderWithCluster(html: string) {
     });
 
     await page.setContent(data.html, {
-      waitUntil: "networkidle0",
+waitUntil: "networkidle0" as any,
       timeout: 60000,
     });
 
