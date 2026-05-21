@@ -65,6 +65,8 @@ export async function exportPdf(req: Request, res: Response) {
       return res.status(403).json({ error: "Access denied" });
     }
 
+    console.log(`[exportPdf] Attempting export for resume ${resumeId}. isDownloadPaid: ${resume.isDownloadPaid}, isAiPaid: ${resume.isAiPaid}, isAdmin: ${isAdmin}`);
+
     // Check if resume is paid (bypass for admin)
     if (!resume.isDownloadPaid && !isAdmin) {
       return res.status(402).json({
@@ -130,7 +132,7 @@ export async function exportPdf(req: Request, res: Response) {
     resume.isDownloaded = true;
     await resume.save();
 
-    console.log("✅ PDF Export complete and credit consumed");
+    console.log("✅ PDF Export complete");
 
     console.log("Generated PDF buffer length:", pdfBuffer.length);
     console.log(

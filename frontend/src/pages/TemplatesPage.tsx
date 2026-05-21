@@ -1,46 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { resumeAPI, authAPI } from '../services/apiClient'
+import { resumeAPI } from '../services/apiClient'
 import { useTemplateStore, Template } from '../stores/templateStore'
-import {
-  ChevronLeft, FileText, Grid, Sparkles,
-  Briefcase, Palette, Minimize2, Crown, ArrowRight,
-} from 'lucide-react'
+import { ChevronLeft, FileText, ArrowRight } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-// ── Brand ────────────────────────────────────────────────────────────────────
-const BLUE   = "#01467d"
-const YELLOW = "#dea42c"
-const WHITE  = "#ffffff"
-
-const CATEGORY_META: Record<string, { icon: React.ReactNode; color: string; desc: string }> = {
-  professional: {
-    icon: <Briefcase size={15} strokeWidth={1.8} />,
-    color: BLUE,
-    desc: "Clean, corporate-ready layouts",
-  },
-   classic: {
-    icon: <FileText  size={15} strokeWidth={1.8} />,
-    color: "#16a34a",
-    desc: "Timeless designs with a modern twist",
-  },
-  modern: {
-    icon: <Sparkles size={15} strokeWidth={1.8} />,
-    color: "#0891b2",
-    desc: "Fresh designs with bold typography",
-  },
-  creative: {
-    icon: <Palette size={15} strokeWidth={1.8} />,
-    color: "#7c3aed",
-    desc: "Stand out with artistic flair",
-  },
-  minimal: {
-    icon: <Minimize2 size={15} strokeWidth={1.8} />,
-    color: "#374151",
-    desc: "Less is more — pure elegance",
-  },
-}
+// ── Strict Color Specification ───────────────────────────────────────────────
+const BLUE = "#055597"
+const ACCENT_YELLOW = "#d29e3f"
+const WHITE = "#ffffff"
+const TEXT_MUTED = "#64748b"
 
 export function TemplatesPage() {
   const navigate = useNavigate()
@@ -83,606 +53,347 @@ export function TemplatesPage() {
 
   const handleSelectTemplate = async (templateId: string) => {
     try {
-      // const token = localStorage.getItem('token')
-      // if (!token) { navigate(`/login?next=/templates&use=${encodeURIComponent(templateId)}`); return }
-      // try { await authAPI.me() } catch { navigate(`/login?next=/templates&use=${encodeURIComponent(templateId)}`); return }
       const template = templates.find(t => t.id === templateId)
       const resume = await resumeAPI.create({ title: `${template?.name || 'Professional'} Resume`, template: templateId })
       const resumeId = resume.data._id || resume.data.id;
 
-if (!resumeId || !/^[a-fA-F0-9]{24}$/.test(resumeId)) {
-  throw new Error("Invalid resume ID from backend");
-}
+      if (!resumeId || !/^[a-fA-F0-9]{24}$/.test(resumeId)) {
+        throw new Error("Invalid resume ID from backend");
+      }
 
-navigate(`/editor/${resumeId}`);
+      navigate(`/editor/${resumeId}`);
     } catch (err: any) {
       if (err.response?.status !== 401)
         toast.error(err.response?.data?.error || err.message || 'Failed to create resume.')
     }
   }
 
-  const categories = ['all', 'classic', 'professional', 'modern', 'creative', 'minimal']
+  const categories = [
+    { id: 'all', label: 'All Templates' },
+    { id: 'classic', label: 'Classic Templates' },
+    { id: 'photo', label: 'Photo Templates' },
+    { id: 'modern', label: 'Modern Templates' }
+  ]
 
-  const groupedTemplates = templates.reduce((acc, t) => {
-    const cat = t.category || 'professional'
-    if (!acc[cat]) acc[cat] = []
-    acc[cat].push(t)
-    return acc
-  }, {} as Record<string, Template[]>)
-
-  const filteredCategories = activeCategory === 'all'
-    ? ['professional', 'classic', 'modern', 'creative', 'minimal']
-    : [activeCategory]
+  const filteredTemplates = templates.filter(t => {
+    if (activeCategory === 'all') return true
+    const cat = t.category?.toLowerCase() || 'classic'
+    if (activeCategory === 'photo') return cat.includes('photo') || cat.includes('creative')
+    return cat === activeCategory
+  })
 
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
-        
-        * { 
-          box-sizing: border-box; 
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
-        
-        @keyframes fadeUp { 
-          from { 
-            opacity: 0; 
-            transform: translateY(16px); 
-          } 
-          to { 
-            opacity: 1; 
-            transform: translateY(0); 
-          } 
+        .tp-scroll::-webkit-scrollbar {
+          display: none;
         }
-        
-        @keyframes spin { 
-          to { 
-            transform: rotate(360deg); 
-          } 
-        }
-        
-        @keyframes shimmer { 
-          0%, 100% { 
-            opacity: 0.6; 
-          } 
-          50% { 
-            opacity: 1; 
-          } 
-        }
-        
-        .tpl-card { 
-          transition: transform 0.22s ease, box-shadow 0.22s ease; 
-        }
-        
-        .tpl-card:hover { 
-          transform: translateY(-4px); 
-          box-shadow: 0 20px 48px rgba(1,70,125,0.18) !important; 
-        }
-        
-        .cat-pill { 
-          transition: all 0.15s ease; 
-          cursor: pointer; 
-        }
-        
-        .use-btn { 
-          transition: all 0.15s ease; 
-        }
-        
-        .use-btn:hover { 
-          background: ${BLUE} !important; 
-          color: ${WHITE} !important; 
-          transform: scale(1.02);
-        }
-        
-        .tp-scroll::-webkit-scrollbar { 
-          display: none; 
-        }
-        
         .tp-scroll {
           -ms-overflow-style: none;
           scrollbar-width: none;
-        }
-        
-        .animate-fadeUp {
-          animation: fadeUp 0.4s ease forwards;
         }
       `}</style>
 
       <div style={{ 
         minHeight: "100vh", 
-        background: "linear-gradient(160deg, #f0f6fc 0%, #e8f1f8 60%, #edf3f9 100%)", 
-        fontFamily: "'DM Sans', sans-serif",
+        background: "#fdfefe", 
+        fontFamily: "'Inter', sans-serif",
         position: "relative",
       }}>
 
-        {/* Subtle dot grid bg */}
-        <div style={{ 
-          position: "fixed", 
-          inset: 0, 
-          pointerEvents: "none", 
-          zIndex: 0, 
-          backgroundImage: `radial-gradient(${BLUE}08 1px, transparent 1px)`, 
-          backgroundSize: "28px 28px" 
-        }} />
-
-        <main style={{ 
-          maxWidth: 1280, 
-          margin: "0 auto", 
-          padding: "36px 24px 64px", 
-          position: "relative", 
-          zIndex: 1 
-        }}>
-
-          {/* Category filter tabs */}
-          <div style={{ 
-            display: "flex", 
-            gap: 8, 
-            marginBottom: 40, 
-            overflowX: "auto",
-            alignItems: "center",
-          }} 
-          className="tp-scroll">
+        {/* ── HEADER SECTION ────────────────────────────────────────────────── */}
+        <motion.header 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
+          style={{
+            background: WHITE,
+            padding: "48px 24px 36px 24px",
+            textAlign: "center",
+            borderBottom: "1px solid #eef2f6",
+            boxShadow: "0 10px 40px rgba(5, 85, 151, 0.02)"
+          }}
+        >
+          <div className='flex flex-col justify-center items-center'>
             
-            {/* Back Button */}
             <button
               onClick={() => navigate("/onboarding")}
               style={{
+                position: "absolute",
+                left: "16px",
+                top: "4px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 width: 40,
                 height: 40,
-                borderRadius: 12,
+                borderRadius: "50%",
                 background: WHITE,
-                border: `1.5px solid ${BLUE}20`,
+                border: "1px solid #e2e8f0",
+                color: BLUE,
                 cursor: "pointer",
                 transition: "all 0.2s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = BLUE
-                e.currentTarget.style.color = WHITE
+                e.currentTarget.style.background = "#f8fafc"
+                e.currentTarget.style.borderColor = BLUE
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = WHITE
-                e.currentTarget.style.color = BLUE
+                e.currentTarget.style.borderColor = "#e2e8f0"
               }}
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={20} strokeWidth={2.5} />
             </button>
-            
-            {categories.map(cat => {
-              const isActive = activeCategory === cat
-              const meta = CATEGORY_META[cat]
-              return (
-                <button
-                  key={cat}
-                  className="cat-pill"
-                  onClick={() => setActiveCategory(cat)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    padding: "8px 18px",
-                    borderRadius: 24,
-                    border: `1.5px solid ${isActive ? BLUE : `${BLUE}20`}`,
-                    background: isActive ? BLUE : WHITE,
-                    color: isActive ? WHITE : "#475569",
-                    fontSize: 13,
-                    fontWeight: isActive ? 700 : 500,
-                    whiteSpace: "nowrap",
-                    boxShadow: isActive ? `0 4px 14px ${BLUE}33` : "none",
-                    fontFamily: "'DM Sans', sans-serif",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  {cat !== 'all' && (
-                    <span style={{ color: isActive ? "rgba(255,255,255,0.85)" : meta?.color }}>
-                      {meta?.icon}
-                    </span>
-                  )}
-                  <span style={{ textTransform: "capitalize" }}>
-                    {cat === 'all' ? 'All Templates' : cat}
-                  </span>
-                  {cat !== 'all' && groupedTemplates[cat]?.length > 0 && (
-                    <span style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      background: isActive ? "rgba(255,255,255,0.2)" : `${BLUE}12`,
-                      color: isActive ? WHITE : BLUE,
-                      padding: "1px 7px",
-                      borderRadius: 10,
-                    }}>
-                      {groupedTemplates[cat].length}
-                    </span>
-                  )}
-                </button>
-              )
-            })}
+
+            <h1 style={{
+              fontSize: "32px",
+              fontWeight: 700,
+              color: "#0f172a",
+              margin: "0 0 12px 0",
+              letterSpacing: "-0.025em"
+            }}>
+              Choose a Resume Template
+            </h1>
+
+            <div style={{
+              width: 48,
+              height: 3,
+              background: ACCENT_YELLOW,
+              borderRadius: 2,
+              display: "block",
+              border: "none"
+            }} />
+
+            <p style={{
+              fontSize: "15px",
+              color: TEXT_MUTED,
+              lineHeight: "1.5",
+              maxWidth: "720px",
+              margin: "20px 0",
+              fontWeight: 400
+            }}>
+              Select one of our expertly designed resume templates to kickstart your job application. Try out one of our premium resume templates to make an impressive resume and land your dream job in no time!
+            </p>
+
+            <p style={{
+              fontSize: "13px",
+              color: BLUE,
+              fontWeight: 600,
+              margin: "0 0 28px 0",
+              letterSpacing: "-0.01em"
+            }}>
+              You can easily change your template later.
+            </p>
+
+            {/* Filter Tabs Layout */}
+            <div style={{ 
+              display: "flex", 
+              gap: 10, 
+              justifyContent: "center",
+              overflowX: "auto",
+              alignItems: "center",
+              paddingBottom: "4px"
+            }} className="tp-scroll">
+              {categories.map(cat => {
+                const isActive = activeCategory === cat.id
+                return (
+                  <button
+                    key={cat.id}
+                    className="cat-pill"
+                    onClick={() => setActiveCategory(cat.id)}
+                    style={{
+                      padding: "9px 20px",
+                      borderRadius: 8,
+                      border: isActive ? `1px solid ${BLUE}` : `1px solid #e2e8f0`,
+                      background: isActive ? BLUE : WHITE,
+                      color: isActive ? WHITE : "#334155",
+                      fontSize: "13px",
+                      fontWeight: isActive ? 600 : 500,
+                      whiteSpace: "nowrap",
+                      cursor: "pointer",
+                      boxShadow: isActive ? "0 4px 12px rgba(5, 85, 151, 0.12)" : "0 1px 2px rgba(0,0,0,0.02)"
+                    }}
+                  >
+                    {cat.label}
+                  </button>
+                )
+              })}
+            </div>
           </div>
+        </motion.header>
 
-          {/* States */}
-          {loading ? (
-            <div style={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              alignItems: "center", 
-              justifyContent: "center", 
-              padding: "120px 0" 
-            }}>
-              <div style={{ position: "relative", width: 56, height: 56 }}>
-                <div style={{ 
-                  position: "absolute", 
-                  inset: 0, 
-                  borderRadius: "50%", 
-                  border: `3px solid ${BLUE}18` 
-                }} />
-                <div style={{ 
-                  position: "absolute", 
-                  inset: 0, 
-                  borderRadius: "50%", 
-                  border: `3px solid ${BLUE}`, 
-                  borderTopColor: "transparent", 
-                  animation: "spin 0.8s linear infinite" 
-                }} />
-              </div>
-              <p style={{ marginTop: 20, fontSize: 15, fontWeight: 600, color: "#1a2e40" }}>
-                Loading templates…
-              </p>
-              <p style={{ marginTop: 4, fontSize: 13, color: "#94a3b8" }}>
-                Preparing the best designs for you
-              </p>
-            </div>
-          ) : error ? (
-            <div style={{ 
-              display: "flex", 
-              flexDirection: "column", 
-              alignItems: "center", 
-              padding: "80px 0", 
-              textAlign: "center" 
-            }}>
-              <div style={{ 
-                width: 72, 
-                height: 72, 
-                borderRadius: 20, 
-                background: "#fff1f1", 
-                border: "1.5px solid #fecaca", 
-                display: "flex", 
-                alignItems: "center", 
-                justifyContent: "center", 
-                marginBottom: 20 
-              }}>
-                <FileText size={32} color="#ef4444" strokeWidth={1.5} />
-              </div>
-              <h3 style={{ fontSize: 17, fontWeight: 700, color: "#0f172a", marginBottom: 8 }}>
-                Failed to load templates
-              </h3>
-              <p style={{ fontSize: 13, color: "#64748b", maxWidth: 340, marginBottom: 24 }}>
-                {error || "We couldn't load the templates. Please try again."}
-              </p>
-              <button
-                onClick={fetchTemplates}
-                style={{
-                  padding: "10px 24px",
-                  borderRadius: 12,
-                  background: `linear-gradient(135deg, ${BLUE}, #025fa8)`,
-                  color: WHITE,
-                  border: "none",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  boxShadow: `0 4px 16px ${BLUE}40`,
-                  fontFamily: "'DM Sans', sans-serif",
-                  transition: "transform 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.05)"
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)"
-                }}
-              >
-                Try Again
-              </button>
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 56 }}>
-              {filteredCategories.map(category =>
-                groupedTemplates[category]?.length > 0 && (
-                  <section key={category} style={{ animation: "fadeUp 0.4s ease" }}>
+        {/* ── REDUCED CARD SIZE GRID ────────────────────────────────────────── */}
+        <main style={{ 
+          width: "100%",
+          margin: "0 auto",
+          padding: "40px 32px 80px 32px", 
+        }}>
+          <motion.div 
+            layout
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))",
+              gap: 32,
+            }}
+          >
+            <AnimatePresence mode="popLayout">
+              {filteredTemplates.map(template => {
+                const isHovered = hoveredTemplate === template.id
+                return (
+                  <motion.div
+                    key={template.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.96 }}
+                    animate={{ opacity: 1, scale: isHovered ? 1.02 : 1 }}
+                    exit={{ opacity: 0, scale: 0.96 }}
+                    transition={{ duration: 0.35, cubicBezier: [0.16, 1, 0.3, 1] }}
+                    className="tpl-card"
+                    onClick={() => handleSelectTemplate(template.id)}
+                    onMouseEnter={() => setHoveredTemplate(template.id)}
+                    onMouseLeave={() => setHoveredTemplate(null)}
+                    style={{
+                      borderRadius: 14,
+                      overflow: "hidden",
+                      background: WHITE,
+                      border: isHovered ? `1px solid ${BLUE}` : "1px solid #eef2f6",
+                      boxShadow: isHovered 
+                        ? "0 20px 40px rgba(5, 85, 151, 0.1), 0 6px 12px rgba(5, 85, 151, 0.04)" 
+                        : "0 8px 20px rgba(15, 23, 42, 0.02)",
+                      cursor: "pointer",
+                      position: "relative",
+                      transform: isHovered ? "translateY(-3px)" : "translateY(0)",
+                      transition: "transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1)"
+                    }}
+                  >
+                    {/* Reduced canvas wrapper */}
+                    <div
+                      ref={el => (containerRefs.current[template.id] = el)}
+                      style={{
+                        position: "relative",
+                        aspectRatio: "210/280", 
+                        overflow: "hidden",
+                        background: "#ffffff",
+                        borderBottom: "1px solid #f8fafc"
+                      }}
+                    >
+                      {previewLoading[template.id] && (
+                        <div style={{
+                          position: "absolute",
+                          inset: 0,
+                          zIndex: 4,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: "rgba(255,255,255,0.9)",
+                        }}>
+                          <div style={{ width: 24, height: 24, borderRadius: "50%", border: `2px solid #e2e8f0`, borderTopColor: BLUE, animation: "spin 0.6s linear infinite" }} />
+                        </div>
+                      )}
 
-                    {/* Category heading */}
-                    <div style={{ 
-                      display: "flex", 
-                      alignItems: "center", 
-                      gap: 14, 
-                      marginBottom: 24,
-                      flexWrap: "wrap",
-                    }}>
+                      {previews[template.id] ? (
+                        <iframe
+                          srcDoc={previews[template.id]}
+                          scrolling="no"
+                          style={{
+                            width: "200mm",
+                            height: "280mm",
+                            position: "absolute",
+                            left: "50%",
+                            transform: `translateX(-50%) scale(${containerRefs.current[template.id] ? (containerRefs.current[template.id]!.offsetWidth / 794) * 0.95 : 0.45})`,
+                            transformOrigin: "top center",
+                            border: 0,
+                            padding: 0,
+                            pointerEvents: "none",
+                          }}
+                          title={template.name}
+                        />
+                      ) : !previewLoading[template.id] && (
+                        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                          <FileText size={32} color="#cbd5e1" strokeWidth={1.5} />
+                          <span style={{ fontSize: "12px", color: "#94a3b8", marginTop: 10 }}>{template.name}</span>
+                        </div>
+                      )}
+
+                      {/* Cover Action Overlay */}
                       <div style={{
+                        position: "absolute",
+                        inset: 0,
+                        zIndex: 5,
+                        background: "linear-gradient(to top, rgba(15, 23, 42, 0.75) 0%, rgba(15, 23, 42, 0.15) 65%, transparent 100%)",
+                        opacity: isHovered ? 1 : 0,
+                        transition: "opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                         display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: "8px 16px",
-                        borderRadius: 12,
-                        background: WHITE,
-                        border: `1.5px solid ${BLUE}18`,
-                        boxShadow: `0 2px 8px ${BLUE}08`,
+                        flexDirection: "column",
+                        justifyContent: "flex-end",
+                        padding: 24,
                       }}>
-                        <span style={{ color: CATEGORY_META[category]?.color || BLUE }}>
-                          {CATEGORY_META[category]?.icon}
-                        </span>
-                        <span style={{ 
-                          fontSize: 14, 
-                          fontWeight: 700, 
-                          color: "#0f172a", 
-                          textTransform: "capitalize" 
-                        }}>
-                          {category}
-                        </span>
-                        <span style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          background: `${BLUE}10`,
-                          color: BLUE,
-                          padding: "1px 8px",
-                          borderRadius: 8,
-                        }}>
-                          {groupedTemplates[category].length}
+                        <button
+                          onClick={e => { 
+                            e.stopPropagation(); 
+                            handleSelectTemplate(template.id); 
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "11px 0",
+                            borderRadius: 8,
+                            border: "none",
+                            background: ACCENT_YELLOW,
+                            color: WHITE,
+                            fontSize: "14px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 8,
+                            boxShadow: "0 4px 16px rgba(210, 158, 63, 0.3)",
+                            transform: isHovered ? "translateY(0) scale(1)" : "translateY(14px) scale(0.98)",
+                            transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)"
+                          }}
+                        >
+                          Use Template <ArrowRight size={14} strokeWidth={2.5} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Reduced metadata */}
+                    <div style={{
+                      padding: "16px 20px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}>
+                      <div>
+                        <h4 style={{ fontSize: "15px", fontWeight: 600, color: "#0f172a", margin: 0, letterSpacing: "-0.01em" }}>
+                          {template.name}
+                        </h4>
+                        <span style={{ fontSize: "11px", color: TEXT_MUTED, textTransform: "capitalize", display: "inline-block", marginTop: 4, fontWeight: 500 }}>
+                          {template.category || 'Classic'} Layout
                         </span>
                       </div>
-
-                      <span style={{ fontSize: 13, color: "#94a3b8", fontWeight: 500 }}>
-                        {CATEGORY_META[category]?.desc}
-                      </span>
-
-                      <div style={{ flex: 1, height: 1, background: `${BLUE}10` }} />
+                      <div style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: "50%",
+                        background: isHovered ? BLUE : "#f8fafc",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        transform: isHovered ? "translateX(3px)" : "translateX(0)",
+                        transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+                      }}>
+                        <ArrowRight size={14} color={isHovered ? WHITE : "#64748b"} strokeWidth={2.5} />
+                      </div>
                     </div>
-
-                    {/* Grid */}
-                    <div style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))",
-                      gap: 24,
-                    }}>
-                      {groupedTemplates[category].map(template => {
-                        const isHovered = hoveredTemplate === template.id
-                        return (
-                          <div
-                            key={template.id}
-                            className="tpl-card"
-                            onClick={() => handleSelectTemplate(template.id)}
-                            onMouseEnter={() => setHoveredTemplate(template.id)}
-                            onMouseLeave={() => setHoveredTemplate(null)}
-                            style={{
-                              borderRadius: 20,
-                              overflow: "hidden",
-                              background: WHITE,
-                              border: `1.5px solid ${isHovered ? BLUE + "44" : BLUE + "14"}`,
-                              boxShadow: `0 2px 12px ${BLUE}0a`,
-                              cursor: "pointer",
-                              position: "relative",
-                              transition: "all 0.3s ease",
-                            }}
-                          >
-                            {/* A4 preview area */}
-                            <div
-                              ref={el => (containerRefs.current[template.id] = el)}
-                              style={{
-                                position: "relative",
-                                aspectRatio: "210/297",
-                                // background: "#f8fafc",
-                                overflow: "hidden",
-                              }}
-                            >
-                              {/* Top accent */}
-                              <div style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                height: 3,
-                                zIndex: 3,
-                                background: isHovered ? `linear-gradient(90deg, ${BLUE}, #025fa8)` : "transparent",
-                                transition: "background 0.2s",
-                              }} />
-
-                              {/* Loading */}
-                              {previewLoading[template.id] && (
-                                <div style={{
-                                  position: "absolute",
-                                  inset: 0,
-                                  zIndex: 10,
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  background: "rgba(255,255,255,0.92)",
-                                  backdropFilter: "blur(4px)",
-                                }}>
-                                  <div style={{ position: "relative", width: 36, height: 36 }}>
-                                    <div style={{ 
-                                      position: "absolute", 
-                                      inset: 0, 
-                                      borderRadius: "50%", 
-                                      border: `2.5px solid ${BLUE}18` 
-                                    }} />
-                                    <div style={{ 
-                                      position: "absolute", 
-                                      inset: 0, 
-                                      borderRadius: "50%", 
-                                      border: `2.5px solid ${BLUE}`, 
-                                      borderTopColor: "transparent", 
-                                      animation: "spin 0.8s linear infinite" 
-                                    }} />
-                                  </div>
-                                  <span style={{ 
-                                    marginTop: 10, 
-                                    fontSize: 11, 
-                                    fontWeight: 600, 
-                                    color: `${BLUE}99` 
-                                  }}>
-                                    Loading…
-                                  </span>
-                                </div>
-                              )}
-
-                              {/* iframe preview */}
-                              {previews[template.id] ? (
-                                <iframe
-                                  srcDoc={previews[template.id]}
-                                  scrolling="no"
-                                  style={{
-                                    width: "200mm",
-                                    height: "290mm",
-                                    position: "absolute",
-                                    left: "50%",
-                                    transform: `translateX(-50%) scale(${containerRefs.current[template.id] ? containerRefs.current[template.id]!.offsetWidth / 794 : 0.32})`,
-                                    transformOrigin: "top center",
-                                    border: 0,
-                                    padding: 20,
-                                    pointerEvents: "none",
-                                    
-                                  }}
-                                  title={template.name}
-                                />
-                              ) : !previewLoading[template.id] && (
-                                <div style={{
-                                  position: "absolute",
-                                  inset: 0,
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  gap: 10,
-                                }}>
-                                  <div style={{
-                                    width: 52,
-                                    height: 52,
-                                    borderRadius: 14,
-                                    background: `${BLUE}0a`,
-                                    border: `1.5px dashed ${BLUE}28`,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                  }}>
-                                    <FileText size={24} color={`${BLUE}55`} strokeWidth={1.5} />
-                                  </div>
-                                  <span style={{ 
-                                    fontSize: 12, 
-                                    fontWeight: 600, 
-                                    color: `${BLUE}88`, 
-                                    textAlign: "center" 
-                                  }}>
-                                    {template.name}
-                                  </span>
-                                </div>
-                              )}
-
-                              {/* Hover overlay */}
-                              <div style={{
-                                position: "absolute",
-                                inset: 0,
-                                zIndex: 5,
-                                background: "linear-gradient(to top, rgba(1,70,125,0.88) 0%, rgba(1,70,125,0.3) 50%, transparent 100%)",
-                                opacity: isHovered ? 1 : 0,
-                                transition: "opacity 0.25s ease",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "flex-end",
-                                padding: 16,
-                              }}>
-                                <div style={{
-                                  transform: isHovered ? "translateY(0)" : "translateY(10px)",
-                                  transition: "transform 0.25s ease",
-                                }}>
-                                  <p style={{ 
-                                    fontSize: 13, 
-                                    fontWeight: 700, 
-                                    color: WHITE, 
-                                    margin: "0 0 8px" 
-                                  }}>
-                                    {template.name}
-                                  </p>
-                                  <button
-                                    className="use-btn"
-                                    onClick={e => { 
-                                      e.stopPropagation(); 
-                                      handleSelectTemplate(template.id); 
-                                    }}
-                                    style={{
-                                      width: "100%",
-                                      padding: "9px 0",
-                                      borderRadius: 10,
-                                      border: "none",
-                                      background: WHITE,
-                                      color: BLUE,
-                                      fontSize: 12,
-                                      fontWeight: 700,
-                                      cursor: "pointer",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      gap: 6,
-                                      fontFamily: "'DM Sans', sans-serif",
-                                      transition: "all 0.2s ease",
-                                    }}
-                                  >
-                                    Use Template <ArrowRight size={13} strokeWidth={2.5} />
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Card footer */}
-                            <div style={{
-                              padding: "12px 14px",
-                              borderTop: `1px solid ${BLUE}0e`,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                            }}>
-                              <div>
-                                <p style={{ 
-                                  fontSize: 14, 
-                                  fontWeight: 700, 
-                                  color: "#0f172a", 
-                                  margin: 0, 
-                                  letterSpacing: "-0.01em" 
-                                }}>
-                                  {template.name}
-                                </p>
-                                <p style={{ 
-                                  fontSize: 11, 
-                                  color: "#94a3b8", 
-                                  margin: "4px 0 0", 
-                                  fontWeight: 500, 
-                                  textTransform: "capitalize" 
-                                }}>
-                                  {category}
-                                </p>
-                              </div>
-                              <div style={{
-                                width: 32,
-                                height: 32,
-                                borderRadius: 10,
-                                background: isHovered ? BLUE : `${BLUE}10`,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                transition: "all 0.2s",
-                              }}>
-                                <ArrowRight size={14} color={isHovered ? WHITE : BLUE} strokeWidth={2.2} />
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </section>
+                  </motion.div>
                 )
-              )}
-            </div>
-          )}
+              })}
+            </AnimatePresence>
+          </motion.div>
         </main>
       </div>
     </>

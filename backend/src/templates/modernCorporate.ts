@@ -401,9 +401,9 @@ export function buildModernCorporateTemplate(data: any, theme?: any): string {
 
         <div class="contact-line">
           ${[
-            personal.phone ? `Ph. ${personal.phone}` : '',
-            personal.email ? `Email ${personal.email}` : '',
-            personal.location ? `Addr. ${personal.location}` : ''
+            personal.phone ? `Phone: ${personal.phone}` : '',
+            personal.email ? `Email: ${personal.email}` : '',
+            personal.location ? `Address: ${personal.location}` : ''
           ].filter(Boolean).join('<span class="contact-separator">|</span>')}
         </div>
 

@@ -859,14 +859,14 @@ export default function PreviewPage() {
     navigate("/login");
   };
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (finalType: "download" | "ai") => {
     try {
       await fetchResume();
 
-      if (paymentType === "download" && pendingExportFormat) {
+      if (finalType === "download" && pendingExportFormat) {
         await performExport(pendingExportFormat);
         setPendingExportFormat(null);
-      } else if (paymentType === "ai") {
+      } else if (finalType === "ai") {
         await handleAIEnhance();
       }
     } catch (err) {

@@ -864,11 +864,30 @@ export function Heading({
                   icon={<Users className="w-4 h-4" />}
                 />
 
-                <DatePicker
-                  label="Date of Birth"
-                  value={personal.dob || ""}
-                  onChange={(date) => handleFieldChange("dob", date)}
-                />
+                <div className="flex flex-col gap-2">
+  <label className="text-sm font-medium text-gray-700">
+    Date of Birth
+  </label>
+
+  <input
+    type="text"
+    placeholder="DD/MM/YYYY"
+    value={personal.dob || ""}
+    onChange={(e) => {
+      let value = e.target.value.replace(/\D/g, "");
+
+      if (value.length > 2)
+        value = value.slice(0, 2) + "/" + value.slice(2);
+
+      if (value.length > 5)
+        value = value.slice(0, 5) + "/" + value.slice(5, 9);
+
+      handleFieldChange("dob", value);
+    }}
+    maxLength={10}
+    className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+</div>
               </div>
 
               {/* Address Row */}

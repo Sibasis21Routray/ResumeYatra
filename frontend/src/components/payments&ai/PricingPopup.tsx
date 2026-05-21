@@ -76,130 +76,130 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
   const freelancerDiscount = pricing?.freelancerAiDiscount || 50
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col animate-scaleIn relative">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 bg-slate-900/50 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl max-h-[85vh] overflow-hidden flex flex-col animate-scaleIn relative">
         
-        {/* Close Button inside popup */}
+        {/* Close Button */}
         <button 
           onClick={onClose} 
-          className="absolute top-4 right-4 z-10 p-2 hover:bg-gray-100 rounded-full transition-colors"
+          className="absolute top-3 right-3 z-10 p-1.5 hover:bg-gray-100 rounded-full transition-colors"
         >
-          <X className="w-5 h-5 text-gray-400" />
+          <X className="w-4 h-4 text-gray-500" />
         </button>
 
         {/* Content */}
-        <div className="pricing-section p-8 overflow-y-auto">
+        <div className="pricing-section p-4 overflow-y-auto">
           {/* Header */}
-          <div className="header text-center mb-6">
-            <div className="eyebrow inline-block bg-sky-100 text-sky-800 font-extrabold px-5 py-2 rounded-full text-sm mb-3">
+          <div className="header text-center mb-4">
+            <div className="eyebrow inline-block bg-blue-50 text-[#055597] font-extrabold px-4 py-1.5 rounded-full text-xs mb-2">
               ResumeYatra Pricing Snapshot
             </div>
-            <h2 className="text-4xl font-black tracking-tight text-slate-800 mb-2">
+            <h2 className="text-2xl font-black tracking-tight text-slate-800 mb-1">
               Compare Plans in One Glance
             </h2>
-            <p className="subtitle text-slate-500 text-lg">
+            <p className="subtitle text-slate-500 text-sm">
               Choose the right plan for creating, saving and optimizing resumes.
             </p>
           </div>
 
           {/* Loading State */}
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
-              <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-              <p className="text-gray-500 font-medium">Loading pricing plans...</p>
+            <div className="flex flex-col items-center justify-center py-16 gap-3">
+              <Loader2 className="w-8 h-8 text-[#055597] animate-spin" />
+              <p className="text-gray-500 font-medium text-sm">Loading pricing plans...</p>
             </div>
           ) : (
             <>
-              {/* Pricing Table with reduced height */}
-              <div className="table-wrap overflow-x-auto rounded-2xl border border-slate-200 shadow-lg bg-white">
-                <table className="w-full min-w-[920px] border-collapse">
+              {/* Pricing Table - More Compact */}
+              <div className="table-wrap overflow-x-auto rounded-xl border border-slate-200 shadow-sm bg-white">
+                <table className="w-full min-w-[800px] border-collapse text-sm">
                   <thead>
                     <tr>
-                      <th className="bg-[#0b1f3a] text-white p-4 text-left text-sm uppercase tracking-wide font-bold">
+                      <th className="bg-[#055597] text-white p-3 text-left text-xs uppercase tracking-wide font-bold rounded-tl-xl">
                         Feature / Benefit
                       </th>
-                      <th className="bg-[#0b1f3a] text-white p-4 text-center text-sm uppercase tracking-wide font-bold">
-                        <span className="block text-lg font-black">Guest</span>
-                        <span className="block text-xs font-medium text-slate-300 mt-1">Trial users</span>
+                      <th className="bg-[#055597] text-white p-3 text-center text-xs uppercase tracking-wide font-bold">
+                        <span className="block text-base font-black">Guest</span>
+                        <span className="block text-[11px] font-medium text-blue-100 mt-0.5">Trial users</span>
                       </th>
-                      <th className="bg-[#0b1f3a] text-white p-4 text-center text-sm uppercase tracking-wide font-bold">
-                        <span className="block text-lg font-black">Candidate Membership</span>
-                        <span className="block text-xs font-medium text-slate-300 mt-1">Active job seekers</span>
+                      <th className="bg-[#055597] text-white p-3 text-center text-xs uppercase tracking-wide font-bold">
+                        <span className="block text-base font-black">Candidate</span>
+                        <span className="block text-[11px] font-medium text-blue-100 mt-0.5">Job seekers</span>
                       </th>
-                      <th className="bg-[#0b1f3a] text-white p-4 text-center text-sm uppercase tracking-wide font-bold">
-                        <span className="block text-lg font-black">Freelancer Membership</span>
-                        <span className="block text-xs font-medium text-slate-300 mt-1">Resume pros & freelancers</span>
+                      <th className="bg-[#055597] text-white p-3 text-center text-xs uppercase tracking-wide font-bold rounded-tr-xl">
+                        <span className="block text-base font-black">Freelancer</span>
+                        <span className="block text-[11px] font-medium text-blue-100 mt-0.5">Resume pros</span>
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {/* Membership Price */}
                     <tr>
-                      <td className="p-4 text-left font-black text-slate-800 bg-slate-50 border-t border-slate-200">
+                      <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
                         Membership Price
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-white">
-                        <span className="text-slate-400 font-semibold">No Signup Required</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-white">
+                        <span className="text-slate-500 font-semibold text-xs">No Signup</span>
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-emerald-50/30">
-                        <span className="price text-3xl font-black text-slate-800">{formatPrice(pricing?.candidatePrice)}</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
+                        <span className="price text-2xl font-black text-slate-800">{formatPrice(pricing?.candidatePrice)}</span>
                         <br />
-                        <span className="text-xs text-slate-400 font-medium">/ {candidateDuration * 30} days</span>
+                        <span className="text-[11px] text-slate-500 font-medium">/ {candidateDuration * 30} days</span>
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-amber-50/30">
-                        <span className="price text-3xl font-black text-slate-800">{formatPrice(pricing?.freelancerPrice)}</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
+                        <span className="price text-2xl font-black text-slate-800">{formatPrice(pricing?.freelancerPrice)}</span>
                         <br />
-                        <span className="text-xs text-slate-400 font-medium">/ {freelancerDuration * 30} days</span>
+                        <span className="text-[11px] text-slate-500 font-medium">/ {freelancerDuration * 30} days</span>
                       </td>
                     </tr>
 
                     {/* Single Resume Download */}
                     <tr>
-                      <td className="p-4 text-left font-black text-slate-800 bg-slate-50 border-t border-slate-200">
+                      <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
                         Single Resume Download
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-white font-bold text-slate-800">
+                      <td className="p-3 text-center border-t border-slate-200 bg-white font-bold text-slate-700 text-sm">
                         ₹{guestDownloadPrice}
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-emerald-50/30 font-bold text-slate-800">
+                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30 font-bold text-slate-700 text-sm">
                         ₹{guestDownloadPrice}
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-amber-50/30 font-bold ttext-slate-800">
+                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30 font-bold text-slate-700 text-sm">
                         ₹{guestDownloadPrice}
                       </td>
                     </tr>
 
                     {/* AI Optimization Price */}
                     <tr>
-                      <td className="p-4 text-left font-black text-slate-800 bg-slate-50 border-t border-slate-200">
+                      <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
                         AI Optimization Price
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-white font-bold text-orange-600">
+                      <td className="p-3 text-center border-t border-slate-200 bg-white font-bold text-[#d29e3f] text-sm">
                         ₹{guestAiPrice}
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-emerald-50/30">
-                        <span className="font-bold text-emerald-700 text-lg">₹{candidateDiscountedAi.toFixed(2)}</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
+                        <span className="font-bold text-emerald-700 text-base">₹{candidateDiscountedAi.toFixed(2)}</span>
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-amber-50/30">
-                        <span className="font-bold text-emerald-700 text-lg">₹{freelancerDiscountedAi.toFixed(2)}</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
+                        <span className="font-bold text-emerald-700 text-base">₹{freelancerDiscountedAi.toFixed(2)}</span>
                       </td>
                     </tr>
 
                     {/* Savings on AI Optimization */}
                     <tr>
-                      <td className="p-4 text-left font-black text-slate-800 bg-slate-50 border-t border-slate-200">
-                        Savings on AI Optimization
+                      <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
+                        Savings on AI
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-white">
-                        <span className="text-slate-300 font-bold">—</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-white">
+                        <span className="text-slate-500 font-bold text-xs">—</span>
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-emerald-50/30">
-                        <span className="inline-block bg-green-100 text-green-700 font-black px-3 py-1 rounded-full text-xs">
+                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
+                        <span className="inline-block bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full text-[11px]">
                           {candidateDiscount}% OFF
                         </span>
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-amber-50/30">
-                        <span className="inline-block bg-amber-100 text-amber-700 font-black px-3 py-1 rounded-full text-xs">
+                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
+                        <span className="inline-block bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-full text-[11px]">
                           {freelancerDiscount}% OFF
                         </span>
                       </td>
@@ -207,61 +207,61 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
 
                     {/* Dashboard */}
                     <tr>
-                      <td className="p-4 text-left font-black text-slate-800 bg-slate-50 border-t border-slate-200">
-                        Dashboard
+                      <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
+                        Dashboard Access
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-white">
-                        <span className="text-slate-300 font-black">✕ Not included</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-white">
+                        <span className="text-slate-500 font-bold text-xs">✕ Not included</span>
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-emerald-50/30">
-                        <span className="text-emerald-600 font-black">✓ Personal Dashboard</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
+                        <span className="text-emerald-600 font-bold text-xs">✓ Personal Dashboard</span>
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-amber-50/30">
-                        <span className="text-emerald-600 font-black">✓ Professional Dashboard</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
+                        <span className="text-emerald-600 font-bold text-xs">✓ Professional Dashboard</span>
                       </td>
                     </tr>
 
                     {/* Resume Saving Limit */}
                     <tr>
-                      <td className="p-4 text-left font-black text-slate-800 bg-slate-50 border-t border-slate-200">
+                      <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
                         Resume Saving Limit
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-white">
-                        <span className="text-slate-300 font-black">✕ No</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-white">
+                        <span className="text-slate-500 font-bold text-xs">✕ No</span>
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-emerald-50/30">
-                        Save up to {candidateResumeLimit} resumes
+                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
+                        <span className="text-xs">Save up to {candidateResumeLimit} resumes</span>
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-amber-50/30">
-                        Save up to {freelancerResumeLimit} resumes
+                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
+                        <span className="text-xs">Save up to {freelancerResumeLimit} resumes</span>
                       </td>
                     </tr>
 
                     {/* CTA Buttons */}
                     <tr className="cta-row">
-                      <td className="p-4 text-left font-black text-slate-800 bg-slate-50 border-t border-slate-200">
+                      <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
                         Action
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-white">
+                      <td className="p-3 text-center border-t border-slate-200 bg-white">
                         <button
                           onClick={onClose}
-                          className="bg-slate-600 text-white px-5 py-2 rounded-xl font-bold text-sm hover:bg-slate-700 transition-all"
+                          className="bg-slate-500 text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-slate-600 transition-all"
                         >
                           Continue as Guest
                         </button>
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-emerald-50/30">
+                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
                         <button
                           onClick={() => handleSignup("candidate")}
-                          className="bg-emerald-600 text-white px-5 py-2 rounded-xl font-bold text-sm hover:bg-emerald-700 transition-all shadow-md"
+                          className="bg-[#055597] text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-[#04447a] transition-all shadow-sm"
                         >
                           Get Candidate Plan →
                         </button>
                       </td>
-                      <td className="p-4 text-center border-t border-slate-200 bg-amber-50/30">
+                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
                         <button
                           onClick={() => handleSignup("freelancer")}
-                          className="bg-amber-500 text-white px-5 py-2 rounded-xl font-bold text-sm hover:bg-amber-600 transition-all shadow-md"
+                          className="bg-[#d29e3f] text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-[#c18c2e] transition-all shadow-sm"
                         >
                           Get Freelancer Plan →
                         </button>
@@ -272,8 +272,8 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
               </div>
 
               {/* Footer Note */}
-              <p className="note text-center text-slate-400 text-sm mt-5">
-                Membership Plan renews every {candidateDuration * 30} days, Cancel anytime.
+              <p className="note text-center text-slate-500 text-[11px] mt-4">
+                Membership Plan renews every {candidateDuration * 30} days. Cancel anytime.
               </p>
             </>
           )}

@@ -1,22 +1,8 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { paymentAPI, pricingAPI } from "../../services/apiClient";
-import { motion } from "framer-motion";
-import {
-  X,
-  CreditCard,
-  Download,
-  Sparkles,
-  IndianRupee,
-  CheckCircle,
-  Check,
-  Loader2,
-  Lock,
-  Crown,
-  ArrowRight,
-  Zap,
-  FastForward,
-} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Loader2, Download, Sparkles, Check, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 declare global {
@@ -30,7 +16,7 @@ interface PaymentModalProps {
   onClose: () => void;
   resumeId?: string;
   type: "download" | "ai";
-  onSuccess: () => void;
+  onSuccess: (finalType: "download" | "ai") => void;
 }
 
 export default function PaymentModal({
@@ -43,133 +29,120 @@ export default function PaymentModal({
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<"guest" | "candidate" | "freelancer">("guest");
+  const [downloadType, setDownloadType] = useState<"no_ai" | "ai">("no_ai");
   const [pricing, setPricing] = useState<any>(null);
 
   useEffect(() => {
     if (open) {
       setPaymentSuccess(false);
       setLoading(false);
+      // Sync initial type prop to current selection state
+      setDownloadType(type === "ai" ? "ai" : "no_ai");
 
       if (!pricing) {
         pricingAPI
           .get()
           .then((res) => {
-            // Handle both response structures
             const data = res.data?.data || res.data;
             setPricing(data);
           })
           .catch((err) => console.error("Failed to load pricing:", err));
       }
     }
-  }, [open, pricing]);
+  }, [open, type, pricing]);
 
   if (!open) return null;
 
   const isUser = !!localStorage.getItem("token");
 
-  const formatPrice = (paisa?: number) => {
-    if (!paisa && paisa !== 0) return "₹0";
-    const rupees = (paisa / 100).toFixed(2);
-    return `₹${rupees}`;
+  // Helper functions to format prices with 2 decimals
+  const formatPrice = (rupees: number) => {
+    return rupees.toFixed(2);
   };
 
-  const formatPriceNumber = (paisa?: number) => {
-    if (!paisa && paisa !== 0) return "0";
-    return (paisa / 100).toFixed(2);
+  // Dynamic values from backend
+  const getPlanPrice = (plan: string) => {
+    if (!pricing) return plan === "guest" ? 0 : plan === "candidate" ? 29 : 99;
+    if (plan === "guest") return 0;
+    if (plan === "candidate") return pricing.candidatePrice / 100;
+    return pricing.freelancerPrice / 100;
   };
 
-  const getPaymentDetails = () => {
-    let dynamicAmount = null;
+  const getDownloadPrice = (dlType: string) => {
+    if (!pricing) return dlType === "no_ai" ? 9 : 49;
+    if (dlType === "no_ai") return pricing.guestDownload / 100;
+    return pricing.guestAi / 100;
+  };
+
+  const getPlanDuration = (plan: string) => {
+    if (!pricing) return 3;
+    if (plan === "candidate") return pricing.candidateDurationMonths || 3;
+    if (plan === "freelancer") return pricing.freelancerDurationMonths || 3;
+    return 0;
+  };
+
+  const getResumeLimit = (plan: string) => {
+    if (!pricing) return plan === "candidate" ? 5 : 100;
+    if (plan === "candidate") return pricing.candidateResumeLimit || 5;
+    if (plan === "freelancer") return pricing.freelancerResumeLimit || 100;
+    return 0;
+  };
+
+  const getAIDiscount = (plan: string) => {
+    if (!pricing) return plan === "candidate" ? 25 : 50;
+    if (plan === "candidate") return pricing.candidateAiDiscount || 25;
+    if (plan === "freelancer") return pricing.freelancerAiDiscount || 50;
+    return 0;
+  };
+
+  const getUserDiscount = () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      if (user.subscriptionPlan === "freelancer") {
+        return pricing?.freelancerAiDiscount || 50;
+      } else if (user.subscriptionPlan === "candidate") {
+        return pricing?.candidateAiDiscount || 25;
+      }
+    } catch (e) {
+      return 0;
+    }
+    return 0;
+  };
+
+  const getDiscountedAIPrice = () => {
+    if (downloadType !== "ai") return getDownloadPrice("ai");
     let discount = 0;
-    let originalAmount = null;
-
-    if (pricing) {
-      if (type === "download") {
-        originalAmount = pricing.guestDownload;
-        dynamicAmount = pricing.guestDownload / 100;
-      } else {
-        originalAmount = pricing.guestAi;
-        if (isUser) {
-          try {
-            const user = JSON.parse(localStorage.getItem("user") || "{}");
-            if (user.subscriptionPlan === "freelancer") {
-              discount = pricing.freelancerAiDiscount || 0;
-            } else if (user.subscriptionPlan === "candidate") {
-              discount = pricing.candidateAiDiscount || 0;
-            } else {
-              discount = pricing.candidateAiDiscount || 0;
-            }
-          } catch (e) {
-            discount = pricing.candidateAiDiscount || 0;
-          }
-        }
-        dynamicAmount = (pricing.guestAi * (1 - discount / 100)) / 100;
-      }
-    }
-
-    if (type === "download") {
-      const baseDetails: any = {
-        title: "Unlock Premium Export",
-        description:
-          "Get your professionally crafted resume in industry-standard formats.",
-        amount: dynamicAmount,
-        originalAmount: originalAmount ? originalAmount / 100 : null,
-        discount: discount,
-        icon: Download,
-        features: [
-          "PDF format with perfect ATS layout",
-          "Word document for easy fine-tuning",
-          "High-quality print ready format",
-          "Instant download after secure checkout",
-        ],
-      };
-
-      if (!isUser && selectedPlan && pricing) {
-        const planPrice = (selectedPlan === 'candidate' ? pricing.candidatePrice : pricing.freelancerPrice) / 100;
-        baseDetails.totalAmount = baseDetails.amount + planPrice;
-        baseDetails.planPrice = planPrice;
-      } else {
-        baseDetails.totalAmount = baseDetails.amount;
-      }
-      return baseDetails;
+    if (isUser) {
+      discount = getUserDiscount();
     } else {
-      const baseDetails: any = {
-        title: "Deep AI Enhancement",
-        description:
-          "Upgrade your resume sentences with data-driven, ATS-tested improvements.",
-        amount: dynamicAmount,
-        originalAmount: originalAmount ? originalAmount / 100 : null,
-        discount: discount,
-        icon: Sparkles,
-        features: [
-          "Professional high-impact suggestions",
-          "Grammar, tone and phrasing improvements",
-          "Keyword injection for ATS bypass",
-          "Deep clarity and flow adjustments",
-          "Data-driven measurable impact metrics",
-          "1 free download Docx/Pdf credit",
-        ],
-      };
-
-      if (!isUser && selectedPlan && pricing) {
-        const planPrice = (selectedPlan === 'candidate' ? pricing.candidatePrice : pricing.freelancerPrice) / 100;
-        const planDiscount = selectedPlan === 'candidate' ? pricing.candidateAiDiscount : pricing.freelancerAiDiscount;
-        const discountedAiPrice = (pricing.guestAi * (1 - (planDiscount || 0) / 100)) / 100;
-        
-        baseDetails.amount = discountedAiPrice; // Update shown amount to discounted version
-        baseDetails.totalAmount = discountedAiPrice + planPrice;
-        baseDetails.planPrice = planPrice;
-        baseDetails.discount = planDiscount;
-      } else {
-        baseDetails.totalAmount = baseDetails.amount;
-      }
-      return baseDetails;
+      discount = getAIDiscount(selectedPlan);
     }
+    const originalPrice = getDownloadPrice("ai");
+    return originalPrice * (1 - discount / 100);
   };
 
-  const details = getPaymentDetails();
-  const Icon = details.icon;
+  const calculateTotal = () => {
+    let planCost = 0;
+    let downloadCost = getDownloadPrice(downloadType);
+    
+    if (isUser) {
+      // For logged-in users, no plan cost, but apply their subscription discount
+      if (downloadType === "ai") {
+        const discount = getUserDiscount();
+        downloadCost = downloadCost * (1 - discount / 100);
+      }
+    } else {
+      planCost = getPlanPrice(selectedPlan);
+      // Apply membership discount logic to AI choice if applicable
+      if (downloadType === "ai" && selectedPlan !== "guest") {
+        const discount = getAIDiscount(selectedPlan);
+        downloadCost = downloadCost * (1 - discount / 100);
+      }
+    }
+    
+    return planCost + downloadCost;
+  };
 
   const loadRazorpay = () => {
     return new Promise((resolve) => {
@@ -186,11 +159,11 @@ export default function PaymentModal({
       toast.error("Resume ID not found");
       return;
     }
-    if (details.amount === null) return;
 
-    if (!isUser && selectedPlan) {
+    // For non-logged-in users who selected a paid plan, redirect to signup
+    if (!isUser && selectedPlan !== "guest") {
       onClose();
-      const redirectUrl = `/register?plan=${selectedPlan}${resumeId ? `&resumeId=${resumeId}` : ""}&individualType=${type}&redirect=payment`;
+      const redirectUrl = `/register?plan=${selectedPlan}&resumeId=${resumeId}&individualType=${downloadType === "ai" ? "ai" : "download"}&redirect=payment`;
       navigate(redirectUrl);
       return;
     }
@@ -205,7 +178,7 @@ export default function PaymentModal({
         return;
       }
 
-      const { data: order } = await paymentAPI.createOrder(type);
+      const { data: order } = await paymentAPI.createOrder(downloadType === "ai" ? "ai" : "download");
       const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
       if (!razorpayKey) {
@@ -219,7 +192,7 @@ export default function PaymentModal({
         amount: order.amount,
         currency: order.currency || "INR",
         name: "ResumeYatra Pro",
-        description: details.title,
+        description: downloadType === "ai" ? "Deep AI Enhancement" : "Unlock Premium Export",
         image: "/logo.png",
         order_id: order.id,
         handler: async function (response: any) {
@@ -229,14 +202,14 @@ export default function PaymentModal({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_signature: response.razorpay_signature,
               resumeId,
-              type,
+              type: downloadType === "ai" ? "ai" : "download",
             });
 
             setPaymentSuccess(true);
             toast.success("Payment successful");
 
             setTimeout(() => {
-              onSuccess();
+              onSuccess(downloadType === "ai" ? "ai" : "download");
               onClose();
             }, 1800);
           } catch (err) {
@@ -256,10 +229,6 @@ export default function PaymentModal({
       };
 
       const rzp = new window.Razorpay(options);
-      rzp.on("payment.failed", function (response: any) {
-        toast.error(response.error.description);
-        setLoading(false);
-      });
       rzp.open();
     } catch (err: any) {
       console.error("Payment error:", err);
@@ -268,21 +237,50 @@ export default function PaymentModal({
     }
   };
 
-  const handleSignupForPlan = (plan: string) => {
-    if (selectedPlan === plan) {
-      setSelectedPlan(null);
+  const getPlanLabel = () => {
+    if (isUser) return "Member";
+    if (selectedPlan === "guest") return "Guest";
+    return selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1);
+  };
+
+  const getDownloadLabel = () => {
+    return downloadType === "ai" ? "AI Optimized" : "No AI";
+  };
+
+  const getFeatures = () => {
+    if (downloadType === "no_ai") {
+      return [
+        "PDF format with perfect ATS layout",
+        "Word document for easy fine-tuning",
+        "High-quality print ready format",
+        "Instant download after secure checkout",
+      ];
     } else {
-      setSelectedPlan(plan);
+      return [
+        "Professional high-impact suggestions",
+        "Grammar, tone and phrasing improvements",
+        "Keyword injection for ATS bypass",
+        "Deep clarity and flow adjustments",
+        "Data-driven measurable impact metrics",
+        "1 free download Docx/Pdf credit",
+      ];
     }
   };
 
-  const getDiscountedPriceForPlan = (discountPercent: number) => {
-    if (type === "ai" && pricing) {
-      const guestPrice = pricing?.guestAi || 0;
-      const discounted = guestPrice * (1 - discountPercent / 100);
-      return discounted / 100;
+  const getTitle = () => {
+    if (downloadType === "no_ai") {
+      return "Unlock Premium Export";
+    } else {
+      return "Deep AI Enhancement";
     }
-    return null;
+  };
+
+  const getDescription = () => {
+    if (downloadType === "no_ai") {
+      return "Get your professionally crafted resume in industry-standard formats.";
+    } else {
+      return "Upgrade your resume sentences with data-driven, ATS-tested improvements.";
+    }
   };
 
   if (paymentSuccess) {
@@ -300,13 +298,15 @@ export default function PaymentModal({
             transition={{ type: "spring", delay: 0.1 }}
             className="relative z-10"
           >
-            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-green-600 text-2xl font-bold">✓</span>
+            </div>
           </motion.div>
           <h3 className="text-2xl font-bold text-slate-800 relative z-10 mb-2">
             Payment Successful
           </h3>
           <p className="text-slate-500 relative z-10">
-            {type === "download"
+            {downloadType as any === "download"
               ? "Your premium resume is being prepared for download."
               : "Accessing deep AI models to enhance your resume."}
           </p>
@@ -315,34 +315,36 @@ export default function PaymentModal({
     );
   }
 
-  return (
-    <div
-      className="fixed inset-0 bg-[#01467d]/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4 overflow-y-auto"
-      onClick={!loading ? onClose : undefined}
-    >
-      <motion.div
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 50, opacity: 0 }}
-        className={`bg-white rounded-[2rem] overflow-hidden shadow-[0_30px_60px_-15px_rgba(1,70,125,0.4)] relative my-8 ${
-          isUser ? "w-full max-w-md" : "w-full max-w-5xl"
-        }`}
-        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+  // Logged-in user UI - Clean professional design
+  if (isUser) {
+    const discount = downloadType === "ai" ? getUserDiscount() : 0;
+    const originalPrice = getDownloadPrice(downloadType);
+    const finalPrice = discount > 0 ? originalPrice * (1 - discount / 100) : originalPrice;
+    
+    return (
+      <div
+        className="fixed inset-0 bg-[#01467d]/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4 overflow-y-auto"
+        onClick={!loading ? onClose : undefined}
       >
-        {/* Close Button - Top Right of Modal */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors z-50 bg-white/80 hover:bg-white p-2 rounded-full cursor-pointer shadow-sm"
-          disabled={loading}
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 50, opacity: 0 }}
+          className="bg-white rounded-[2rem] overflow-hidden shadow-[0_30px_60px_-15px_rgba(1,70,125,0.4)] relative my-8 w-full max-w-md"
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
         >
-          <X className="w-5 h-5 pointer-events-none" />
-        </button>
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors z-50 bg-white/80 hover:bg-white p-2 rounded-full cursor-pointer shadow-sm"
+            disabled={loading}
+          >
+            <X className="w-5 h-5 pointer-events-none" />
+          </button>
 
-        <div className={`${isUser ? "grid grid-cols-1" : "grid grid-cols-1 md:grid-cols-2"}`}>
-          {/* Left Column - Current Payment */}
           <div className="relative">
             {/* Decorative Header Background */}
-            <div className="absolute top-0 left-0 right-0 h-[22vh] bg-gradient-to-br from-[#01467d] to-[#013a66] pointer-events-none rounded-tl-[2rem] md:rounded-tr-none rounded-tr-[2rem]">
+            <div className="absolute top-0 left-0 right-0 h-[22vh] bg-gradient-to-br from-[#01467d] to-[#013a66] pointer-events-none rounded-t-[2rem]">
               <div
                 className="absolute inset-0 opacity-10"
                 style={{
@@ -356,13 +358,17 @@ export default function PaymentModal({
             <div className="relative z-10 pt-8 px-6 pb-6 text-center text-white pointer-events-none">
               <div className="w-14 h-14 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20 shadow-xl overflow-hidden relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
-                <Icon className="w-7 h-7 text-[#dea42c] relative z-10" />
+                {downloadType === "no_ai" ? (
+                  <Download className="w-7 h-7 text-[#dea42c] relative z-10" />
+                ) : (
+                  <Sparkles className="w-7 h-7 text-[#dea42c] relative z-10" />
+                )}
               </div>
               <h2 className="text-[22px] font-extrabold tracking-tight mb-1.5">
-                {details.title}
+                {getTitle()}
               </h2>
               <p className="text-blue-100 text-sm opacity-90 mx-auto max-w-[280px] leading-relaxed">
-                {details.description}
+                {getDescription()}
               </p>
             </div>
 
@@ -372,46 +378,31 @@ export default function PaymentModal({
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">
                     Total Amount
                   </span>
-                  {details.amount === null ? (
-                    <div className="flex items-center justify-center gap-2 text-slate-400 h-10">
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span className="text-sm font-medium">
-                        Fetching price...
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center">
-                      <div className="flex items-center gap-2">
-                        {details.originalAmount && details.discount > 0 && (
-                          <span className="text-lg font-medium text-slate-400 line-through">
-                            ₹{details.originalAmount.toFixed(2)}
-                          </span>
-                        )}
-                        <div className="flex items-center text-3xl font-extrabold text-slate-800 tracking-tight">
-                          <span className="text-xl mr-0.5 font-bold text-slate-400">
-                            ₹
-                          </span>
-                          {details.totalAmount?.toFixed(2)}
-                        </div>
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="flex items-center gap-2">
+                      {discount > 0 && (
+                        <span className="text-lg font-medium text-slate-400 line-through">
+                          ₹{formatPrice(originalPrice)}
+                        </span>
+                      )}
+                      <div className="flex items-center text-3xl font-extrabold text-slate-800 tracking-tight">
+                        <span className="text-xl mr-0.5 font-bold text-slate-400">
+                          ₹
+                        </span>
+                        {formatPrice(finalPrice)}
                       </div>
-                      {details.discount > 0 && (
-                        <div className="mt-1.5 bg-green-100 text-green-700 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1">
-                          <Check className="w-2.5 h-2.5" /> {details.discount}%
-                          Discount Applied
-                        </div>
-                      )}
-                      {!isUser && selectedPlan && (
-                        <div className="mt-1 text-[10px] text-slate-500 font-medium">
-                          Includes {selectedPlan === 'candidate' ? 'Candidate' : 'Freelancer'} Plan (₹{details.planPrice.toFixed(2)})
-                        </div>
-                      )}
                     </div>
-                  )}
+                    {discount > 0 && (
+                      <div className="mt-1.5 bg-green-100 text-green-700 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1">
+                        <Check className="w-2.5 h-2.5" /> {discount}% Discount Applied
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
               <div className="space-y-3 mb-6 px-1">
-                {details.features.map((feature:any, idx:any) => (
+                {getFeatures().map((feature, idx) => (
                   <div key={idx} className="flex items-start gap-3">
                     <div className="mt-0.5 w-5 h-5 rounded-full bg-[#01467d]/10 border border-[#01467d]/20 flex items-center justify-center shrink-0">
                       <Check className="w-3 h-3 text-[#01467d]" />
@@ -425,7 +416,7 @@ export default function PaymentModal({
 
               <button
                 onClick={handlePayment}
-                disabled={loading || details.amount === null}
+                disabled={loading}
                 className="group relative w-full h-[52px] bg-[#01467d] text-white rounded-[1rem] font-bold text-sm overflow-hidden transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:hover:scale-100 shadow-[0_10px_20px_-10px_rgba(1,70,125,0.5)] hover:shadow-[0_15px_25px_-10px_rgba(1,70,125,0.6)]"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-[#dea42c] to-[#c48b1f] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
@@ -437,221 +428,235 @@ export default function PaymentModal({
                     </>
                   ) : (
                     <>
-                      <Lock className="w-3.5 h-3.5 opacity-70" /> {selectedPlan ? "Sign Up & Pay" : "Pay"} ₹
-                      {details.totalAmount !== null ? details.totalAmount.toFixed(2) : "..."}
+                      <Lock className="w-3.5 h-3.5 opacity-70" /> Pay ₹
+                      {formatPrice(finalPrice)}
                     </>
                   )}
                 </span>
               </button>
 
               <p className="text-center text-[10px] text-slate-400 mt-4 flex items-center justify-center gap-1.5 font-medium uppercase tracking-wider">
-                <Lock className="w-2.5 h-2.5" /> Secure 256-bit Encrypted
-                Checkout
+                <Lock className="w-2.5 h-2.5" /> Secure 256-bit Encrypted Checkout
               </p>
             </div>
           </div>
+        </motion.div>
+      </div>
+    );
+  }
 
-          {/* Right Column - Plan Suggestions (Only for non-logged-in users) */}
-          {!isUser && (
-            <div className="bg-gradient-to-br from-slate-50 to-gray-50 p-6 rounded-r-[2rem] border-l border-gray-100">
-              <div className="mb-5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Crown className="w-5 h-5 text-amber-500" />
-                  <h3 className="font-bold text-slate-800 text-lg">
-                    Save More with Plans
-                  </h3>
+  // Non-logged-in user UI - Plan selection UI
+  return (
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 15 }}
+            className="bg-[#f7f8fa] rounded-3xl shadow-2xl overflow-hidden w-full max-w-[600px] border border-gray-100 relative"
+          >
+            {/* Close Button Header */}
+            <div className="bg-white pt-5 pb-4 px-6 flex flex-col items-center relative border-b border-gray-50">
+              <button
+                onClick={onClose}
+                className="absolute -top-5 bg-[#334155] text-white hover:bg-slate-800 rounded-full p-2.5 transition-all shadow-md transform translate-y-1/2"
+                disabled={loading}
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-3 mt-4 self-start">
+                <div className="bg-[#e0f2fe] text-[#0369a1] font-black text-lg p-2.5 rounded-xl tracking-tight w-11 h-11 flex items-center justify-center shadow-sm">
+                  RY
                 </div>
-                <p className="text-xs text-slate-500">
-                  Get unlimited access and exclusive discounts with our
-                  subscription plans
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {/* Candidate Plan */}
-                {pricing && (
-                  <div
-                    className={`bg-white rounded-xl p-4 border transition-all cursor-pointer group relative ${
-                      selectedPlan === "candidate" 
-                        ? "border-[#01467d] ring-2 ring-[#01467d]/10 shadow-md" 
-                        : "border-emerald-100 shadow-sm hover:shadow-md"
-                    }`}
-                    onClick={() => handleSignupForPlan("candidate")}
-                  >
-                    {selectedPlan === "candidate" && (
-                      <div className="absolute -top-2 -left-2 bg-[#01467d] text-white p-1 rounded-full z-10 shadow-sm transform scale-100 animate-in zoom-in duration-300">
-                        <Check className="w-3 h-3" />
-                      </div>
-                    )}
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-slate-800">
-                            Candidate Plan
-                          </h4>
-                          <span className="bg-emerald-100 text-emerald-700 text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-                            Popular
-                          </span>
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-0.5">
-                          Best for active job seekers
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-black text-slate-800">
-                          {formatPrice(pricing.candidatePrice)}
-                        </div>
-                        <div className="text-[9px] text-slate-400">
-                          for {pricing.candidateDurationMonths || 3} months
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-1.5 mt-3 mb-3">
-                      <span className="text-[9px] bg-slate-100 text-slate-600 px-2 py-1 rounded-full">
-                        Up to {pricing.candidateResumeLimit || 5} resumes
-                      </span>
-                      <span className="text-[9px] bg-slate-100 text-slate-600 px-2 py-1 rounded-full">
-                        {pricing.candidateAiDiscount || 25}% AI discount
-                      </span>
-                    </div>
-
-                    {/* Show discounted price for AI enhancement */}
-                    {type === "ai" && (
-                      <div className="mb-2 p-2 bg-emerald-50 rounded-lg">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] text-emerald-700 font-medium">
-                            Your price with this plan:
-                          </span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-[9px] text-slate-400 line-through">
-                              ₹{formatPriceNumber(pricing.guestAi)}
-                            </span>
-                            <span className="text-sm font-bold text-emerald-700">
-                              ₹{getDiscountedPriceForPlan(pricing.candidateAiDiscount || 25)?.toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-                      <div className="flex items-center gap-1">
-                        <Zap className="w-3 h-3 text-emerald-500" />
-                        <span className="text-[10px] text-emerald-600 font-medium">
-                          Save {pricing.candidateAiDiscount || 25}% on this
-                          purchase
-                        </span>
-                      </div>
-                      <div className="text-emerald-600 text-xs font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
-                        {selectedPlan === "candidate" ? "Selected" : "Select Plan"} <ArrowRight className="w-3 h-3" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Freelancer Plan */}
-                {pricing && (
-                  <div
-                    className={`bg-white rounded-xl p-4 border transition-all cursor-pointer group relative ${
-                      selectedPlan === "freelancer" 
-                        ? "border-[#c48b1f] ring-2 ring-[#c48b1f]/10 shadow-md" 
-                        : "border-gray-100 shadow-sm hover:shadow-md"
-                    }`}
-                    onClick={() => handleSignupForPlan("freelancer")}
-                  >
-                    {selectedPlan === "freelancer" && (
-                      <div className="absolute -top-2 -left-2 bg-[#c48b1f] text-white p-1 rounded-full z-10 shadow-sm transform scale-100 animate-in zoom-in duration-300">
-                        <Check className="w-3 h-3" />
-                      </div>
-                    )}
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-slate-800">
-                            Freelancer Plan
-                          </h4>
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-0.5">
-                          For high-volume professionals
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-black text-slate-800">
-                          {formatPrice(pricing.freelancerPrice)}
-                        </div>
-                        <div className="text-[9px] text-slate-400">
-                          for {pricing.freelancerDurationMonths || 3} months
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-1.5 mt-3 mb-3">
-                      <span className="text-[9px] bg-slate-100 text-slate-600 px-2 py-1 rounded-full">
-                        Up to {pricing.freelancerResumeLimit || 100} resumes
-                      </span>
-                      <span className="text-[9px] bg-slate-100 text-slate-600 px-2 py-1 rounded-full">
-                        {pricing.freelancerAiDiscount || 50}% AI discount
-                      </span>
-                    </div>
-
-                    {/* Show discounted price for AI enhancement */}
-                    {type === "ai" && (
-                      <div className="mb-2 p-2 bg-blue-50 rounded-lg">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] text-blue-700 font-medium">
-                            Your price with this plan:
-                          </span>
-                          <div className="flex items-center gap-1">
-                            <span className="text-[9px] text-slate-400 line-through">
-                              ₹{formatPriceNumber(pricing.guestAi)}
-                            </span>
-                            <span className="text-sm font-bold text-blue-700">
-                              ₹{getDiscountedPriceForPlan(pricing.freelancerAiDiscount || 50)?.toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-                      <div className="flex items-center gap-1">
-                        <FastForward className="w-3 h-3 text-blue-500" />
-                        <span className="text-[10px] text-blue-600 font-medium">
-                          Save {pricing.freelancerAiDiscount || 50}% on this
-                          purchase
-                        </span>
-                      </div>
-                      <div className="text-blue-600 text-xs font-semibold flex items-center gap-1 group-hover:gap-2 transition-all">
-                        {selectedPlan === "freelancer" ? "Selected" : "Select Plan"} <ArrowRight className="w-3 h-3" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Value Comparison */}
-                <div className="mt-6 p-3 bg-amber-50 rounded-xl border border-amber-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <IndianRupee className="w-4 h-4 text-amber-600" />
-                    <span className="text-xs font-semibold text-amber-700">
-                      Value Highlight
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-amber-800 leading-relaxed">
-                    With Candidate Plan, you get{" "}
-                    {pricing?.candidateAiDiscount || 25}% off AI enhancements +
-                    {pricing?.candidateResumeLimit || 5} free resume downloads.
-                    That's {(pricing?.candidateAiDiscount || 25) + 15}%+
-                    savings!
-                  </p>
+                <div>
+                  <h2 className="text-[21px] font-extrabold text-[#0f172a] tracking-tight">ResumeYatra Checkout</h2>
+                  <p className="text-xs text-gray-500 font-medium mt-0.5">Choose your plan and download type before payment</p>
                 </div>
               </div>
-
-              
             </div>
-          )}
+
+            {/* Scrollable Form Content */}
+            <div className="p-5 max-h-[70vh] overflow-y-auto space-y-6">
+              {/* SECTION 1: Choose Your Plan */}
+              <div>
+                <h3 className="text-[15px] font-bold text-[#0f172a] mb-0.5">Choose Your Plan</h3>
+                <p className="text-xs text-gray-400 font-medium mb-3">Select any 1</p>
+                
+                <div className="space-y-2.5">
+                  {/* Guest Option */}
+                  <label className={`flex items-center justify-between bg-white border rounded-2xl p-4 cursor-pointer transition-all ${selectedPlan === "guest" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="plan"
+                        checked={selectedPlan === "guest"}
+                        onChange={() => setSelectedPlan("guest")}
+                        className="w-5 h-5 accent-emerald-600 cursor-pointer"
+                      />
+                      <div>
+                        <span className="font-bold text-[#1e293b] text-[15px] block">Guest Plan</span>
+                        <span className="text-xs text-gray-400 font-medium">No Signup Required</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#1e293b] text-base">₹0.00</span>
+                      <div className="w-[3px] h-4 bg-orange-400 rounded-full" />
+                    </div>
+                  </label>
+
+                  {/* Candidate Option */}
+                  <label className={`flex items-center justify-between bg-white border rounded-2xl p-4 cursor-pointer transition-all ${selectedPlan === "candidate" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="plan"
+                        checked={selectedPlan === "candidate"}
+                        onChange={() => setSelectedPlan("candidate")}
+                        className="w-5 h-5 accent-emerald-600 cursor-pointer"
+                      />
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#1e293b] text-[15px]">Candidate Membership</span>
+                          <span className="bg-emerald-50 text-[10px] text-emerald-600 font-bold px-1.5 py-0.5 rounded-md tracking-wide uppercase">Popular</span>
+                        </div>
+                        <span className="text-xs text-gray-400 font-medium">
+                          ₹{formatPrice(getPlanPrice("candidate"))} / {getPlanDuration("candidate") * 30} days · 
+                          Save up to {getResumeLimit("candidate")} resumes · 
+                          {getAIDiscount("candidate")}% AI discount
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#1e293b] text-base">+ ₹{formatPrice(getPlanPrice("candidate"))}</span>
+                      <div className="w-[3px] h-4 bg-slate-300 rounded-full" />
+                    </div>
+                  </label>
+
+                  {/* Freelancer Option */}
+                  <label className={`flex items-center justify-between bg-white border rounded-2xl p-4 cursor-pointer transition-all ${selectedPlan === "freelancer" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="radio"
+                        name="plan"
+                        checked={selectedPlan === "freelancer"}
+                        onChange={() => setSelectedPlan("freelancer")}
+                        className="w-5 h-5 accent-emerald-600 cursor-pointer"
+                      />
+                      <div>
+                        <span className="font-bold text-[#1e293b] text-[15px] block">Freelancer Membership</span>
+                        <span className="text-xs text-gray-400 font-medium">
+                          ₹{formatPrice(getPlanPrice("freelancer"))} / {getPlanDuration("freelancer") * 30} days · 
+                          Save up to {getResumeLimit("freelancer")} resumes · 
+                          {getAIDiscount("freelancer")}% AI discount
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[#1e293b] text-base">+ ₹{formatPrice(getPlanPrice("freelancer"))}</span>
+                      <div className="w-[3px] h-4 bg-slate-300 rounded-full" />
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* SECTION 2: Choose Resume Download */}
+              <div>
+                <h3 className="text-[15px] font-bold text-[#0f172a] mb-0.5">Choose Resume Download</h3>
+                <p className="text-xs text-gray-400 font-medium mb-3">Select any 1</p>
+
+                <div className="space-y-2.5">
+                  {/* No AI Option */}
+                  <div 
+                    className={`bg-white border rounded-2xl p-4 cursor-pointer transition-all ${downloadType === "no_ai" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
+                    onClick={() => setDownloadType("no_ai")}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${downloadType === "no_ai" ? "border-emerald-500 bg-emerald-500" : "border-gray-300"}`}>
+                          {downloadType === "no_ai" && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                        </div>
+                        <div>
+                          <span className="font-bold text-[#1e293b] text-[15px] block">No AI</span>
+                          <span className="text-xs text-gray-400 font-medium">Clean resume download in PDF/DOC</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-[#1e293b] text-base">₹{formatPrice(getDownloadPrice("no_ai"))}</span>
+                        <div className="w-[3px] h-4 bg-orange-400 rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* AI Optimized Option */}
+                  <div 
+                    className={`bg-white border rounded-2xl p-4 cursor-pointer transition-all ${downloadType === "ai" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
+                    onClick={() => setDownloadType("ai")}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${downloadType === "ai" ? "border-emerald-500 bg-emerald-500" : "border-gray-300"}`}>
+                          {downloadType === "ai" && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-bold text-pink-500 block mb-0.5">Recommended</span>
+                          <span className="font-bold text-[#1e293b] text-[15px] block">AI Optimized</span>
+                          <span className="text-xs text-gray-400 font-medium">Profile summary rewrite · role-specific summary · structured skills</span>
+                          {selectedPlan !== "guest" && downloadType === "ai" && (
+                            <span className="text-[10px] text-emerald-600 font-medium block mt-1">
+                              {getAIDiscount(selectedPlan)}% discount applied with {getPlanLabel()} plan
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {selectedPlan !== "guest" && downloadType === "ai" && (
+                          <span className="text-xs text-gray-400 line-through">₹{formatPrice(getDownloadPrice("ai"))}</span>
+                        )}
+                        <span className="font-bold text-[#1e293b] text-base">
+                          ₹{selectedPlan !== "guest" && downloadType === "ai" 
+                            ? formatPrice(getDiscountedAIPrice())
+                            : formatPrice(getDownloadPrice("ai"))
+                          }
+                        </span>
+                        <div className="w-[3px] h-4 bg-slate-300 rounded-full" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Sticky Action Bar */}
+            <div className="bg-white border-t border-gray-100 p-4 flex gap-3 items-center">
+              <div className="bg-[#f8fafc] border border-gray-200/60 rounded-xl py-2 px-3 flex flex-col justify-center min-w-[140px] max-w-[160px] shadow-inner">
+                <span className="text-[10px] text-gray-400 font-bold tracking-wider uppercase">SELECTED</span>
+                <span className="text-xs font-black text-slate-800 truncate mt-0.5">
+                  {getPlanLabel()} + {getDownloadLabel()}
+                </span>
+                {selectedPlan !== "guest" && downloadType === "ai" && (
+                  <span className="text-[9px] text-emerald-600 font-medium mt-0.5">
+                    {getAIDiscount(selectedPlan)}% off on AI
+                  </span>
+                )}
+              </div>
+
+              <button
+                onClick={handlePayment}
+                disabled={loading}
+                className="flex-1 bg-[#10b981] hover:bg-[#059669] text-white text-base font-bold py-3.5 px-4 rounded-xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {loading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>Pay & Download | ₹{formatPrice(calculateTotal())}</>
+                )}
+              </button>
+            </div>
+          </motion.div>
         </div>
-      </motion.div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 }

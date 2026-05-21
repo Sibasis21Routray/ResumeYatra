@@ -145,14 +145,17 @@ export async function verifyPayment(req, res) {
       razorpay_payment_id,
       razorpay_signature,
       resumeId,
-      type,
-      includeItem,
+      type: rawType,
+      includeItem: rawIncludeItem,
     } = req.body;
+
+    const type = typeof rawType === 'string' ? rawType.trim() : rawType;
+    const includeItem = typeof rawIncludeItem === 'string' ? rawIncludeItem.trim() : rawIncludeItem;
 
     const userId = (req as any).userId || null;
     const guestId = getGuestId(req.headers);
 
-    console.log(`[verifyPayment] START - resumeId: ${resumeId}, userId: ${userId}, guestId: ${guestId}, type: ${type}`);
+    console.log(`[verifyPayment] START - resumeId: ${resumeId}, userId: ${userId}, guestId: ${guestId}, type: ${type}, includeItem: ${includeItem}`);
 
     //  Basic validation
     if (!type || (!resumeId && !type.startsWith("subscription"))) {

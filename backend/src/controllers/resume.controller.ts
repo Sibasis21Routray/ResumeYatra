@@ -1332,6 +1332,7 @@ export async function markPaid(req: Request, res: Response) {
       resume.isDownloadPaid = true;
     } else if (type === "ai") {
       resume.isAiPaid = true;
+      resume.isDownloadPaid = true; // AI optimization includes 1 download credit
     }
 
     await resume.save();
