@@ -1125,7 +1125,7 @@ export default function PreviewPage() {
           </div>
         )}
 
-        <div className="w-full min-h-[calc(100vh-112px)] max-w-screen-2xl mx-auto">
+        <div className="w-full min-h-[calc(100vh-112px)] max-w-[1600px] mx-auto">
           {isSidebarOpen && (
             <div
               className="fixed inset-0 bg-black/50 z-40 sm:hidden"
@@ -1448,7 +1448,7 @@ export default function PreviewPage() {
               `}
             >
               <div className="rounded-xl h-full sm:h-auto">
-                <div className="p-4">
+                <div className="">
                   {showSettings && showTemplates && (
                     <div>
                       <div className="mb-6">
