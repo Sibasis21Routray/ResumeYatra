@@ -38,46 +38,14 @@ export default function LoginPage({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center p-6 overflow-hidden bg-gradient-to-br from-white via-blue-50 to-blue-100">
-      {/* --- DESIGN BACKGROUND ELEMENTS --- */}
-      <div className="absolute inset-0 z-0">
-        {/* Animated gradient orbs */}
-        <div className="absolute top-[-5%] left-[-5%] w-[600px] h-[600px] bg-[#01467d]/10 rounded-full blur-[120px] animate-pulse" />
-        {/* <div className="absolute bottom-[-5%] right-[-5%] w-[600px] h-[600px] bg-[#dea42c]/10 rounded-full blur-[120px] animate-pulse delay-700" /> */}
-
-        {/* Decorative pattern */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `radial-gradient(circle at 20px 20px, #01467d 2px, transparent 2px), 
-                              radial-gradient(circle at 80px 80px, #dea42c 2px, transparent 2px)`,
-            backgroundSize: "80px 80px, 160px 160px",
-          }}
-        />
-
-        {/* Floating icons */}
-        <div className="absolute top-20 left-20 opacity-10 animate-float">
-          <Briefcase className="w-24 h-24 text-[#01467d]" />
-        </div>
-        <div className="absolute bottom-20 right-20 opacity-10 animate-float-delayed">
-          <GraduationCap className="w-24 h-24 text-[#dea42c]" />
-        </div>
-        <div className="absolute top-1/2 left-1/4 opacity-5 animate-spin-slow">
-          <Star className="w-16 h-16 text-[#01467d]" />
-        </div>
-      </div>
+    <div className="relative min-h-screen w-full flex items-center justify-center p-6 overflow-hidden bg-white">
+      
 
       <div className="relative z-10 w-full max-w-[440px] animate-in fade-in zoom-in duration-500">
         {/* Premium Glass Card */}
         <div className="bg-white/90 backdrop-blur-xl border border-white/50 rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(1,70,125,0.3)] p-10 md:p-12 relative overflow-hidden">
-          {/* Decorative corner accents */}
-          <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-[#01467d]/20 to-transparent rounded-br-[100px]"></div>
-          <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-[#dea42c]/20 to-transparent rounded-tl-[100px]"></div>
-
-          {/* Inner glow */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/50 to-transparent opacity-30"></div>
-
-          {/* Branding */}
+          
+        {/* Branding */}
           <header className="mb-10 text-center relative">
             {/* Logo */}
             <motion.div

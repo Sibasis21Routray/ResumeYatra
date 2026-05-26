@@ -340,35 +340,8 @@ export default function RegisterPage({ onSuccess }: { onSuccess: () => void }) {
 };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center p-4 overflow-hidden bg-gradient-to-br from-white via-blue-50 to-blue-100">
-      {/* --- DESIGN BACKGROUND ELEMENTS (from LoginPage) --- */}
-      <div className="absolute inset-0 z-0">
-        {/* Animated gradient orbs */}
-        <div className="absolute top-[-5%] left-[-5%] w-[600px] h-[600px] bg-[#01467d]/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-5%] right-[-5%] w-[600px] h-[600px] bg-[#dea42c]/10 rounded-full blur-[120px] animate-pulse delay-700" />
-
-        {/* Decorative pattern */}
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `radial-gradient(circle at 20px 20px, #01467d 2px, transparent 2px), 
-                              radial-gradient(circle at 80px 80px, #dea42c 2px, transparent 2px)`,
-            backgroundSize: "80px 80px, 160px 160px",
-          }}
-        />
-
-        {/* Floating icons */}
-        <div className="absolute top-20 left-20 opacity-10 animate-float">
-          <Briefcase className="w-24 h-24 text-[#01467d]" />
-        </div>
-        <div className="absolute bottom-20 right-20 opacity-10 animate-float-delayed">
-          <GraduationCap className="w-24 h-24 text-[#dea42c]" />
-        </div>
-        <div className="absolute top-1/2 left-1/4 opacity-5 animate-spin-slow">
-          <Star className="w-16 h-16 text-[#01467d]" />
-        </div>
-      </div>
-
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4 overflow-hidden bg-white">
+     
         <div className="relative z-10 w-full max-w-5xl">
           {/* Logo */}
           <motion.div
@@ -507,8 +480,8 @@ export default function RegisterPage({ onSuccess }: { onSuccess: () => void }) {
             >
               <div className="bg-white/90 backdrop-blur-xl border border-white/50 rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(1,70,125,0.2)] p-7 relative overflow-hidden">
                 {/* Corner accents */}
-                <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-[#01467d]/10 to-transparent rounded-br-[80px]" />
-                <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-[#dea42c]/10 to-transparent rounded-tl-[80px]" />
+                {/* <div className="absolute top-0 left-0 w-24 h-24 bg-gradient-to-br from-[#01467d]/10 to-transparent rounded-br-[80px]" />
+                <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-[#dea42c]/10 to-transparent rounded-tl-[80px]" /> */}
 
                 <h2 className="text-lg font-bold text-slate-800 mb-5 relative">
                   {activePlan ? (
