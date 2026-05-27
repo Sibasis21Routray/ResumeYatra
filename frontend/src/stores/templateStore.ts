@@ -333,6 +333,7 @@ export const useTemplateStore = create<TemplateState>()(
   // "minimal-ats",
   "azurill",
   // "saanvi-patel",
+  "machamp",
   "stellar",
   "nebula",
   "modern",

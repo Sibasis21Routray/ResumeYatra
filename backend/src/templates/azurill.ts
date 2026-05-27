@@ -282,7 +282,6 @@ export function buildAzurillTemplate(data: any, theme?: any): string {
   color: #666;
   font-size: 56px;
   border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 
@@ -536,21 +535,7 @@ export function buildAzurillTemplate(data: any, theme?: any): string {
       </div>
     ` : ""}
 
-    <!-- Professional Context Section -->
-    ${professionalContext && hasObjectValues(professionalContext) ? `
-      <div class="cv-section">
-        <h2 class="cv-section-title">Professional Context</h2>
-        <div class="divider"></div>
-        <div class="context-grid">
-          ${professionalContext.currentRole ? `<div class="context-item"><span class="context-label">Current Role:</span> ${professionalContext.currentRole}</div>` : ''}
-          ${professionalContext.yearsOfExperience ? `<div class="context-item"><span class="context-label">Years of Experience:</span> ${professionalContext.yearsOfExperience}</div>` : ''}
-          ${professionalContext.industrySector ? `<div class="context-item"><span class="context-label">Industry Sector:</span> ${professionalContext.industrySector}</div>` : ''}
-          ${professionalContext.employmentType ? `<div class="context-item"><span class="context-label">Employment Type:</span> ${professionalContext.employmentType}</div>` : ''}
-          ${professionalContext.workMode ? `<div class="context-item"><span class="context-label">Work Mode:</span> ${professionalContext.workMode}</div>` : ''}
-          ${professionalContext.careerLevel ? `<div class="context-item"><span class="context-label">Career Level:</span> ${professionalContext.careerLevel}</div>` : ''}
-        </div>
-      </div>
-    ` : ""}
+    
 
     <!-- Career Objective Section -->
     ${careerObjective && careerObjective.trim() && (!summary || !summary.trim()) ? `
@@ -586,7 +571,6 @@ export function buildAzurillTemplate(data: any, theme?: any): string {
               </div>
               <div class="entry-row-subhead">
                 <span>${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}${edu.grade ? `, ${edu.grade}` : ""}</span>
-                ${edu.location ? `<span class="location-span">${edu.location}</span>` : ""}
               </div>
               ${edu.description ? `<div class="bullets-container"><p>${edu.description}</p></div>` : ""}
             </div>
@@ -610,7 +594,7 @@ export function buildAzurillTemplate(data: any, theme?: any): string {
               </div>
               <div class="entry-row-subhead">
                 <span style="font-weight: 600;">${exp.title || ""}</span>
-                ${exp.location ? `<span class="location-span">${exp.location}</span>` : ""}
+                
               </div>
               ${exp.description ? renderDescription(exp.description) : ""}
               ${exp.achievements ? `<div class="bullets-container"><p><strong>Achievements:</strong> ${exp.achievements}</p></div>` : ""}

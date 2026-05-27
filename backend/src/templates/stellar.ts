@@ -571,7 +571,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
               </div>
               <div class="entry-row-subhead">
                 <span>${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}${edu.grade ? `, ${edu.grade}` : ""}</span>
-                ${edu.location ? `<span class="location-span">${edu.location}</span>` : ""}
+                
               </div>
               ${edu.description ? `<div class="bullets-container"><p>${edu.description}</p></div>` : ""}
             </div>
@@ -595,7 +595,6 @@ export function buildStellarTemplate(data: any, theme?: any): string {
               </div>
               <div class="entry-row-subhead">
                 <span style="font-weight: 600;">${exp.title || ""}</span>
-                ${exp.location ? `<span class="location-span">${exp.location}</span>` : ""}
               </div>
               ${exp.description ? renderDescription(exp.description) : ""}
               ${exp.achievements ? `<div class="bullets-container"><p><strong>Achievements:</strong> ${exp.achievements}</p></div>` : ""}
