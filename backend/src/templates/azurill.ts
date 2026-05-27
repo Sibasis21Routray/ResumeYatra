@@ -503,7 +503,12 @@ export function buildAzurillTemplate(data: any, theme?: any): string {
   <div class="profile-image-wrapper">
     ${profileImage ? 
       `<img src="${profileImage}" alt="Profile" class="profile-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : 
-      `<div class="profile-placeholder">👤</div>`
+      `<div class="profile-placeholder">
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+</div>`
     }
   </div>
   <div class="name-wrapper">
