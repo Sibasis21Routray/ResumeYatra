@@ -313,7 +313,7 @@ export function Sidebar({ resumeId }: { resumeId: string }) {
         e.currentTarget.style.boxShadow = `0 10px 25px -5px ${BLUE_GLOW}`;
       }}
     >
-      <Menu size={24} color="white" strokeWidth={2} />
+      <ChevronRight size={24} color="white" strokeWidth={2} />
     </button>
   );
 
@@ -473,7 +473,7 @@ export function Sidebar({ resumeId }: { resumeId: string }) {
                   e.currentTarget.style.transform = "scale(1)";
                 }}
               >
-                <Menu size={20} />
+                <ChevronRight size={20} />
               </button>
             )
           )}

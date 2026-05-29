@@ -649,7 +649,7 @@ const Hero: React.FC = () => {
     {[
       'Professional Dashboard',
       `Save upto ${pricing?.freelancerResumeLimit || 100} Different resumes`,
-      `Exclusive Discount of ${pricing?.freelancerAiDiscount || 50}% on AI optimisation`,
+      `${pricing?.freelancerAiDiscount || 50}% off on AI Optimization`,
       'AI Optimization Includes 1 Download Credit',
       'No Watermark',
       `Auto renewed every ${(pricing?.candidateDurationMonths || 3) * 30} days. Cancel anytime.`

@@ -175,6 +175,13 @@ export default function PreviewPage() {
     }
   }, [])
 
+  useEffect(() => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+}, []);
+
   // Animation for AI enhancement steps
   useEffect(() => {
     if (enhancing && !enhancementSuccess) {
@@ -982,16 +989,7 @@ export default function PreviewPage() {
 
           <div className="flex items-center gap-4 p-2 bg-white/80 backdrop-blur-xl border border-white/40 rounded-2xl shadow-sm">
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowSettings(!showSettings)}
-                className={`p-2.5 rounded-xl transition-all ${
-                  showSettings 
-                    ? "bg-[#04477E] text-white shadow-lg shadow-[#04477E]/30" 
-                    : "bg-slate-50 text-slate-600 hover:bg-slate-100"
-                }`}
-              >
-                <LayoutTemplateIcon className="w-5 h-5" />
-              </button>
+              
 
               <button
                 onClick={handleAIEnhance}
@@ -1310,7 +1308,7 @@ export default function PreviewPage() {
             </div>
 
             {/* Resume Preview */}
-            <div className="flex-1 min-w-0 relative">
+            <div className="flex-1 min-w-0 relative z-30">
               {/* AI Enhancement Loading Overlay */}
               {enhancing && !enhancementSuccess && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">

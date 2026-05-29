@@ -491,11 +491,33 @@ export default function ExperienceForm({
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
-          Experience <span className="text-accent dark:text-dark-accent">Summary</span>
+          Experience{" "}
+          <span className="text-accent dark:text-dark-accent">Summary</span>
         </h2>
-        <p className="text-base text-text-muted dark:text-dark-text-muted">
-          Review and manage your work experience.
-        </p>
+
+        <div className="mt-6 flex  justify-between items-center">
+          <p className="text-base text-text-muted dark:text-dark-text-muted">
+            Review and manage your work experience.
+          </p>
+          <button
+  onClick={handleAddMore}
+  className="
+    flex items-center gap-1.5
+    px-3 py-1.5
+    rounded-lg
+    bg-accent
+    text-white
+    text-sm
+    font-medium
+    hover:opacity-90
+    transition-all
+    shadow-sm
+  "
+>
+  <Plus className="w-4 h-4" />
+  Add Experience
+</button>
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -507,15 +529,6 @@ export default function ExperienceForm({
             onDelete={() => handleDelete(item.id)}
           />
         ))}
-      </div>
-
-      <div className="mt-6">
-        <button
-          onClick={handleAddMore}
-          className="w-full border-2 border-dashed border-light-border dark:border-dark-border rounded-xl py-4 text-base text-text-muted dark:text-dark-text-muted hover:bg-accent/5 hover:border-accent dark:hover:border-dark-accent transition-all flex items-center justify-center gap-2"
-        >
-          <Plus className="w-5 h-5" /> Add more experience
-        </button>
       </div>
 
       <div className="flex justify-between mt-8 pt-6 border-t border-light-border dark:border-dark-border">

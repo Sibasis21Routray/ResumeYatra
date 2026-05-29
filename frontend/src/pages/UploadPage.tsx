@@ -283,7 +283,7 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
                 }`}
               >
                 <input {...getInputProps()} />
-                <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center mx-auto mb-3 shadow-sm border border-gray-100">
+                <div className="w-12 h-12  rounded-lg flex items-center justify-center mx-auto mb-3 ">
                   <Upload size={20} className="text-[#055597]" />
                 </div>
                 <p className="text-sm font-medium text-gray-700">
@@ -293,7 +293,7 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
               </div>
             ) : (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex items-center gap-3">
-                <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm border border-gray-100">
+                <div className="w-10 h-10  flex items-center justify-center ">
                   {getFileIcon()}
                 </div>
                 <div className="flex-1 min-w-0">

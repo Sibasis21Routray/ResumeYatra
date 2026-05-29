@@ -722,7 +722,7 @@ export function Heading({
       </div>
 
       {/* Main Content */}
-      <div className="py-6 overflow-auto h-[70vh]">
+      <div className="py-6 overflow-auto h-full">
         <div className="bg-bg-primary dark:bg-dark-bg-primary rounded-xl shadow-sm">
           <div className="p-4 sm:p-6">
             {/* Profile Photo Section */}
@@ -846,7 +846,6 @@ export function Heading({
                     { value: "Male", label: "Male" },
                     { value: "Female", label: "Female" },
                     { value: "Other", label: "Other" },
-                    { value: "Prefer not to say", label: "Prefer not to say" },
                   ]}
                   icon={<Users className="w-4 h-4" />}
                 />

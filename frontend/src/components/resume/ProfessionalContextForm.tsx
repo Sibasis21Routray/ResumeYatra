@@ -628,12 +628,12 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
     // Revenue options
     const REVENUE_OPTIONS = [
         "Not applicable",
-        "Less than ₹1 Cr / $100k",
-        "₹1–5 Cr / $100k–$500k",
-        "₹5–25 Cr / $500k–$5M",
-        "₹25–100 Cr / $5M–$20M",
-        "₹100–500 Cr / $20M–$100M",
-        "₹500+ Cr / $100M+"
+        "Less than ₹1 Cr",
+        "₹1–5 Cr ",
+        "₹5–25 Cr ",
+        "₹25–100 Cr ",
+        "₹100–500 Cr ",
+        "₹500+ Cr"
     ];
 
     return (

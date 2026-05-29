@@ -457,36 +457,46 @@ export default function PaymentModal({
             className="bg-[#f7f8fa] rounded-3xl shadow-2xl overflow-hidden w-full max-w-[600px] border border-gray-100 relative"
           >
             {/* Close Button Header */}
-            <div className="bg-white pt-5 pb-4 px-6 flex flex-col items-center relative border-b border-gray-50">
-              <button
-                onClick={onClose}
-                className="absolute -top-5 bg-[#334155] text-white hover:bg-slate-800 rounded-full p-2.5 transition-all shadow-md transform translate-y-1/2"
-                disabled={loading}
-              >
-                <X className="w-5 h-5" />
-              </button>
+            <div className="bg-white pt-5 pb-4 px-6 border-b border-gray-50">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="bg-[#e0f2fe] text-[#0369a1] font-black text-lg p-2.5 rounded-xl tracking-tight w-11 h-11 flex items-center justify-center shadow-sm">
+                    RY
+                  </div>
 
-              <div className="flex items-center gap-3 mt-4 self-start">
-                <div className="bg-[#e0f2fe] text-[#0369a1] font-black text-lg p-2.5 rounded-xl tracking-tight w-11 h-11 flex items-center justify-center shadow-sm">
-                  RY
+                  <div>
+                    <h2 className="text-[21px] font-extrabold text-[#0f172a] tracking-tight">
+                      ResumeYatra Checkout
+                    </h2>
+                    <p className="text-xs text-gray-500 font-medium mt-0.5">
+                      Choose your plan and download type before payment
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-[21px] font-extrabold text-[#0f172a] tracking-tight">ResumeYatra Checkout</h2>
-                  <p className="text-xs text-gray-500 font-medium mt-0.5">Choose your plan and download type before payment</p>
-                </div>
+
+                <button
+                  onClick={onClose}
+                  disabled={loading}
+                  className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-all"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
             </div>
 
             {/* Scrollable Form Content */}
-            <div className="p-5 max-h-[70vh] overflow-y-auto space-y-6">
+            <div className="p-5 max-h-[70vh] overflow-y-auto space-y-3">
               {/* SECTION 1: Choose Your Plan */}
               <div>
-                <h3 className="text-[15px] font-bold text-[#0f172a] mb-0.5">Choose Your Plan</h3>
-                <p className="text-xs text-gray-400 font-medium mb-3">Select any 1</p>
-                
-                <div className="space-y-2.5">
+                <h3 className="text-[15px] font-bold text-[#0f172a] mb-0.5">
+                  Choose Your Plan
+                </h3>
+
+                <div className="space-y-1.5">
                   {/* Guest Option */}
-                  <label className={`flex items-center justify-between bg-white border rounded-2xl p-4 cursor-pointer transition-all ${selectedPlan === "guest" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}>
+                  <label
+                    className={`flex items-center justify-between bg-white border rounded-2xl px-4 py-2 cursor-pointer transition-all ${selectedPlan === "guest" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
+                  >
                     <div className="flex items-center gap-3">
                       <input
                         type="radio"
@@ -496,18 +506,26 @@ export default function PaymentModal({
                         className="w-5 h-5 accent-emerald-600 cursor-pointer"
                       />
                       <div>
-                        <span className="font-bold text-[#1e293b] text-[15px] block">Guest Plan</span>
-                        <span className="text-xs text-gray-400 font-medium">No Signup Required</span>
+                        <span className="font-bold text-[#1e293b] text-[15px] block">
+                          Guest Plan
+                        </span>
+                        <span className="text-xs text-gray-400 font-medium">
+                          No Signup Required
+                        </span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#1e293b] text-base">₹0.00</span>
+                      <span className="font-bold text-[#1e293b] text-base">
+                        ₹0.00
+                      </span>
                       <div className="w-[3px] h-4 bg-orange-400 rounded-full" />
                     </div>
                   </label>
 
                   {/* Candidate Option */}
-                  <label className={`flex items-center justify-between bg-white border rounded-2xl p-4 cursor-pointer transition-all ${selectedPlan === "candidate" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}>
+                  <label
+                    className={`flex items-center justify-between bg-white border rounded-2xl px-4 py-2 cursor-pointer transition-all ${selectedPlan === "candidate" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
+                  >
                     <div className="flex items-center gap-3">
                       <input
                         type="radio"
@@ -518,24 +536,30 @@ export default function PaymentModal({
                       />
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-[#1e293b] text-[15px]">Candidate Membership</span>
-                          <span className="bg-emerald-50 text-[10px] text-emerald-600 font-bold px-1.5 py-0.5 rounded-md tracking-wide uppercase">Popular</span>
+                          <span className="font-bold text-[#1e293b] text-[15px]">
+                            Candidate Membership
+                          </span>
                         </div>
                         <span className="text-xs text-gray-400 font-medium">
-                          ₹{formatPrice(getPlanPrice("candidate"))} / {getPlanDuration("candidate") * 30} days · 
-                          Save up to {getResumeLimit("candidate")} resumes · 
+                          ₹{formatPrice(getPlanPrice("candidate"))} /{" "}
+                          {getPlanDuration("candidate") * 30} days · Save up to{" "}
+                          {getResumeLimit("candidate")} resumes ·
                           {getAIDiscount("candidate")}% AI discount
                         </span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#1e293b] text-base">+ ₹{formatPrice(getPlanPrice("candidate"))}</span>
+                      <span className="font-bold text-[#1e293b] text-base">
+                        + ₹{formatPrice(getPlanPrice("candidate"))}
+                      </span>
                       <div className="w-[3px] h-4 bg-slate-300 rounded-full" />
                     </div>
                   </label>
 
                   {/* Freelancer Option */}
-                  <label className={`flex items-center justify-between bg-white border rounded-2xl p-4 cursor-pointer transition-all ${selectedPlan === "freelancer" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}>
+                  <label
+                    className={`flex items-center justify-between bg-white border rounded-2xl px-4 py-2 cursor-pointer transition-all ${selectedPlan === "freelancer" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
+                  >
                     <div className="flex items-center gap-3">
                       <input
                         type="radio"
@@ -545,16 +569,21 @@ export default function PaymentModal({
                         className="w-5 h-5 accent-emerald-600 cursor-pointer"
                       />
                       <div>
-                        <span className="font-bold text-[#1e293b] text-[15px] block">Freelancer Membership</span>
+                        <span className="font-bold text-[#1e293b] text-[15px] block">
+                          Freelancer Membership
+                        </span>
                         <span className="text-xs text-gray-400 font-medium">
-                          ₹{formatPrice(getPlanPrice("freelancer"))} / {getPlanDuration("freelancer") * 30} days · 
-                          Save up to {getResumeLimit("freelancer")} resumes · 
+                          ₹{formatPrice(getPlanPrice("freelancer"))} /{" "}
+                          {getPlanDuration("freelancer") * 30} days · Save up to{" "}
+                          {getResumeLimit("freelancer")} resumes ·
                           {getAIDiscount("freelancer")}% AI discount
                         </span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-[#1e293b] text-base">+ ₹{formatPrice(getPlanPrice("freelancer"))}</span>
+                      <span className="font-bold text-[#1e293b] text-base">
+                        + ₹{formatPrice(getPlanPrice("freelancer"))}
+                      </span>
                       <div className="w-[3px] h-4 bg-slate-300 rounded-full" />
                     </div>
                   </label>
@@ -563,62 +592,85 @@ export default function PaymentModal({
 
               {/* SECTION 2: Choose Resume Download */}
               <div>
-                <h3 className="text-[15px] font-bold text-[#0f172a] mb-0.5">Choose Resume Download</h3>
-                <p className="text-xs text-gray-400 font-medium mb-3">Select any 1</p>
+                <h3 className="text-[15px] font-bold text-[#0f172a] mb-0.5">
+                  Choose Resume Download
+                </h3>
 
-                <div className="space-y-2.5">
+                <div className="space-y-1.5">
                   {/* No AI Option */}
-                  <div 
-                    className={`bg-white border rounded-2xl p-4 cursor-pointer transition-all ${downloadType === "no_ai" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
+                  <div
+                    className={`bg-white border rounded-2xl px-4 py-2 cursor-pointer transition-all ${downloadType === "no_ai" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
                     onClick={() => setDownloadType("no_ai")}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${downloadType === "no_ai" ? "border-emerald-500 bg-emerald-500" : "border-gray-300"}`}>
-                          {downloadType === "no_ai" && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${downloadType === "no_ai" ? "border-emerald-500 bg-emerald-500" : "border-gray-300"}`}
+                        >
+                          {downloadType === "no_ai" && (
+                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                          )}
                         </div>
                         <div>
-                          <span className="font-bold text-[#1e293b] text-[15px] block">No AI</span>
-                          <span className="text-xs text-gray-400 font-medium">Clean resume download in PDF/DOC</span>
+                          <span className="font-bold text-[#1e293b] text-[15px] block">
+                            No AI
+                          </span>
+                          <span className="text-xs text-gray-400 font-medium">
+                            Clean resume download in PDF/DOC
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#1e293b] text-base">₹{formatPrice(getDownloadPrice("no_ai"))}</span>
+                        <span className="font-bold text-[#1e293b] text-base">
+                          ₹{formatPrice(getDownloadPrice("no_ai"))}
+                        </span>
                         <div className="w-[3px] h-4 bg-orange-400 rounded-full" />
                       </div>
                     </div>
                   </div>
 
                   {/* AI Optimized Option */}
-                  <div 
-                    className={`bg-white border rounded-2xl p-4 cursor-pointer transition-all ${downloadType === "ai" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
+                  <div
+                    className={`bg-white border rounded-2xl px-4 py-2 cursor-pointer transition-all ${downloadType === "ai" ? "border-emerald-500 shadow-sm" : "border-gray-100 hover:border-gray-200"}`}
                     onClick={() => setDownloadType("ai")}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${downloadType === "ai" ? "border-emerald-500 bg-emerald-500" : "border-gray-300"}`}>
-                          {downloadType === "ai" && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${downloadType === "ai" ? "border-emerald-500 bg-emerald-500" : "border-gray-300"}`}
+                        >
+                          {downloadType === "ai" && (
+                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                          )}
                         </div>
                         <div>
-                          <span className="text-[11px] font-bold text-pink-500 block mb-0.5">Recommended</span>
-                          <span className="font-bold text-[#1e293b] text-[15px] block">AI Optimized</span>
-                          <span className="text-xs text-gray-400 font-medium">Profile summary rewrite · role-specific summary · structured skills</span>
-                          {selectedPlan !== "guest" && downloadType === "ai" && (
-                            <span className="text-[10px] text-emerald-600 font-medium block mt-1">
-                              {getAIDiscount(selectedPlan)}% discount applied with {getPlanLabel()} plan
-                            </span>
-                          )}
+                          <span className="font-bold text-[#1e293b] text-[15px] block">
+                            AI Optimized
+                          </span>
+                          <span className="text-xs text-gray-400 font-medium">
+                            Profile summary rewrite · role-specific summary ·
+                            structured skills
+                          </span>
+                          {selectedPlan !== "guest" &&
+                            downloadType === "ai" && (
+                              <span className="text-[10px] text-emerald-600 font-medium block mt-1">
+                                {getAIDiscount(selectedPlan)}% discount applied
+                                with {getPlanLabel()} plan
+                              </span>
+                            )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {selectedPlan !== "guest" && downloadType === "ai" && (
-                          <span className="text-xs text-gray-400 line-through">₹{formatPrice(getDownloadPrice("ai"))}</span>
+                          <span className="text-xs text-gray-400 line-through">
+                            ₹{formatPrice(getDownloadPrice("ai"))}
+                          </span>
                         )}
                         <span className="font-bold text-[#1e293b] text-base">
-                          ₹{selectedPlan !== "guest" && downloadType === "ai" 
+                          ₹
+                          {selectedPlan !== "guest" && downloadType === "ai"
                             ? formatPrice(getDiscountedAIPrice())
-                            : formatPrice(getDownloadPrice("ai"))
-                          }
+                            : formatPrice(getDownloadPrice("ai"))}
                         </span>
                         <div className="w-[3px] h-4 bg-slate-300 rounded-full" />
                       </div>
@@ -631,7 +683,9 @@ export default function PaymentModal({
             {/* Bottom Sticky Action Bar */}
             <div className="bg-white border-t border-gray-100 p-4 flex gap-3 items-center">
               <div className="bg-[#f8fafc] border border-gray-200/60 rounded-xl py-2 px-3 flex flex-col justify-center min-w-[140px] max-w-[160px] shadow-inner">
-                <span className="text-[10px] text-gray-400 font-bold tracking-wider uppercase">SELECTED</span>
+                <span className="text-[10px] text-gray-400 font-bold tracking-wider uppercase">
+                  SELECTED
+                </span>
                 <span className="text-xs font-black text-slate-800 truncate mt-0.5">
                   {getPlanLabel()} + {getDownloadLabel()}
                 </span>
@@ -645,7 +699,7 @@ export default function PaymentModal({
               <button
                 onClick={handlePayment}
                 disabled={loading}
-                className="flex-1 bg-[#10b981] hover:bg-[#059669] text-white text-base font-bold py-3.5 px-4 rounded-xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 bg-[#10b981] hover:bg-[#059669] text-white text-base font-bold py-2.5 px-4 rounded-xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {loading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

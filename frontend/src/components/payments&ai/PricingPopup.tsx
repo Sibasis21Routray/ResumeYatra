@@ -27,13 +27,13 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
     } catch (err) {
       // Fallback default pricing if API fails
       setPricing({
-        guestDownload: 900, // ₹9
-        guestAi: 4900,      // ₹49
-        candidatePrice: 2900,   // ₹29
+        guestDownload: 900,
+        guestAi: 4900,
+        candidatePrice: 2900,
         candidateDurationMonths: 3,
         candidateResumeLimit: 5,
         candidateAiDiscount: 25,
-        freelancerPrice: 9900,   // ₹99
+        freelancerPrice: 9900,
         freelancerDurationMonths: 3,
         freelancerResumeLimit: 100,
         freelancerAiDiscount: 50
@@ -47,11 +47,6 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
     if (!paisa && paisa !== 0) return "₹0"
     const rupees = (paisa / 100).toFixed(0)
     return `₹${rupees}`
-  }
-
-  const formatPriceDecimal = (paisa?: number) => {
-    if (!paisa && paisa !== 0) return "0"
-    return (paisa / 100).toFixed(2)
   }
 
   const handleSignup = (plan: string) => {
@@ -110,7 +105,7 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
             </div>
           ) : (
             <>
-              {/* Pricing Table - More Compact */}
+              {/* Pricing Table */}
               <div className="table-wrap overflow-x-auto rounded-xl border border-slate-200 shadow-sm bg-white">
                 <table className="w-full min-w-[800px] border-collapse text-sm">
                   <thead>
@@ -138,18 +133,18 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
                       <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
                         Membership Price
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-white">
-                        <span className="text-slate-500 font-semibold text-xs">No Signup</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-white text-slate-500 font-semibold text-xs">
+                        No Signup
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
-                        <span className="price text-2xl font-black text-slate-800">{formatPrice(pricing?.candidatePrice)}</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-white text-[#055597]">
+                        <span className="price text-2xl font-black">{formatPrice(pricing?.candidatePrice)}</span>
                         <br />
-                        <span className="text-[11px] text-slate-500 font-medium">/ {candidateDuration * 30} days</span>
+                        <span className="text-[11px] font-medium">/ {candidateDuration * 30} days</span>
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
-                        <span className="price text-2xl font-black text-slate-800">{formatPrice(pricing?.freelancerPrice)}</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-white text-[#daa13c]">
+                        <span className="price text-2xl font-black">{formatPrice(pricing?.freelancerPrice)}</span>
                         <br />
-                        <span className="text-[11px] text-slate-500 font-medium">/ {freelancerDuration * 30} days</span>
+                        <span className="text-[11px] font-medium">/ {freelancerDuration * 30} days</span>
                       </td>
                     </tr>
 
@@ -158,13 +153,13 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
                       <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
                         Single Resume Download
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-white font-bold text-slate-700 text-sm">
+                      <td className="p-3 text-center border-t border-slate-200 bg-gray-50 font-bold text-slate-600 text-sm">
                         ₹{guestDownloadPrice}
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30 font-bold text-slate-700 text-sm">
+                      <td className="p-3 text-center border-t border-slate-200 bg-gray-50 font-bold text-[#055597] text-sm">
                         ₹{guestDownloadPrice}
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30 font-bold text-slate-700 text-sm">
+                      <td className="p-3 text-center border-t border-slate-200 bg-gray-50 font-bold text-[#daa13c] text-sm">
                         ₹{guestDownloadPrice}
                       </td>
                     </tr>
@@ -174,14 +169,14 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
                       <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
                         AI Optimization Price
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-white font-bold text-[#d29e3f] text-sm">
+                      <td className="p-3 text-center border-t border-slate-200 bg-white font-bold text-slate-600 text-sm">
                         ₹{guestAiPrice}
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
-                        <span className="font-bold text-emerald-700 text-base">₹{candidateDiscountedAi.toFixed(2)}</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-white font-bold text-[#055597] text-base">
+                        ₹{candidateDiscountedAi.toFixed(2)}
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
-                        <span className="font-bold text-emerald-700 text-base">₹{freelancerDiscountedAi.toFixed(2)}</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-white font-bold text-[#daa13c] text-base">
+                        ₹{freelancerDiscountedAi.toFixed(2)}
                       </td>
                     </tr>
 
@@ -190,16 +185,16 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
                       <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
                         Savings on AI
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-white">
-                        <span className="text-slate-500 font-bold text-xs">—</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-gray-50">
+                        <span className="text-slate-700 font-bold text-xs">0% off</span>
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
-                        <span className="inline-block bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full text-[11px]">
+                      <td className="p-3 text-center border-t border-slate-200 bg-gray-50">
+                        <span className="inline-block bg-blue-100 text-[#055597] font-bold px-2 py-0.5 rounded-full text-[11px]">
                           {candidateDiscount}% OFF
                         </span>
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
-                        <span className="inline-block bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded-full text-[11px]">
+                      <td className="p-3 text-center border-t border-slate-200 bg-gray-50">
+                        <span className="inline-block bg-amber-100 text-[#daa13c] font-bold px-2 py-0.5 rounded-full text-[11px]">
                           {freelancerDiscount}% OFF
                         </span>
                       </td>
@@ -211,13 +206,13 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
                         Dashboard Access
                       </td>
                       <td className="p-3 text-center border-t border-slate-200 bg-white">
-                        <span className="text-slate-500 font-bold text-xs">✕ Not included</span>
+                        <span className="text-slate-500 font-bold text-xs">No</span>
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
-                        <span className="text-emerald-600 font-bold text-xs">✓ Personal Dashboard</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-white text-[#055597] font-bold text-xs">
+                        ✓ Personal Dashboard
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
-                        <span className="text-emerald-600 font-bold text-xs">✓ Professional Dashboard</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-white text-[#daa13c] font-bold text-xs">
+                        ✓ Professional Dashboard
                       </td>
                     </tr>
 
@@ -226,14 +221,14 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
                       <td className="p-3 text-left font-bold text-slate-700 bg-slate-50 border-t border-slate-200 text-xs">
                         Resume Saving Limit
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-white">
-                        <span className="text-slate-500 font-bold text-xs">✕ No</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-gray-50">
+                        <span className="text-slate-500 font-bold text-xs">No</span>
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
-                        <span className="text-xs">Save up to {candidateResumeLimit} resumes</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-gray-50 text-[#055597] text-xs font-medium">
+                        Save up to {candidateResumeLimit} resumes
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
-                        <span className="text-xs">Save up to {freelancerResumeLimit} resumes</span>
+                      <td className="p-3 text-center border-t border-slate-200 bg-gray-50 text-[#daa13c] text-xs font-medium">
+                        Save up to {freelancerResumeLimit} resumes
                       </td>
                     </tr>
 
@@ -245,23 +240,23 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
                       <td className="p-3 text-center border-t border-slate-200 bg-white">
                         <button
                           onClick={onClose}
-                          className="bg-slate-500 text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-slate-600 transition-all"
+                          className="bg-slate-600 text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-slate-700 transition-all"
                         >
                           Continue as Guest
                         </button>
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-blue-50/30">
+                      <td className="p-3 text-center border-t border-slate-200 bg-white">
                         <button
                           onClick={() => handleSignup("candidate")}
-                          className="bg-[#055597] text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-[#04447a] transition-all shadow-sm"
+                          className="bg-[#055597] text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-[#044a80] transition-all shadow-sm"
                         >
                           Get Candidate Plan →
                         </button>
                       </td>
-                      <td className="p-3 text-center border-t border-slate-200 bg-amber-50/30">
+                      <td className="p-3 text-center border-t border-slate-200 bg-white">
                         <button
                           onClick={() => handleSignup("freelancer")}
-                          className="bg-[#d29e3f] text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-[#c18c2e] transition-all shadow-sm"
+                          className="bg-[#daa13c] text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-[#c88c2a] transition-all shadow-sm"
                         >
                           Get Freelancer Plan →
                         </button>

@@ -135,7 +135,7 @@ export default function RegisterPage({ onSuccess }: { onSuccess: () => void }) {
               icon: Save,
             },
             {
-              text: `Exclusive Discount of ${pricing.freelancerAiDiscount}% on AI Optimization`,
+              text: `${pricing.freelancerAiDiscount}% off on AI Optimization`,
               icon: Sparkles,
             },
             {

@@ -720,7 +720,7 @@ useEffect(() => {
     // Default to letter grade
     return `Grade: ${grade}`;
   };
-
+  
   const renderSummary = () => (
     <div className="space-y-6">
       <div>
@@ -781,9 +781,9 @@ useEffect(() => {
                   </div>
 
                   {education.description && (
-                    <div className="mt-3 p-3 bg-bg-secondary dark:bg-dark-bg-secondary rounded-lg">
+                    <div className="mt-3 p-3  rounded-lg">
                       <p className="text-sm text-text-primary dark:text-dark-text-primary whitespace-pre-line">
-                        {getDescriptionPreview(education.description)}
+                        {education.description}
                       </p>
                     </div>
                   )}
