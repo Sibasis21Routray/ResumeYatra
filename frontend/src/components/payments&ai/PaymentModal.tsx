@@ -58,7 +58,7 @@ export default function PaymentModal({
 
   // Helper functions to format prices with 2 decimals
   const formatPrice = (rupees: number) => {
-    return rupees.toFixed(2);
+    return Math.round(rupees).toString();
   };
 
   // Dynamic values from backend
@@ -119,7 +119,7 @@ export default function PaymentModal({
       discount = getAIDiscount(selectedPlan);
     }
     const originalPrice = getDownloadPrice("ai");
-    return originalPrice * (1 - discount / 100);
+    return Math.round(originalPrice * (1 - discount / 100));
   };
 
   const calculateTotal = () => {
@@ -130,14 +130,14 @@ export default function PaymentModal({
       // For logged-in users, no plan cost, but apply their subscription discount
       if (downloadType === "ai") {
         const discount = getUserDiscount();
-        downloadCost = downloadCost * (1 - discount / 100);
+        downloadCost = Math.round(downloadCost * (1 - discount / 100));
       }
     } else {
       planCost = getPlanPrice(selectedPlan);
       // Apply membership discount logic to AI choice if applicable
       if (downloadType === "ai" && selectedPlan !== "guest") {
         const discount = getAIDiscount(selectedPlan);
-        downloadCost = downloadCost * (1 - discount / 100);
+        downloadCost = Math.round(downloadCost * (1 - discount / 100));
       }
     }
     
@@ -319,7 +319,7 @@ export default function PaymentModal({
   if (isUser) {
     const discount = downloadType === "ai" ? getUserDiscount() : 0;
     const originalPrice = getDownloadPrice(downloadType);
-    const finalPrice = discount > 0 ? originalPrice * (1 - discount / 100) : originalPrice;
+    const finalPrice = discount > 0 ? Math.round(originalPrice * (1 - discount / 100)) : originalPrice;
     
     return (
       <div

@@ -52,7 +52,7 @@ export default function PricingDetailsPopup({ resumeId }: ActivityFeedProps) {
         }
       }
       
-      const discountedPrice = originalPrice * (1 - discount / 100);
+      const discountedPrice = Math.round(originalPrice * (1 - discount / 100));
       return { original: originalPrice, discounted: discountedPrice, discount };
     }
   };
@@ -96,8 +96,8 @@ export default function PricingDetailsPopup({ resumeId }: ActivityFeedProps) {
           {aiPrice.discount > 0 ? (
             <p className="text-sm text-gray-700">
               <span className="font-medium">Price:</span>{' '}
-              <span className="text-[#01467d] font-semibold">₹{aiPrice.discounted?.toFixed(2)}</span>{' '}
-              <span className="text-gray-400 line-through">₹{aiPrice.original?.toFixed(2)}</span>{' '}
+              <span className="text-[#01467d] font-semibold">₹{aiPrice.discounted}</span>{' '}
+              <span className="text-gray-400 line-through">₹{aiPrice.original?.toFixed(0)}</span>{' '}
               <span className="text-green-600 text-xs">({aiPrice.discount}% off for subscribers)</span>
             </p>
           ) : (

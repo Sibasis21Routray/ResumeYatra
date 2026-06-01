@@ -186,7 +186,7 @@ const SectionCard = ({ children, isDropdownOpen }: { children: React.ReactNode; 
 
 // Info Helper Component - Simplified
 const InfoHelper = ({ text }: { text: string }) => (
-    <div className="flex items-start gap-1.5 mt-2 text-xs text-text-muted">
+    <div className="flex items-start gap-1.5 mt-2 text-xs text-text-muted font-semibold" >
         <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-accent" />
         <span className="leading-relaxed">{text}</span>
     </div>
@@ -643,7 +643,7 @@ export function ProfessionalContextForm({ onBack, onNext, onNavigateToSubSection
                 <h2 className="text-3xl sm:text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
                     Professional <span className="text-accent dark:text-dark-accent">Context</span>
                 </h2>
-                <p className="text-base text-text-muted dark:text-dark-text-muted">
+                <p className="text-base text-text-muted dark:text-dark-text-muted font-bold">
                     This data stays behind the scenes to help our AI craft a high-impact leadership summary.
                 </p>
             </div>

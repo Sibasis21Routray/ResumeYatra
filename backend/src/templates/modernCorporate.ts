@@ -461,9 +461,7 @@ export function buildModernCorporateTemplate(data: any, theme?: any): string {
           ${skillArray.length > 0 ? `
           <div class="section" data-section="skills">
             <div class="section-title">Skills</div>
-            <ul class="skill-list">
               ${skillArray.map((skill, idx) => `<li data-index="${idx}">${skill}</li>`).join('')}
-            </ul>
           </div>
           ` : ''}
 

@@ -250,7 +250,7 @@ useEffect(() => {
       { id: "education", label: "Education", component: EducationForm },
       { id: "academicCampus", label: "Academic & Campus Experience", component: AcademicCampusExperienceForm },
       { id: "experience", label: "Experience", component: ExperienceForm },
-      // { id: "professionalContext", label: "Professional Context", component: ProfessionalContextForm },
+      { id: "professionalContext", label: "Professional Context", component: ProfessionalContextForm },
       { id: "industry", label: "Industry", component: IndustryForm },
       { id: "domain", label: "Domain", component: DomainForm },
       { id: "geographicScope", label: "Geographic Scope", component: GeographicScopeForm },
@@ -430,7 +430,7 @@ useEffect(() => {
       "personal",
       "education",
       "academicCampus",
-      // "professionalContext",
+      "professionalContext",
       "experience",
       "skills",
       "summary",
@@ -480,7 +480,7 @@ useEffect(() => {
       "personal",
       "education",
       "academicCampus",
-      // "professionalContext",
+      "professionalContext",
       "experience",
       "skills",
       "summary",
@@ -488,10 +488,10 @@ useEffect(() => {
     ];
 
     // For industry and domain sub-sections, go back to professional context
-    // if (selectedSection === "industry" || selectedSection === "domain" || selectedSection === "geographicScope" || selectedSection === "revenue") {
-    //   setSelectedSection("professionalContext");
-    //   return;
-    // }
+    if (selectedSection === "industry" || selectedSection === "domain" || selectedSection === "geographicScope" || selectedSection === "revenue") {
+      setSelectedSection("professionalContext");
+      return;
+    }
 
     // For sub-sections of academic campus experience, go back to academic campus
     const subSections = [ "careerObjective", "internship", "academicProject", "leadershipPosition", "trainingProgram", "scholarship", "coCurricular", "extraCurricular", "hobbies"];
@@ -713,16 +713,16 @@ useEffect(() => {
           </SectionWrapper>
         );
 
-      // case "professionalContext":
-      //   return (
-      //     <SectionWrapper sectionId="professionalContext">
-      //       <ProfessionalContextForm
-      //         onNext={handleNext}
-      //         onBack={handleBack}
-      //         onNavigateToSubSection={(subsectionId) => setSelectedSection(subsectionId)}
-      //       />
-      //     </SectionWrapper>
-      //   );
+      case "professionalContext":
+        return (
+          <SectionWrapper sectionId="professionalContext">
+            <ProfessionalContextForm
+              onNext={handleNext}
+              onBack={handleBack}
+              onNavigateToSubSection={(subsectionId) => setSelectedSection(subsectionId)}
+            />
+          </SectionWrapper>
+        );
 
       // case "industry":
       //   return (

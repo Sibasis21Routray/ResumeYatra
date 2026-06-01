@@ -49,7 +49,8 @@ export async function createOrder(req, res) {
           if (user?.subscriptionPlan === "freelancer") discount = pricing.freelancerAiDiscount;
           else if (user?.subscriptionPlan === "candidate") discount = pricing.candidateAiDiscount;
 
-          amount = pricing.guestAi * (1 - discount / 100);
+          const rawAmount = pricing.guestAi * (1 - discount / 100);
+          amount = Math.round(rawAmount / 100) * 100;
         }
       } else {
         // Guests pay base rates
@@ -65,7 +66,8 @@ export async function createOrder(req, res) {
         itemAmount = pricing.guestDownload;
       } else if (itemType === "ai") {
         const discount = type === "subscription_freelancer" ? pricing.freelancerAiDiscount : pricing.candidateAiDiscount;
-        itemAmount = pricing.guestAi * (1 - (discount || 0) / 100);
+        const rawItemAmount = pricing.guestAi * (1 - (discount || 0) / 100);
+        itemAmount = Math.round(rawItemAmount / 100) * 100;
       }
       amount += itemAmount;
       console.log(`[createOrder] Combined purchase: ${type} + ${itemType}. New total amount: ${amount}`);
@@ -90,7 +92,8 @@ export async function createOrder(req, res) {
             itemAmount = pricing.guestDownload;
           } else if (itemType === "ai") {
             const discount = type === "subscription_freelancer" ? pricing.freelancerAiDiscount : pricing.candidateAiDiscount;
-            itemAmount = pricing.guestAi * (1 - (discount || 0) / 100);
+            const rawItemAmount = pricing.guestAi * (1 - (discount || 0) / 100);
+            itemAmount = Math.round(rawItemAmount / 100) * 100;
           }
 
           if (itemAmount > 0) {
@@ -259,7 +262,8 @@ export async function verifyPayment(req, res) {
           // Add item price to total amount for invoice
           let itemPrice = itemType === "download" ? pricing.guestDownload : pricing.guestAi;
           const discount = user.subscriptionPlan === 'freelancer' ? pricing.freelancerAiDiscount : pricing.candidateAiDiscount;
-          itemPrice = itemPrice * (1 - (discount || 0) / 100);
+          const rawItemPrice = itemPrice * (1 - (discount || 0) / 100);
+          itemPrice = Math.round(rawItemPrice / 100) * 100;
           totalAmount += itemPrice;
         }
       }
@@ -355,7 +359,8 @@ export async function verifyPayment(req, res) {
         let discount = 0;
         if (user?.subscriptionPlan === "freelancer") discount = pricing.freelancerAiDiscount;
         else if (user?.subscriptionPlan === "candidate") discount = pricing.candidateAiDiscount;
-        actualAmount = actualAmount * (1 - discount / 100);
+        const rawAmount = actualAmount * (1 - discount / 100);
+        actualAmount = Math.round(rawAmount / 100) * 100;
       }
 
       await createAndSaveInvoice({

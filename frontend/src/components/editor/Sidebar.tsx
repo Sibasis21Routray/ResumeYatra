@@ -51,7 +51,7 @@ const sectionHasData = (sectionId: string, data: any): boolean => {
   }
 };
 
-const CORE_SECTIONS    = ["personal","education","academicCampus","experience","skills","summary","customSections"];
+const CORE_SECTIONS    = ["personal","education","academicCampus","professionalContext","experience","skills","summary","customSections"];
 const HIDDEN_SECTIONS  = ["projects","hobbies","keyAchievements","responsibilities","tools","socialLinks"];
 
 const getSidebarSections = (data: any, completedSections: string[], selectedSection: string) => {

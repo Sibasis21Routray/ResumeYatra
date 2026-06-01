@@ -30,8 +30,6 @@ const AI_ENHANCEMENT_STEPS = [
   { icon: <ShieldCheck size={20} />, text: "Applying ATS-friendly formatting..." },
 ];
 
-// Section icon mapping function
-
 
 // Enhanced color palettes with 50+ colors across all categories
 const colorPalettes = [

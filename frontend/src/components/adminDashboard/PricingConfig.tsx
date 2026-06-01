@@ -61,6 +61,17 @@ const PlanCard = ({ title, icon: Icon, color, planKey, fields, localPricing, onC
               )}
             </div>
             <p className="text-xs text-gray-400 mt-1">{field.hint}</p>
+            {field.key.includes('AiDiscount') && localPricing?.guestAi && (
+              <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800/50">
+                <p className="text-[10px] uppercase tracking-wider text-blue-500 font-bold mb-1">Price Preview</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">Discounted AI Price:</span>
+                  <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">
+                    ₹{Math.round((localPricing.guestAi / 100) * (1 - (Number(val) || 0) / 100))}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         );
       })}

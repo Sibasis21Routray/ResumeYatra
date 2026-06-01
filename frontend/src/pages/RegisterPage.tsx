@@ -117,33 +117,33 @@ export default function RegisterPage({ onSuccess }: { onSuccess: () => void }) {
           ],
         },
         {
-          id: "freelancer" as const,
-          label: "Freelancer",
-          tagline: "Showcase Better. Pitch Smarter. Earn More.",
-          icon: Briefcase,
-          price: pricing.freelancerPrice,
-          duration: pricing.freelancerDurationMonths,
-          color: "#c48b1f",
-          gradient: "from-[#dea42c] to-[#c48b1f]",
-          bgGradient: "from-amber-50 to-amber-100/50",
-          border: "border-[#dea42c]",
-          buttonText: "Start Your Journey",
-          features: [
-            { text: "Professional Dashboard", icon: Briefcase },
-            {
-              text: `Save up to ${pricing.freelancerResumeLimit} Different Resumes`,
-              icon: Save,
-            },
-            {
-              text: `${pricing.freelancerAiDiscount}% off on AI Optimization`,
-              icon: Sparkles,
-            },
-            {
-              text: "AI Optimization Includes 1 Download Credit",
-              icon: CreditCard,
-            },
-          ],
-        },
+  id: "freelancer" as const,
+  label: "Freelancer",
+  tagline: "Showcase Better. Pitch Smarter. Earn More.",
+  icon: Briefcase,
+  price: pricing.freelancerPrice,
+  duration: pricing.freelancerDurationMonths,
+  color: "#374151", // gray-700
+  gradient: "from-gray-700 to-black",
+  bgGradient: "from-gray-50 to-gray-200/50",
+  border: "border-gray-700",
+  buttonText: "Start Your Journey",
+  features: [
+    { text: "Professional Dashboard", icon: Briefcase },
+    {
+      text: `Save up to ${pricing.freelancerResumeLimit} Different Resumes`,
+      icon: Save,
+    },
+    {
+      text: `${pricing.freelancerAiDiscount}% off on AI Optimization`,
+      icon: Sparkles,
+    },
+    {
+      text: "AI Optimization Includes 1 Download Credit",
+      icon: CreditCard,
+    },
+  ],
+}
       ]
     : [];
 
@@ -159,7 +159,7 @@ export default function RegisterPage({ onSuccess }: { onSuccess: () => void }) {
     if (individualType) {
       if (individualType === "ai") {
         const discount = selectedPlan === "freelancer" ? pricing.freelancerAiDiscount : pricing.candidateAiDiscount;
-        const discountedPrice = pricing.guestAi * (1 - (discount || 0) / 100);
+        const discountedPrice = Math.round(pricing.guestAi * (1 - (discount || 0) / 100));
         total += discountedPrice;
       } else if (individualType === "download") {
         total += pricing.guestDownload;
@@ -395,7 +395,7 @@ export default function RegisterPage({ onSuccess }: { onSuccess: () => void }) {
                     >
                       {/* Popular badge for freelancer */}
                       {plan.id === "freelancer" && (
-                        <span className="absolute top-3 right-3 text-xs font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <span className="absolute top-3 right-3 text-xs font-bold bg-grey-100 text-grey-700 px-2 py-0.5 rounded-full flex items-center gap-1">
                           <Star className="w-3 h-3" /> Popular
                         </span>
                       )}
@@ -694,7 +694,7 @@ export default function RegisterPage({ onSuccess }: { onSuccess: () => void }) {
                       ) : (
                         <>
                           {activePlan?.buttonText || "Sign Up"} —{" "}
-                          {activePlan ? (individualType ? formatPriceExact(getCombinedTotal()) : formatPrice(activePlan.price)) : ""}
+                          {activePlan ? (individualType ? formatPrice(getCombinedTotal()) : formatPrice(activePlan.price)) : ""}
                           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </>
                       )}

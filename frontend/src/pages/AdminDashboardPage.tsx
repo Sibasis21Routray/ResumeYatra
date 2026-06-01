@@ -365,16 +365,16 @@ export function AdminDashboardPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="w-12 h-12 text-[#04477E] animate-spin mx-auto mb-4" />
-          <p className="text-gray-500 font-medium">Loading Admin Dashboard...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen  flex items-center justify-center">
+  //       <div className="text-center">
+  //         <RefreshCw className="w-12 h-12 text-[#04477E] animate-spin mx-auto mb-4" />
+  //         <p className="text-gray-500 font-medium">Loading Admin Dashboard...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-12">
@@ -426,6 +426,15 @@ export function AdminDashboardPage() {
           />
         )}
       </main>
+
+      {loading && (
+        <div className="absolute inset-0  backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="text-center">
+            <RefreshCw className="w-12 h-12 text-[#04477E] animate-spin mx-auto mb-4" />
+            <p className="text-gray-500 font-medium">Processing...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

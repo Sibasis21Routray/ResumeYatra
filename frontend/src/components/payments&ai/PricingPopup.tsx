@@ -57,12 +57,12 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
 
   if (!isOpen) return null
 
-  const guestDownloadPrice = pricing ? pricing.guestDownload / 100 : 9
-  const guestAiPrice = pricing ? pricing.guestAi / 100 : 49
+  const guestDownloadPrice = pricing ? Math.round(pricing.guestDownload / 100) : 9
+  const guestAiPrice = pricing ? Math.round(pricing.guestAi / 100) : 49
   const candidatePrice = pricing ? pricing.candidatePrice / 100 : 29
   const freelancerPrice = pricing ? pricing.freelancerPrice / 100 : 99
-  const candidateDiscountedAi = pricing ? (pricing.guestAi * (1 - (pricing.candidateAiDiscount || 25) / 100)) / 100 : 36.75
-  const freelancerDiscountedAi = pricing ? (pricing.guestAi * (1 - (pricing.freelancerAiDiscount || 50) / 100)) / 100 : 24.5
+  const candidateDiscountedAi = pricing ? Math.round((pricing.guestAi * (1 - (pricing.candidateAiDiscount || 25) / 100)) / 100) : 37
+  const freelancerDiscountedAi = pricing ? Math.round((pricing.guestAi * (1 - (pricing.freelancerAiDiscount || 50) / 100)) / 100) : 25
   const candidateDuration = pricing?.candidateDurationMonths || 3
   const freelancerDuration = pricing?.freelancerDurationMonths || 3
   const candidateResumeLimit = pricing?.candidateResumeLimit || 5
@@ -173,10 +173,10 @@ const PricingPopup: React.FC<PricingPopupProps> = ({ isOpen, onClose, resumeId }
                         ₹{guestAiPrice}
                       </td>
                       <td className="p-3 text-center border-t border-slate-200 bg-white font-bold text-[#055597] text-base">
-                        ₹{candidateDiscountedAi.toFixed(2)}
+                        ₹{candidateDiscountedAi}
                       </td>
                       <td className="p-3 text-center border-t border-slate-200 bg-white font-bold text-[#daa13c] text-base">
-                        ₹{freelancerDiscountedAi.toFixed(2)}
+                        ₹{freelancerDiscountedAi}
                       </td>
                     </tr>
 

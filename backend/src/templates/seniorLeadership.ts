@@ -171,7 +171,6 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           color: #ffffff;
           text-align: center;
           padding: 35px 20px;
-          margin-bottom: 25px;
         }
         .name { 
           font-size: ${nameFontSize}px; 
@@ -361,6 +360,9 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           margin-right: 8px;
           color: ${primaryColor};
         }
+          .skill-list {
+            margin-left: 20px;
+          }
 
         @media print {
           .header-container { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #000000 !important; }
@@ -416,9 +418,10 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
             <div class="section-header">
               <h2 class="section-title">Core Competencies</h2>
             </div>
-            <ul class="side-list">
-              ${skillArray.map((skill: any, idx: number) => `<li data-index="${idx}">${skill}</li>`).join('')}
-            </ul>
+              <div class="skill-list  ">
+                ${skillArray.map((skill: any, idx: number) => `<li data-index="${idx}">${skill}</li>`).join('')}
+              </div>
+           
           </section>
           ` : ''}
 

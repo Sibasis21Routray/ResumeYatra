@@ -144,58 +144,155 @@ export async function renderTemplateSample(templateId?: string, theme?: any) {
   }
 
   // Minimal sample data used for public previews
-  const sampleData = {
-    personal: {
-      name: "John Doe",
-      email: "email@example.com",
-      phone: "(555) 123-4567",
-      location: "San Francisco, CA",
-      linkedin: "https://linkedin.com/in/johndoe",
-      github: "https://github.com/johndoe",
-      portfolioUrl: "https://johndoe.com",
-      image: undefined as string | undefined,
+
+const sampleData = {
+  personal: {
+    name: "Ajaya Dugar",
+    email: "ajaya@gmail.com",
+    phone: "+91 98765 43210",
+    location: "Kolkata, West Bengal, India",
+    linkedin: "https://linkedin.com/in/ajayadugar",
+    github: "https://github.com/ajayadugar",
+    portfolioUrl: "https://ajayadugar.dev",
+    image: undefined as string | undefined,
+  },
+
+  summary:
+    "Results-driven Full Stack Developer with 6+ years of experience designing and developing scalable web applications. Skilled in React, Node.js, TypeScript, cloud technologies, and modern software development practices. Strong background in delivering high-performance solutions and collaborating with cross-functional teams.",
+
+  experience: [
+    {
+      id: "exp1",
+      title: "Senior Software Engineer",
+      company: "Infosys Limited",
+      startDate: "Jan 2022",
+      endDate: "Present",
+      description: `
+      Led development of enterprise-grade web applications using React and Node.js.
+      Improved application performance by 40% through code optimization and caching strategies.
+      Collaborated with product managers and designers to deliver customer-focused features.
+      Mentored junior developers and conducted code reviews.
+      Integrated third-party APIs and cloud services to improve scalability.
+      `,
     },
-    summary:
-      "Experienced software engineer with 5+ years of expertise in full-stack development, cloud technologies, and agile methodologies.",
-    experience: [
-      {
-        id: "exp1",
-        title: "Senior Software Engineer",
-        company: "TechCorp Inc.",
-        startDate: "Jan 2022",
-        endDate: "Present",
-        description:
-          "Led development of microservices architecture serving large user bases.",
-      },
-    ],
-    projects: [
-      {
-        id: "proj1",
-        name: "E-commerce Platform",
-        description:
-          "Built a scalable e-commerce platform handling 10k+ daily transactions.",
-        technologies: "React, Node.js, MongoDB, AWS",
-        url: "https://github.com/johndoe/ecommerce",
-      },
-    ],
-    education: [
-      {
-        id: "edu1",
-        degree: "B.Sc. Computer Science",
-        school: "University of Somewhere",
-        field: "Computer Science",
-        graduationDate: "May 2020",
-      },
-    ],
-    skills: ["JavaScript", "TypeScript", "React", "Node.js", "Python", "AWS"],
-    languages: [
-      { language: "English", level: "Native" },
-      { language: "Spanish", level: "Intermediate" },
-    ],
-    hobbies: ["Photography", "Hiking", "Reading"],
-    fontSize: 16,
-    fontFamily: "Arial, sans-serif",
-  };
+
+    {
+      id: "exp2",
+      title: "Software Engineer",
+      company: "Tata Consultancy Services (TCS)",
+      startDate: "Jun 2019",
+      endDate: "Dec 2021",
+      description: `
+       Developed and maintained client-facing applications using JavaScript and React.
+        Implemented RESTful APIs and backend services using Node.js.
+        Participated in Agile sprint planning, development, and deployment activities.
+        Reduced production bugs through comprehensive testing and quality assurance.
+        Worked closely with stakeholders to gather requirements and deliver solutions.
+      `,
+    },
+
+    {
+      id: "exp3",
+      title: "Junior Software Developer",
+      company: "Webskitters Technology Solutions",
+      startDate: "Jul 2018",
+      endDate: "May 2019",
+      description: `
+        Built responsive websites using HTML, CSS, JavaScript, and Bootstrap.
+        Assisted in database design and backend integration.
+        Fixed bugs and enhanced existing application features.
+        Collaborated with senior developers on multiple client projects.
+      `,
+    },
+  ],
+
+  projects: [
+    {
+      id: "proj1",
+      name: "E-Commerce Marketplace",
+      description:
+        "Developed a scalable multi-vendor e-commerce platform supporting secure payments, product management, and order tracking.",
+      technologies: "React, Node.js, MongoDB, AWS",
+      url: "https://github.com/ajayadugar/ecommerce-platform",
+    },
+
+    {
+      id: "proj2",
+      name: "Hospital Management System",
+      description:
+        "Built a comprehensive healthcare management system for patient records, appointments, billing, and reporting.",
+      technologies: "React, Express.js, PostgreSQL",
+      url: "https://github.com/ajayadugar/hospital-management",
+    },
+
+    {
+      id: "proj3",
+      name: "Employee Attendance Portal",
+      description:
+        "Designed and developed a cloud-based attendance and leave management portal with real-time reporting.",
+      technologies: "TypeScript, React, Firebase",
+      url: "https://github.com/ajayadugar/attendance-portal",
+    },
+  ],
+
+  education: [
+    {
+      id: "edu1",
+      degree: "Master of Computer Applications (MCA)",
+      school: "University of Calcutta",
+      field: "Computer Applications",
+      graduationDate: "2020",
+    },
+
+    {
+      id: "edu2",
+      degree: "Bachelor of Computer Applications (BCA)",
+      school: "Techno India University, Kolkata",
+      field: "Computer Applications",
+      graduationDate: "2018",
+    },
+
+    {
+      id: "edu3",
+      degree: "Higher Secondary Education",
+      school: "St. Xavier's Collegiate School, Kolkata",
+      field: "Science",
+      graduationDate: "2015",
+    },
+  ],
+
+  skills: [
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Node.js",
+    "Express.js",
+    "MongoDB",
+    "PostgreSQL",
+    "AWS",
+    "Git",
+    "REST APIs",
+    "HTML",
+    "CSS",
+  ],
+
+  languages: [
+    { language: "English", level: "Professional" },
+    { language: "Hindi", level: "Native" },
+    { language: "Bengali", level: "Native" },
+  ],
+
+  hobbies: [
+    "Photography",
+    "Traveling",
+    "Reading",
+    "Cricket",
+    "Technology Blogging",
+  ],
+
+  fontSize: 16,
+  fontFamily: "Arial, sans-serif",
+};
 
   // Add default image for photographic template if missing
   if (template === "photographic" && !sampleData.personal?.image) {
