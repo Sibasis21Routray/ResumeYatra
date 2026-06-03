@@ -484,7 +484,7 @@ useEffect(() => {
       "experience",
       "skills",
       "summary",
-      "customSection"
+      "customSections"
     ];
 
     // For industry and domain sub-sections, go back to professional context
@@ -669,10 +669,8 @@ useEffect(() => {
         return (
           <SectionWrapper>
             <ExperienceForm
-              data={data}
               onNext={handleNext}
               onBack={handleBack}
-              onOpenAIModal={openAIModal}
               resumeId={resumeId || ""}
             />
           </SectionWrapper>
@@ -852,8 +850,6 @@ useEffect(() => {
         return (
           <SectionWrapper sectionId="skills">
             <SkillsForm
-              data={data}
-              onChange={handleDataChange}
               onNext={handleNext}
               onBack={handleBack}
             />

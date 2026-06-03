@@ -416,8 +416,8 @@ export const paymentAPI = {
   getAutoPayStatus: () =>
     api.get("/payment/autopay-status"),
 
-  getInvoice: (resumeId: string) =>
-    api.get(`/payment/invoice/${resumeId}`),
+  getInvoice: (resumeId: string, type?: 'ai' | 'download') =>
+    api.get(`/payment/invoice/${resumeId}${type ? `?type=${type}` : ''}`),
 };
 
 export const pricingAPI = {

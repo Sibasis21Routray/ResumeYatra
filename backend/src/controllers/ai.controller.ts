@@ -40,10 +40,10 @@ function fixMalformedJSON(text: string): string {
 // ─────────────────────────────────────────────
 function cleanPhoneNumber(phone: string): string {
   if (!phone || typeof phone !== "string") return phone;
-  
+
   // Remove all non-digit characters
   let cleaned = phone.replace(/\D/g, "");
-  
+
   // If number starts with country code (91 for India, 1 for US, etc.)
   // Remove common country codes
   if (cleaned.startsWith("91") && cleaned.length === 12) {
@@ -57,10 +57,7 @@ function cleanPhoneNumber(phone: string): string {
   } else if (cleaned.startsWith("86") && cleaned.length === 13) {
     cleaned = cleaned.substring(2);
   }
-  
-  // For Indian numbers: if 10 digits after removing 91, keep as is
-  // For US numbers: if 10 digits after removing 1, keep as is
-  
+
   return cleaned;
 }
 
@@ -68,14 +65,15 @@ function cleanPhoneNumber(phone: string): string {
 // AI-POWERED SKILL SUGGESTION
 // ─────────────────────────────────────────────
 async function enhanceSkillsWithAI(
-  userId: string | null, 
-  currentSkills: any, 
-  experience: any[], 
+  userId: string | null,
+  currentSkills: any,
+  currentCoreCompetencies: any,
+  experience: any[],
   summary: string,
   options?: { skipLogging?: boolean; guestId?: string | null }
-): Promise<{ skills: string[], usage: any }> {
+): Promise<{ skills: string[], coreCompetencies: string[], usage: any }> {
   const guestId = options?.guestId || null;
-  // ... (rest of the prompt logic)
+
   // Parse current skills
   let existingSkills: string[] = [];
   if (Array.isArray(currentSkills)) {
@@ -95,17 +93,37 @@ async function enhanceSkillsWithAI(
       existingSkills = [currentSkills];
     }
   }
-  
+
+  // Parse current core competencies
+  let existingCoreComp: string[] = [];
+  if (Array.isArray(currentCoreCompetencies)) {
+    existingCoreComp = currentCoreCompetencies;
+  } else if (typeof currentCoreCompetencies === "string") {
+    if (currentCoreCompetencies.includes("<ul>")) {
+      const ulMatch = currentCoreCompetencies.match(/<ul>(.*?)<\/ul>/s);
+      if (ulMatch) {
+        const liMatches = ulMatch[1].match(/<li>(.*?)<\/li>/g);
+        if (liMatches) {
+          existingCoreComp = liMatches.map((li: string) => li.replace(/<\/?li>/g, "").trim());
+        }
+      }
+    } else if (currentCoreCompetencies.includes(",")) {
+      existingCoreComp = currentCoreCompetencies.split(",").map((s: string) => s.trim());
+    } else {
+      existingCoreComp = [currentCoreCompetencies];
+    }
+  }
+
   // Extract job titles and tech from experience
   const jobTitles = experience?.map((exp: any) => exp.title).filter(Boolean) || [];
   const techFromExp: string[] = [];
-  
+
   // Extract technologies from experience descriptions
   if (experience) {
     for (const exp of experience) {
       if (exp.description) {
-        const techKeywords = ["React", "Angular", "Vue", "Node", "Python", "Java", "JavaScript", 
-          "TypeScript", "AWS", "Azure", "Docker", "Kubernetes", "MongoDB", "PostgreSQL", 
+        const techKeywords = ["React", "Angular", "Vue", "Node", "Python", "Java", "JavaScript",
+          "TypeScript", "AWS", "Azure", "Docker", "Kubernetes", "MongoDB", "PostgreSQL",
           "MySQL", "GraphQL", "REST", "API", "CI/CD", "Jenkins", "Git", "Agile", "Scrum"];
         for (const tech of techKeywords) {
           if (exp.description.toLowerCase().includes(tech.toLowerCase())) {
@@ -115,25 +133,26 @@ async function enhanceSkillsWithAI(
       }
     }
   }
-  
+
   const uniqueTechFromExp = [...new Set(techFromExp)];
-  
-  const skillPrompt = `You are a technical skills analyst. Based on the following information, suggest 10-15 RELEVANT professional skills.
+
+  const skillPrompt = `You are a technical skills analyst. Based on the following information, suggest 10-15 RELEVANT professional skills and 5-8 core competencies.
 
 EXISTING SKILLS: ${existingSkills.join(", ")}
+EXISTING CORE COMPETENCIES: ${existingCoreComp.join(", ")}
 JOB TITLES: ${jobTitles.join(", ")}
 TECHNOLOGIES MENTIONED: ${uniqueTechFromExp.join(", ")}
 ${summary ? `SUMMARY CONTEXT: ${summary.substring(0, 200)}` : ""}
 
 RULES:
 1. Combine existing skills with inferred skills from job titles
-2. Add relevant technologies, frameworks, and methodologies
-3. Expand abbreviations (py → Python, js → JavaScript, ts → TypeScript)
-4. Remove duplicates
-5. Return ONLY a JSON object: { "skills": ["skill1", "skill2", ...] }
-6. Skills should be professional, technical, and industry-relevant
-7. Include both hard skills and relevant soft skills
-8. Do NOT include spoken languages (English, Hindi, etc.) in skills
+2. Add relevant technologies, frameworks, and methodologies to SKILLS
+3. Add leadership, strategic, and soft skills to CORE COMPETENCIES
+4. Expand abbreviations
+5. Remove duplicates
+6. Return ONLY a JSON object: { "skills": ["skill1", ...], "coreCompetencies": ["competency1", ...] }
+7. Skills should be technical/hard skills
+8. Core competencies should be soft skills, leadership, strategic thinking
 
 Return ONLY valid JSON.`;
 
@@ -146,13 +165,14 @@ Return ONLY valid JSON.`;
       text: {
         format: {
           type: "json_schema",
-          name: "skills",
+          name: "skills_and_competencies",
           schema: {
             type: "object",
             properties: {
-              skills: { type: "array", items: { type: "string" } }
+              skills: { type: "array", items: { type: "string" } },
+              coreCompetencies: { type: "array", items: { type: "string" } }
             },
-            required: ["skills"],
+            required: ["skills", "coreCompetencies"],
             additionalProperties: false,
           },
           strict: true,
@@ -182,16 +202,20 @@ Return ONLY valid JSON.`;
     let aiText = response.output_text?.trim() || "";
     aiText = aiText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
     const parsed = JSON.parse(aiText);
-    
+
     const suggestedSkills = parsed.skills || [];
-    // Merge existing with suggested, remove duplicates
+    const suggestedCoreComp = parsed.coreCompetencies || [];
+
     const allSkills = [...new Set([...existingSkills, ...suggestedSkills])];
-    console.log(`[enhanceSkillsWithAI] Enhanced from ${existingSkills.length} to ${allSkills.length} skills`);
-    
-    return { skills: allSkills, usage: usageData };
+    const allCoreComp = [...new Set([...existingCoreComp, ...suggestedCoreComp])];
+
+    console.log(`[enhanceSkillsWithAI] Skills enhanced from ${existingSkills.length} to ${allSkills.length}`);
+    console.log(`[enhanceSkillsWithAI] Core competencies enhanced from ${existingCoreComp.length} to ${allCoreComp.length}`);
+
+    return { skills: allSkills, coreCompetencies: allCoreComp, usage: usageData };
   } catch (err: any) {
     console.error("[enhanceSkillsWithAI] Failed:", err.message);
-    return { skills: existingSkills, usage: null };
+    return { skills: existingSkills, coreCompetencies: existingCoreComp, usage: null };
   }
 }
 
@@ -234,7 +258,7 @@ function calculateTotalExperience(experience: any[]): string {
 
     if (startDate && endDate && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
       const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 +
-                     (endDate.getMonth() - startDate.getMonth());
+        (endDate.getMonth() - startDate.getMonth());
       totalMonths += Math.max(0, months);
     }
   }
@@ -339,7 +363,7 @@ function cleanBulletSymbols(data: any): any {
 // ─────────────────────────────────────────────
 function cleanPhoneNumbersInData(data: any): any {
   if (!data || typeof data !== "object") return data;
-  
+
   if (data.personal) {
     if (data.personal.phone) {
       data.personal.phone = cleanPhoneNumber(data.personal.phone);
@@ -348,7 +372,7 @@ function cleanPhoneNumbersInData(data: any): any {
       data.personal.alternatePhone = cleanPhoneNumber(data.personal.alternatePhone);
     }
   }
-  
+
   return data;
 }
 
@@ -359,14 +383,19 @@ function buildEnhancementPrompt(data: any): string {
   const totalExperience = calculateTotalExperience(data.experience);
   const totalYearsText = totalExperience ? `Total Experience: ${totalExperience}` : "";
 
-  const skillsList = Array.isArray(data.skills) ? data.skills : 
-                     (typeof data.skills === "string" ? data.skills.split(/[,\n]/) : []);
+  const skillsList = Array.isArray(data.skills) ? data.skills :
+    (typeof data.skills === "string" ? data.skills.split(/[,\n]/) : []);
   const topSkills = skillsList.slice(0, 5).join(", ");
+
+  const coreCompList = Array.isArray(data.coreCompetencies) ? data.coreCompetencies :
+    (typeof data.coreCompetencies === "string" ? data.coreCompetencies.split(/[,\n]/) : []);
+  const topCoreComp = coreCompList.slice(0, 5).join(", ");
 
   return `You are a world-class career strategist, ATS optimization expert, and professional resume writer with 20+ years of experience.
 
 ${totalYearsText ? `📊 CONTEXT FROM RESUME: ${totalYearsText}` : ""}
 ${topSkills ? `🔧 KEY SKILLS IDENTIFIED: ${topSkills}` : ""}
+${topCoreComp ? `⭐ CORE COMPETENCIES: ${topCoreComp}` : ""}
 
 Your task: Transform the provided resume JSON into a **TOP 1% ELITE** professional document.
 
@@ -400,7 +429,6 @@ PROFESSIONAL ENHANCEMENT RULES
    - "Responsible for" → "Led", "Owned", "Directed"
    - "Helped" → "Drove", "Spearheaded", "Championed"
 
-
 2. Add QUALITATIVE impact when metrics unavailable:
    - "Delivered significant business value"
    - "Drove measurable operational improvements"
@@ -412,7 +440,9 @@ PRIORITY SECTIONS (Enhance these with EXTRA care)
 🔴 HIGHEST PRIORITY:
 1. SUMMARY - Include total experience ONCE, top skills, key achievements
 2. EXPERIENCE - Each entry: 3-5 powerful bullet points with metrics
-3. SKILLS - Clean array, expanded abbreviations
+3. SKILLS & CORE COMPETENCIES - Clean arrays, expanded abbreviations
+   - SKILLS: Technical/hard skills (React, Python, AWS, etc.)
+   - CORE COMPETENCIES: Soft skills, leadership, strategic abilities
 
 🟡 HIGH PRIORITY:
 4. CAREER OBJECTIVE - Clear, focused, NO experience repetition
@@ -440,10 +470,12 @@ For EACH job:
 - description: 4-5 achievement points
 - Each point: Action verb + what + impact
 
-── SKILLS ──
-- Return as array: ["React.js", "Node.js", "MongoDB"]
+── SKILLS & CORE COMPETENCIES ──
+- Return as arrays: ["React.js", "Node.js", "MongoDB"]
 - Expand abbreviations: "py" → "Python", "js" → "JavaScript"
 - Remove duplicates
+- Skills = technical/hard skills
+- Core Competencies = soft/leadership skills
 
 ── EDUCATION ──
 - Enhance description with 1-2 sentences
@@ -574,17 +606,24 @@ export async function enhanceResume(req: Request, res: Response) {
     currentData = cleanPhoneNumbersInData(currentData);
     console.log("[enhanceResume] Phone numbers cleaned");
 
-    // STEP 2: Enhance skills with AI
-    const { skills: enhancedSkills, usage: skillsUsage } = await enhanceSkillsWithAI(
+    // STEP 2: Enhance skills and core competencies with AI
+    const { skills: enhancedSkills, coreCompetencies: enhancedCoreComp, usage: skillsUsage } = await enhanceSkillsWithAI(
       userId,
       currentData.skills,
+      currentData.coreCompetencies,
       currentData.experience,
       currentData.summary,
       { skipLogging: true, guestId }
     );
+
     if (enhancedSkills.length > 0) {
       currentData.skills = enhancedSkills;
       console.log(`[enhanceResume] Skills enhanced to ${enhancedSkills.length} skills`);
+    }
+
+    if (enhancedCoreComp.length > 0) {
+      currentData.coreCompetencies = enhancedCoreComp;
+      console.log(`[enhanceResume] Core competencies enhanced to ${enhancedCoreComp.length} competencies`);
     }
 
     // STEP 3: Calculate total experience for debugging
@@ -661,16 +700,16 @@ export async function enhanceResume(req: Request, res: Response) {
 
     // STEP 5: Clean bullet symbols
     const cleanedData = cleanBulletSymbols(enhancedRaw);
-    
+
     // STEP 6: Apply post-enhancement cleanup
     const cleanedData2 = postEnhancementCleanup(cleanedData);
-    
+
     // STEP 7: Ensure phone numbers remain clean in AI output
     const cleanedData3 = cleanPhoneNumbersInData(cleanedData2);
-    
+
     // STEP 8: Normalize
     const normalized = normalizeParsedResume(cleanedData3);
-    
+
     // STEP 9: Deep merge
     const mergedData = deepMergePreserveOriginal(currentData, normalized);
 

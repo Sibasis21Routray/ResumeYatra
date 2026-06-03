@@ -38,6 +38,7 @@ export function buildVenusaurTemplate(data: any, theme?: any): string {
     coCurricular = [],
     extracurricular = [],
     skills = "",
+    coreCompetencies = "",
     languages = [],
     hobbies = [],
     certifications = [],
@@ -60,7 +61,6 @@ export function buildVenusaurTemplate(data: any, theme?: any): string {
     publications = [],
     patents = [],
     toolsTechnologies = [],
-    professionalContext = {},
     availabilityWorkAuth = {},
     socialProfiles = []
   } = data;
@@ -149,6 +149,26 @@ export function buildVenusaurTemplate(data: any, theme?: any): string {
     return [];
   };
 
+  const parseCoreCompetencies = (): any[] => {
+  if (!coreCompetencies) return [];
+  if (Array.isArray(coreCompetencies)) return coreCompetencies.filter((s: any) => s && (typeof s === "string" ? s.trim() : s));
+  if (typeof coreCompetencies === 'string') {
+    if (coreCompetencies.includes('<ul>')) {
+      const matches = coreCompetencies.match(/<li>(.*?)<\/li>/gs);
+      if (matches) {
+        return matches.map(m => m.replace(/<\/?li>/g, '').trim());
+      }
+    }
+    if (coreCompetencies.includes('\n')) {
+      return coreCompetencies.split('\n')
+        .map((s: string) => s.trim())
+        .filter(s => s && s !== '-');
+    }
+    return coreCompetencies.split(',').map((s: string) => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
   // Get profile image from multiple possible sources
   const getProfileImage = (): string => {
     if (personal?.photoUrl) return personal.photoUrl;
@@ -163,6 +183,8 @@ export function buildVenusaurTemplate(data: any, theme?: any): string {
 
   const profileImage = getProfileImage();
   const skillsArray = parseSkills();
+  const coreCompetenciesArray = parseCoreCompetencies();
+
   
   // Get all non-empty arrays
   const nonEmptyExperience = getNonEmptyArray(experience);
@@ -570,6 +592,17 @@ export function buildVenusaurTemplate(data: any, theme?: any): string {
         ${skillsArray.map((skill: any) => `<span class="skill-pill">${typeof skill === "string" ? skill.trim() : skill}</span>`).join("")}
       </div>
     </div>` : ""}
+
+    <!-- Core Competencies Section -->
+${coreCompetenciesArray.length > 0 ? `
+<div class="section" data-section="coreCompetencies">
+  <div class="section-title">Core Competencies</div>
+  <hr class="divider" />
+  <div class="skills-container">
+    ${coreCompetenciesArray.map((comp: any) => `<span class="skill-pill">${typeof comp === "string" ? comp.trim() : comp}</span>`).join("")}
+  </div>
+</div>` : ""}
+
 
     <!-- Tools & Technologies Section -->
     ${nonEmptyToolsTechnologies.length > 0 ? `

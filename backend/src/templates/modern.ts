@@ -13,6 +13,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
     coCurricular = [],
     extracurricular = [],
     skills = "",
+    coreCompetencies = "",
     languages = [],
     hobbies = [],
     certifications = [],
@@ -150,6 +151,8 @@ export function buildModernTemplate(data: any, theme?: any): string {
     `;
   };
 
+  
+
   // Helper to parse skills into two columns with proper bullet points
   const parseSkillsToColumns = (skills: any) => {
     let list: string[] = [];
@@ -177,7 +180,10 @@ export function buildModernTemplate(data: any, theme?: any): string {
     };
   };
 
+
+
   const { col1, col2 } = parseSkillsToColumns(skills);
+  const { col1: coreCompCol1, col2: coreCompCol2 } = parseSkillsToColumns(coreCompetencies);
   
   // Filter arrays to only include non-empty items
   const nonEmptyExperience = getNonEmptyItems(experience);
@@ -637,6 +643,27 @@ export function buildModernTemplate(data: any, theme?: any): string {
         </div>
       </div>
       ` : ''}
+
+
+      <!-- Core Competencies Section -->
+${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
+<div class="section-row" data-section="coreCompetencies">
+  <div class="label-main">Competencies</div>
+  <div class="skills-container" style="display: flex; gap: 30px;">
+    ${coreCompCol1.length > 0 ? `
+    <div style="flex: 1;">
+      ${coreCompCol1.map((s, idx) => `<div class="sidebar-list-item" data-index="${idx}">${s}</div>`).join('')}
+    </div>
+    ` : ''}
+    ${coreCompCol2.length > 0 ? `
+    <div style="flex: 1;">
+      ${coreCompCol2.map((s, idx) => `<div class="sidebar-list-item" data-index="${coreCompCol1.length + idx}">${s}</div>`).join('')}
+    </div>
+    ` : ''}
+  </div>
+</div>
+` : ''}
+
 
       ${nonEmptyLanguages.length > 0 ? `
       <div class="section-row" data-section="languages">

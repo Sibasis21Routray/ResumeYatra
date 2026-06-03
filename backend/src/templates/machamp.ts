@@ -116,6 +116,27 @@ export function buildMachampTemplate(data: any, theme?: any): string {
     return [];
   };
 
+
+  const parseCoreCompetencies = (): any[] => {
+  if (!data.coreCompetencies) return [];
+  if (Array.isArray(data.coreCompetencies)) return data.coreCompetencies.filter((s: any) => s && (typeof s === "string" ? s.trim() : s));
+  if (typeof data.coreCompetencies === 'string') {
+    if (data.coreCompetencies.includes('<ul>')) {
+      const matches = data.coreCompetencies.match(/<li>(.*?)<\/li>/g);
+      if (matches) {
+        return matches.map(m => m.replace(/<\/?li>/g, '').trim());
+      }
+    }
+    if (data.coreCompetencies.includes('\n')) {
+      return data.coreCompetencies.split('\n')
+        .map((s: string) => s.trim())
+        .filter(s => s && s !== '-');
+    }
+    return data.coreCompetencies.split(',').map((s: string) => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
   const renderDescription = (description: string): string => {
     if (!description) return '';
     
@@ -144,6 +165,7 @@ export function buildMachampTemplate(data: any, theme?: any): string {
   };
 
   const nonEmptySkills = parseSkills();
+  const nonEmptyCoreCompetencies = parseCoreCompetencies();
   const nonEmptyInternships = getNonEmptyArray(data.internships);
   const nonEmptyTrainingPrograms = getNonEmptyArray(data.trainingPrograms);
   const nonEmptyAcademicProjects = getNonEmptyArray(data.academicProjects);
@@ -528,6 +550,48 @@ export function buildMachampTemplate(data: any, theme?: any): string {
                   <div class="skill-item">
                     <span class="skill-bullet">&#8226;</span>
                     <span class="skill-text">${typeof skill === "string" ? skill.trim() : skill}</span>
+                  </div>                  
+                `
+              )
+              .join("")}
+          </div>
+        `;
+      })()}
+    </div>
+  </div>`
+    : ""
+}
+
+${
+  nonEmptyCoreCompetencies.length > 0
+    ? `
+  <div class="section" data-section="coreCompetencies">
+    <div class="section-title">Core Competencies</div>
+    <div class="skills-container">
+      ${(() => {
+        const midPoint = Math.ceil(nonEmptyCoreCompetencies.length / 2);
+        const firstColumn = nonEmptyCoreCompetencies.slice(0, midPoint);
+        const secondColumn = nonEmptyCoreCompetencies.slice(midPoint);
+        return `
+          <div class="skills-column">
+            ${firstColumn
+              .map(
+                (comp: any) => `
+                  <div class="skill-item">
+                    <span class="skill-bullet">&#8226;</span>
+                    <span class="skill-text">${typeof comp === "string" ? comp.trim() : comp}</span>
+                  </div>                  
+                `
+              )
+              .join("")}
+          </div>
+          <div class="skills-column">
+            ${secondColumn
+              .map(
+                (comp: any) => `
+                  <div class="skill-item">
+                    <span class="skill-bullet">&#8226;</span>
+                    <span class="skill-text">${typeof comp === "string" ? comp.trim() : comp}</span>
                   </div>                  
                 `
               )

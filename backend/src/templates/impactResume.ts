@@ -13,6 +13,7 @@ export function buildImpactResumeTemplate(data: any, theme?: any): string {
     coCurricular = [],
     extracurricular = [],
     skills = "",
+    coreCompetencies = "",
     languages = [],
     hobbies = [],
     certifications = [],
@@ -92,8 +93,13 @@ export function buildImpactResumeTemplate(data: any, theme?: any): string {
   };
 
   const skillArray = typeof skills === "string" 
-    ? skills.split(",").map(s => s.trim()).filter(s => s) 
-    : Array.isArray(skills) ? skills : [];
+  ? skills.split(",").map(s => s.trim()).filter(s => s) 
+  : Array.isArray(skills) ? skills : [];
+
+const coreCompArray = typeof coreCompetencies === "string" 
+  ? coreCompetencies.split(",").map(s => s.trim()).filter(s => s) 
+  : Array.isArray(coreCompetencies) ? coreCompetencies : [];
+
 
   const linkedIn = socialProfiles.find((p: any) => p.platform?.toLowerCase().includes("linkedin"))?.url || "";
   const github = socialProfiles.find((p: any) => p.platform?.toLowerCase().includes("github"))?.url || "";
@@ -518,6 +524,14 @@ export function buildImpactResumeTemplate(data: any, theme?: any): string {
             <p class="skill-text">${skillArray.join(', ')}</p>
           </div>
           ` : ''}
+
+          <!-- Core Competencies -->
+${coreCompArray.length > 0 ? `
+<div class="section" data-section="coreCompetencies">
+  <h2 class="section-title">Core Competencies</h2>
+  <p class="skill-text">${coreCompArray.join(', ')}</p>
+</div>
+` : ''}
 
           <!-- Tools & Technologies -->
           ${nonEmptyToolsTechnologies.length > 0 ? `

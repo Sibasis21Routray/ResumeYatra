@@ -13,6 +13,7 @@ export function buildOrionTemplate(data: any, theme?: any): string {
     coCurricular = [],
     extracurricular = [],
     skills = "",
+    coreCompetencies = "",
     languages = [],
     hobbies = [],
     certifications = [],
@@ -172,6 +173,7 @@ const currentTheme = {
   };
 
   const skillList = parseSkills(skills);
+  const parsedCoreCompetencies = parseSkills(coreCompetencies);
 
   // Filter arrays
   const nonEmptyExperience = getNonEmptyItems(experience);
@@ -490,6 +492,19 @@ const currentTheme = {
               ${skillList.map((skill, idx) => `
                 <li data-index="${idx}">
                   <div class="text">${skill}</div>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+          ` : ''}
+
+           ${parsedCoreCompetencies.length > 0 ? `
+          <div class="sidebar-section" data-section="skills">
+            <h2 class="sidebar-title">Competencies</h2>
+            <ul class="sidebar-list">
+              ${parsedCoreCompetencies.map((coreCompetency, idx) => `
+                <li data-index="${idx}">
+                  <div class="text">${coreCompetency}</div>
                 </li>
               `).join('')}
             </ul>

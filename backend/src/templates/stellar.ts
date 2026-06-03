@@ -13,6 +13,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     coCurricular = [],
     extracurricular = [],
     skills = "",
+    coreCompetencies = "",
     languages = [],
     hobbies = [],
     certifications = [],
@@ -35,7 +36,6 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     publications = [],
     patents = [],
     toolsTechnologies = [],
-    professionalContext = {},
     availabilityWorkAuth = {},
     socialProfiles = []
   } = data;
@@ -163,6 +163,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
   };
 
   const skillsArray = getSkillsArray(skills);
+  const coreCompetenciesArray = getSkillsArray(coreCompetencies);
   const nonEmptyExperience = getNonEmptyItems(experience);
   const nonEmptyEducation = getNonEmptyItems(education);
   const nonEmptyInternships = getNonEmptyItems(internships);
@@ -508,6 +509,17 @@ export function buildStellarTemplate(data: any, theme?: any): string {
         <div class="divider"></div>
         <div class="skills-flex-wrap">
           ${skillsArray.map(skill => `<span class="skill-pill">${skill}</span>`).join("")}
+        </div>
+      </div>
+    ` : ""}
+
+    <!-- core competency Section -->
+    ${coreCompetenciesArray.length > 0 ? `
+      <div class="cv-section" data-section="coreCompetencies">
+        <h2 class="cv-section-title">Core Competencies</h2>
+        <div class="divider"></div>
+        <div class="skills-flex-wrap">
+          ${coreCompetenciesArray.map(comp => `<span class="skill-pill">${comp}</span>`).join("")}
         </div>
       </div>
     ` : ""}

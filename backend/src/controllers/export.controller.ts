@@ -58,8 +58,8 @@ export async function exportPdf(req: Request, res: Response) {
       isAdmin = user?.role === "admin";
     }
 
-    const isOwner = (userId && resume.ownerId?.toString() === userId) || 
-                   (guestId && resume.guestId === guestId);
+    const isOwner = (userId && resume.ownerId?.toString() === userId) ||
+      (guestId && resume.guestId === guestId);
 
     if (!isOwner && !isAdmin) {
       return res.status(403).json({ error: "Access denied" });
@@ -81,7 +81,7 @@ export async function exportPdf(req: Request, res: Response) {
       req.method === "POST" && req.body && req.body.data
         ? req.body.data
         : undefined;
-    
+
     const html = await templateService.renderResumeHtml(
       resumeId as string,
       template,
@@ -203,8 +203,8 @@ export async function exportDocx(req: Request, res: Response) {
       isAdmin = user?.role === "admin";
     }
 
-    const isOwner = (userId && resume.ownerId?.toString() === userId) || 
-                   (guestId && resume.guestId === guestId);
+    const isOwner = (userId && resume.ownerId?.toString() === userId) ||
+      (guestId && resume.guestId === guestId);
 
     if (!isOwner && !isAdmin) {
       console.warn(`[exportDocx] DENIED: Unauthorized access attempt to resume: ${resumeId}`);
@@ -265,7 +265,7 @@ export async function exportDocx(req: Request, res: Response) {
 
     if (!docxBuffer) {
       console.log("🛠 Queueing DOCX generation (cache miss)...");
-      
+
       docxBuffer = await queueExportTask({
         type: "docx",
         html,
@@ -344,11 +344,11 @@ export async function exportTxt(req: Request, res: Response) {
       isAdmin = user?.role === "admin";
     }
 
-    const isOwner = (userId && resume.ownerId?.toString() === userId) || 
-                   (guestId && resume.guestId === guestId);
+    const isOwner = (userId && resume.ownerId?.toString() === userId) ||
+      (guestId && resume.guestId === guestId);
 
     if (!isOwner && !isAdmin) {
-       console.warn(`[exportTxt] DENIED: Unauthorized access attempt to resume: ${resumeId}`);
+      console.warn(`[exportTxt] DENIED: Unauthorized access attempt to resume: ${resumeId}`);
       return res.status(403).json({ error: "Access denied" });
     }
 
@@ -397,7 +397,7 @@ export async function exportTxt(req: Request, res: Response) {
 
     if (!txtBuffer) {
       console.log("🛠 Queueing TXT generation (cache miss)...");
-      
+
       txtBuffer = await queueExportTask({
         type: "txt",
         data: dataForExport,

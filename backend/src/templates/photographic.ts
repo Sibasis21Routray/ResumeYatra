@@ -13,6 +13,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
     coCurricular = [],
     extracurricular = [],
     skills = "",
+     coreCompetencies = "",
     languages = [],
     hobbies = [],
     certifications = [],
@@ -178,6 +179,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
   };
 
   const { col1, col2 } = parseSkillsToColumns(skills);
+  const { col1: coreCompCol1, col2: coreCompCol2 } = parseSkillsToColumns(coreCompetencies);
   
   // Filter arrays to only include non-empty items
   const nonEmptyExperience = getNonEmptyItems(experience);
@@ -570,6 +572,24 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
         ` : ''}
       </div>
       ` : ''}
+
+
+      <!-- Core Competencies Section -->
+${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
+<div class="section-header" data-section="coreCompetencies"><span>Core Competencies</span></div>
+<div class="skills-grid">
+  ${coreCompCol1.length > 0 ? `
+  <ul class="bullet-list" style="list-style: none; margin-left: 0;">
+    ${coreCompCol1.map((s, idx) => `<li data-index="${idx}">${s}</li>`).join('')}
+  </ul>
+  ` : ''}
+  ${coreCompCol2.length > 0 ? `
+  <ul class="bullet-list" style="list-style: none; margin-left: 0;">
+    ${coreCompCol2.map((s, idx) => `<li data-index="${coreCompCol1.length + idx}">${s}</li>`).join('')}
+  </ul>
+  ` : ''}
+</div>
+` : ''}
 
       ${nonEmptyLanguages.length > 0 ? `
       <div class="section-header" data-section="languages"><span>Languages</span></div>

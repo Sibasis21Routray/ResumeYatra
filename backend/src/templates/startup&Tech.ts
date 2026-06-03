@@ -13,6 +13,7 @@ export function buildStartupAndTechTemplate(data: any, theme?: any): string {
     coCurricular = [],
     extracurricular = [],
     skills = "",
+    coreCompetencies = "",
     languages = [],
     hobbies = [],
     certifications = [],
@@ -110,8 +111,12 @@ export function buildStartupAndTechTemplate(data: any, theme?: any): string {
     `<svg width="${size}" height="${size}" viewBox="0 0 10 10" style="display:inline-block;vertical-align:middle;flex-shrink:0;"><rect x="1" y="1" width="8" height="8" transform="rotate(45 5 5)" fill="${color}"/></svg>`;
 
   const skillArray = typeof skills === "string"
-    ? skills.split(",").map(s => s.trim()).filter(s => s)
-    : Array.isArray(skills) ? skills : [];
+  ? skills.split(",").map(s => s.trim()).filter(s => s)
+  : Array.isArray(skills) ? skills : [];
+
+const coreCompArray = typeof coreCompetencies === "string"
+  ? coreCompetencies.split(",").map(s => s.trim()).filter(s => s)
+  : Array.isArray(coreCompetencies) ? coreCompetencies : [];
 
   const linkedIn = socialProfiles.find((p: any) => p.platform?.toLowerCase().includes("linkedin"))?.url || "";
   const github = socialProfiles.find((p: any) => p.platform?.toLowerCase().includes("github"))?.url || "";
@@ -573,6 +578,19 @@ export function buildStartupAndTechTemplate(data: any, theme?: any): string {
           `).join('')}
         </div>
         ` : ''}
+
+        <!-- CORE COMPETENCIES -->
+${coreCompArray.length > 0 ? `
+${sectionHeader('Core Competencies')}
+<div class="skills-grid" data-section="coreCompetencies">
+  ${coreCompArray.map((comp, idx) => `
+    <div class="skill-item" data-index="${idx}">
+      ${smallDiamond(9, diamondColor)}
+      <span>${comp}</span>
+    </div>
+  `).join('')}
+</div>
+` : ''}
 
         <!-- TOOLS & TECHNOLOGIES -->
         ${nonEmptyToolsTechnologies.length > 0 ? `

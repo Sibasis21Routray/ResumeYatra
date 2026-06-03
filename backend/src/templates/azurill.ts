@@ -13,6 +13,7 @@ export function buildAzurillTemplate(data: any, theme?: any): string {
     coCurricular = [],
     extracurricular = [],
     skills = "",
+      coreCompetencies = "",
     languages = [],
     hobbies = [],
     certifications = [],
@@ -166,6 +167,7 @@ export function buildAzurillTemplate(data: any, theme?: any): string {
   };
 
   const skillsArray = getSkillsArray(skills);
+  const coreCompetenciesArray = getSkillsArray(coreCompetencies);
   const nonEmptyExperience = getNonEmptyItems(experience);
   const nonEmptyEducation = getNonEmptyItems(education);
   const nonEmptyInternships = getNonEmptyItems(internships);
@@ -619,6 +621,17 @@ export function buildAzurillTemplate(data: any, theme?: any): string {
         </div>
       </div>
     ` : ""}
+
+    <!-- Core Competencies Section -->
+${coreCompetenciesArray.length > 0 ? `
+  <div class="cv-section" data-section="coreCompetencies">
+    <h2 class="cv-section-title">Core Competencies</h2>
+    <div class="divider"></div>
+    <div class="skills-flex-wrap">
+      ${coreCompetenciesArray.map(comp => `<span class="skill-pill">${comp}</span>`).join("")}
+    </div>
+  </div>
+` : ""}
 
     <!-- Tools & Technologies Section -->
     ${nonEmptyToolsTechnologies.length > 0 ? `

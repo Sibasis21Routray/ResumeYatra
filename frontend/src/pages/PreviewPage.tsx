@@ -31,32 +31,16 @@ const AI_ENHANCEMENT_STEPS = [
 ];
 
 
-// Enhanced color palettes with 50+ colors across all categories
+//  color palettes
 const colorPalettes = [
-  { name: 'Deep Navy', primary: '#0A1929', secondary: '#1A2A3A', background: '#ffffff', category: 'blue' },
-  { name: 'Classic Blue', primary: '#04477E', secondary: '#0660a9', background: '#ffffff', category: 'blue' },
-  { name: 'Ocean Blue', primary: '#0ea5e9', secondary: '#0284c7', background: '#ffffff', category: 'blue' },
-  { name: 'Electric Blue', primary: '#2563eb', secondary: '#3b82f6', background: '#ffffff', category: 'blue' },
-  { name: 'Cobalt', primary: '#0047AB', secondary: '#1A5F9E', background: '#ffffff', category: 'blue' },
-  { name: 'Forest Green', primary: '#166534', secondary: '#15803d', background: '#ffffff', category: 'green' },
-  { name: 'Emerald', primary: '#047857', secondary: '#065f46', background: '#ffffff', category: 'green' },
-  { name: 'Mint Fresh', primary: '#10b981', secondary: '#059669', background: '#ffffff', category: 'green' },
-  { name: 'Jade', primary: '#00A86B', secondary: '#1FB37B', background: '#ffffff', category: 'green' },
-  { name: 'Burgundy', primary: '#7f1d1d', secondary: '#881337', background: '#ffffff', category: 'red' },
-  { name: 'Ruby Red', primary: '#b91c1c', secondary: '#991b1b', background: '#ffffff', category: 'red' },
-  { name: 'Terracotta', primary: '#c2410c', secondary: '#9a3412', background: '#ffffff', category: 'red' },
-  { name: 'Crimson', primary: '#DC143C', secondary: '#B22222', background: '#ffffff', category: 'red' },
-  { name: 'Royal Purple', primary: '#7e22ce', secondary: '#6b21a8', background: '#ffffff', category: 'purple' },
-  { name: 'Violet', primary: '#6d28d9', secondary: '#5b21b6', background: '#ffffff', category: 'purple' },
-  { name: 'Lavender', primary: '#a78bfa', secondary: '#8b5cf6', background: '#ffffff', category: 'purple' },
-  { name: 'Sunset Orange', primary: '#ea580c', secondary: '#c2410c', background: '#ffffff', category: 'orange' },
-  { name: 'Amber', primary: '#f59e0b', secondary: '#d97706', background: '#ffffff', category: 'orange' },
-  { name: 'Golden Yellow', primary: '#eab308', secondary: '#ca8a04', background: '#ffffff', category: 'orange' },
-  { name: 'Slate Gray', primary: '#475569', secondary: '#334155', background: '#ffffff', category: 'neutral' },
-  { name: 'Charcoal', primary: '#1e293b', secondary: '#0f172a', background: '#ffffff', category: 'neutral' },
-  { name: 'Graphite', primary: '#2C3E50', secondary: '#34495E', background: '#ffffff', category: 'neutral' },
-  { name: 'Dark Blue', primary: '#60a5fa', secondary: '#3b82f6', background: '#0f172a', category: 'dark' },
-  { name: 'Dark Green', primary: '#4ade80', secondary: '#22c55e', background: '#0f172a', category: 'dark' },
+  { name: 'Navy Blue', primary: '#1e3a8a', secondary: '#1d4ed8', background: '#ffffff', category: 'blue' },
+{ name: 'Royal Blue', primary: '#4169E1', secondary: '#3154C4', background: '#ffffff', category: 'blue' },
+{ name: 'Teal', primary: '#0f766e', secondary: '#115e59', background: '#ffffff', category: 'green' },
+{ name: 'Dark Green', primary: '#14532d', secondary: '#166534', background: '#ffffff', category: 'green' },
+{ name: 'Charcoal', primary: '#36454F', secondary: '#2C3A42', background: '#ffffff', category: 'neutral' },
+{ name: 'Maroon', primary: '#800000', secondary: '#6B0000', background: '#ffffff', category: 'red' },
+{ name: 'Slate Grey', primary: '#708090', secondary: '#5A6772', background: '#ffffff', category: 'neutral' },
+{ name: 'Brown / Coffee', primary: '#6F4E37', secondary: '#5C4033', background: '#ffffff', category: 'brown' },
 ];
 
 // Font families
@@ -136,6 +120,7 @@ export default function PreviewPage() {
   const [customFilename, setCustomFilename] = useState('')
   const filenameInputRef = useRef<HTMLInputElement>(null)
   const [downloadingInvoice, setDownloadingInvoice] = useState(false)
+  const [lastInvoiceType, setLastInvoiceType] = useState<'ai' | 'download' | null>(null)
 
   // Keep previous preview URL to prevent flicker
   const previousPreviewUrlRef = useRef<string>('')
@@ -235,8 +220,11 @@ export default function PreviewPage() {
     if (showComparison) {
       await acceptAIData()
     }
+
+    // Map coreCompetencies to skills section
+    const targetSectionId = sectionId === 'coreCompetencies' ? 'skills' : sectionId;
     
-    navigate(`/editor/${id}?section=${sectionId}`);
+    navigate(`/editor/${id}?section=${targetSectionId}`);
   };
 
   // AI Enhance handler with comparison mode
@@ -266,6 +254,7 @@ export default function PreviewPage() {
             setEnhancing(false)
             setShowComparison(true)
             setEnhancementSuccess(false)
+            setLastInvoiceType('ai') // Track that the last action was AI enhancement
             toast.success("AI enhancement complete! Compare the versions below.")
           }, 800)
         }, 500)
@@ -293,7 +282,7 @@ export default function PreviewPage() {
     if (!id) return;
     setDownloadingInvoice(true);
     try {
-      const response = await paymentAPI.getInvoice(id);
+      const response = await paymentAPI.getInvoice(id, lastInvoiceType || undefined);
       if (response.data.success && response.data.pdfUrl) {
         try {
           // Attempt to download the file with custom filename
@@ -402,7 +391,12 @@ export default function PreviewPage() {
       window.URL.revokeObjectURL(url);
 
       toast.success(`Resume exported as ${format.toUpperCase()} successfully!`);
-      
+
+      // Only switch to 'download' invoice if user didn't pay via AI (free bundled credit keeps the AI invoice)
+      if (lastInvoiceType !== 'ai') {
+        setLastInvoiceType('download');
+      }
+
       // If downloading AI enhanced version, accept the AI data
       if (version === 'enhanced') {
         await acceptAIData();
@@ -495,6 +489,10 @@ export default function PreviewPage() {
 
       await resumeAPI.markDownloaded(id);
 
+      // Only switch to 'download' invoice if user didn't pay via AI (free bundled credit keeps the AI invoice)
+      if (lastInvoiceType !== 'ai') {
+        setLastInvoiceType('download')
+      }
       setCopied(true)
       setTimeout(() => setCopied(false), 3000)
       toast.success(`Resume exported as ${format.toUpperCase()} successfully!`)
@@ -689,6 +687,7 @@ export default function PreviewPage() {
         await handleSectionClick(event.data.sectionId);
       } else if (event.data.type === 'SECTION_DELETE' && event.data.sectionId) {
         await handleSectionDelete(event.data.sectionId, event.data.index);
+        console.log('Deleting section:', event.data.sectionId); 
       }
     };
 
@@ -866,6 +865,7 @@ export default function PreviewPage() {
 
   const handlePaymentSuccess = async (finalType: "download" | "ai") => {
     try {
+      setLastInvoiceType(finalType); // Track which invoice to fetch later
       await fetchResume();
 
       if (finalType === "download" && pendingExportFormat) {
@@ -1270,7 +1270,7 @@ export default function PreviewPage() {
                         </>
                       )}
 
-                      {(resume?.isDownloadPaid || resume?.isAiPaid) && (
+                      {(resume?.isDownloadPaid || resume?.isAiPaid || resume?.isDownloaded || resume?.isAiEnhanced) && (
                         <button
                           onClick={handleDownloadInvoice}
                           className="w-full px-4 py-3 bg-white border border-[#04477E] text-[#04477E] rounded-xl hover:bg-[#04477E]/5 hover:shadow-md transition-all flex items-center justify-between gap-2 text-sm font-medium group disabled:opacity-70 disabled:cursor-not-allowed"

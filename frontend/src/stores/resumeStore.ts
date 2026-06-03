@@ -17,6 +17,7 @@ export interface ResumeData {
   coCurricular?: any[];
   extracurricular?: any[];
   skills: any;
+  coreCompetencies?: any;
   languages: any[];
   hobbies: any[];
   certifications?: any[];
@@ -75,6 +76,7 @@ const initialData: ResumeData = {
   coCurricular: [],
   extracurricular: [],
   skills: "",
+  coreCompetencies: "",
   languages: [],
   hobbies: [],
   certifications: [],
@@ -94,6 +96,7 @@ const initialData: ResumeData = {
     "projects",
     "education",
     "skills",
+    "coreCompetencies",
     "languages",
     "hobbies",
     "certifications",
@@ -112,6 +115,7 @@ const initialData: ResumeData = {
     projects: true,
     education: true,
     skills: true,
+    coreCompetencies: true,
     languages: true,
     hobbies: true,
     certifications: true,
@@ -135,13 +139,13 @@ const ensureIds = (data: any) => {
     "academicProjects", "leadershipPositions", "coCurricular", "extracurricular",
     "languages", "hobbies", "certifications", "scholarships", "awards",
     "speakingEngagements", "memberships", "workshops", "socialLinks",
-    "customSections", "clientProjects", "portfolio", "volunteering", 
-    "militaryService", "methodologies", "industryExpertise", "references", 
-    "socialProfiles", "availabilityWorkAuth", "teachingExperience", 
-    "mentorshipExperience", "researchGrants", "testScores", "publications", 
+    "customSections", "clientProjects", "portfolio", "volunteering",
+    "militaryService", "methodologies", "industryExpertise", "references",
+    "socialProfiles", "availabilityWorkAuth", "teachingExperience",
+    "mentorshipExperience", "researchGrants", "testScores", "publications",
     "patents", "toolTechnologies"
   ];
-  
+
   const processed = { ...data };
   for (const key of arrayKeys) {
     if (Array.isArray(processed[key])) {
@@ -152,7 +156,7 @@ const ensureIds = (data: any) => {
           } else if (item._id && !item.id) {
             item.id = item._id.toString();
           }
-          
+
           if (key === 'customSections' && Array.isArray(item.entries)) {
             item.entries = item.entries.map((entry: any, eIndex: number) => {
               if (typeof entry === 'object' && entry !== null && !entry.id && !entry._id) {
@@ -206,9 +210,9 @@ export const useResumeStore = create<ResumeState>()(
 
           const loadedData = latestVersion?.data
             ? {
-                ...initialData,
-                ...latestVersion.data,
-              }
+              ...initialData,
+              ...latestVersion.data,
+            }
             : { ...initialData };
 
           const dataWithIds = ensureIds(loadedData);
@@ -296,9 +300,8 @@ export const useResumeStore = create<ResumeState>()(
   )
 );
 
-// ------------------------------------
+
 // AUTO SAVE SUBSCRIPTION
-// ------------------------------------
 
 useResumeStore.subscribe(
   (state) => state.data,

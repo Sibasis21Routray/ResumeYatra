@@ -13,6 +13,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
     coCurricular = [],
     extracurricular = [],
     skills = "",
+    coreCompetencies = "",
     languages = [],
     hobbies = [],
     certifications = [],
@@ -35,7 +36,6 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
     publications = [],
     patents = [],
     toolsTechnologies = [],
-    professionalContext = {},
     availabilityWorkAuth = {},
     socialProfiles = []
   } = data;
@@ -181,6 +181,8 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
     }
     return '';
   };
+
+  const parsedCoreCompetencies = renderSkills(coreCompetencies);
 
   const skillList = renderSkills(skills);
   
@@ -575,6 +577,12 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
           <div class="sidebar-section" data-section="skills">
             <h2 class="sidebar-title">Skills</h2>
             <div class="skills-html">${skillList}</div>
+          </div>
+          ` : ''}
+          ${parsedCoreCompetencies ? `
+          <div class="sidebar-section" data-section="coreCompetencies">
+            <h2 class="sidebar-title">Core Competencies</h2>
+            <div class="skills-html">${parsedCoreCompetencies}</div>
           </div>
           ` : ''}
 

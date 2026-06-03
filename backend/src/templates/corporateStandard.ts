@@ -13,6 +13,7 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
     coCurricular = [],
     extracurricular = [],
     skills = "",
+    coreCompetencies = "", 
     languages = [],
     hobbies = [],
     certifications = [],
@@ -120,6 +121,10 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
   const skillArray = typeof skills === "string" 
     ? skills.split(",").map(s => s.trim()).filter(s => s) 
     : Array.isArray(skills) ? skills : [];
+
+    const coreCompArray = typeof coreCompetencies === "string" 
+  ? coreCompetencies.split(",").map(s => s.trim()).filter(s => s) 
+  : Array.isArray(coreCompetencies) ? coreCompetencies : [];
 
   const linkedIn = socialProfiles.find((p: any) => p.platform?.toLowerCase().includes("linkedin"))?.url || "";
   
@@ -311,7 +316,7 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
         <h1 class="name">${personal.name || 'Your Name'}</h1>
         <div class="contact-info">
           ${personal.phone ? `<span><strong>Ph.</strong> ${personal.phone}</span>` : ''}
-          ${personal.alternatePhone ? `<span><strong>Alt Ph.</strong> ${personal.alternatePhone}</span>` : ''}
+          ${personal.alternatePhone ? `<span><strong>Alt Phone</strong> ${personal.alternatePhone}</span>` : ''}
           ${personal.email ? `<span><strong>Email</strong> ${personal.email}</span>` : ''}
           ${personal.location ? `<span><strong>Location</strong> ${personal.location}</span>` : ''}
           ${personal.dob ? `<span><strong>DOB</strong> ${personal.dob}</span>` : ''}
@@ -499,6 +504,19 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
           ${skillArray.map((skill: string, idx: number) => `<li data-index="${idx}">${skill}</li>`).join('')}
         </ul>
       </section>` : ''}
+
+
+      <!-- Core Competencies Section -->
+${coreCompArray.length > 0 ? `
+<section class="section" data-section="coreCompetencies">
+  <div class="section-header">
+    <span class="section-dot">●</span>
+    <h2 class="section-title">Core Competencies</h2>
+  </div>
+  <ul class="grid-list">
+    ${coreCompArray.map((comp: string, idx: number) => `<li data-index="${idx}">${comp}</li>`).join('')}
+  </ul>
+</section>` : ''}
 
       ${nonEmptyToolsTechnologies.length > 0 ? `
       <section class="section" data-section="toolsTechnologies">

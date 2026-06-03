@@ -109,6 +109,24 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
     return [];
   };
 
+
+  // Parse core competencies (ADD THIS FUNCTION)
+const parseCoreCompetencies = (): any[] => {
+  if (!data.coreCompetencies) return [];
+  if (Array.isArray(data.coreCompetencies)) return data.coreCompetencies.filter((s: any) => s && (typeof s === "string" ? s.trim() : s));
+  if (typeof data.coreCompetencies === 'string') {
+    if (data.coreCompetencies.includes('<ul>')) {
+      const matches = data.coreCompetencies.match(/<li>(.*?)<\/li>/g);
+      if (matches) {
+        return matches.map(m => m.replace(/<\/?li>/g, '').trim());
+      }
+    }
+    return data.coreCompetencies.split(',').map((s: string) => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
+
   // Helper to render description with HTML content
   const renderDescription = (description: string): string => {
     if (!description) return '';
@@ -140,6 +158,7 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
   };
 
   const nonEmptySkills = parseSkills();
+  const nonEmptyCoreCompetencies = parseCoreCompetencies();
   const nonEmptyInternships = getNonEmptyArray(data.internships);
   const nonEmptyTrainingPrograms = getNonEmptyArray(data.trainingPrograms);
   const nonEmptyAcademicProjects = getNonEmptyArray(data.academicProjects);
@@ -1364,6 +1383,25 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
     </div>`
         : ""
     }
+
+
+    <!-- Core Competencies -->
+${nonEmptyCoreCompetencies.length > 0 ? `
+<div class="section" data-section="coreCompetencies">
+  <div class="section-title">Core Competencies</div>
+  <div class="skills">
+    ${nonEmptyCoreCompetencies
+      .map(
+        (comp: any, index: number) => `
+      <div class="skill-badge" data-section="coreCompetencies" data-index="${index}">${
+          typeof comp === "string" ? comp.trim() : comp
+        }</div>
+    `
+      )
+      .join("")}
+  </div>
+</div>`
+: ''}
 
     <!-- Tools & Technologies -->
     ${

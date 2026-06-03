@@ -205,6 +205,41 @@ if (source.skills) {
   }
 }
 
+// Core Competencies - preserve HTML format (same as skills)
+if (source.coreCompetencies || source.core_competencies) {
+  const coreCompSource = source.coreCompetencies || source.core_competencies;
+  
+  if (typeof coreCompSource === 'string') {
+    // If it's already a string (hopefully HTML), keep it
+    normalized.coreCompetencies = coreCompSource;
+  } 
+  else if (Array.isArray(coreCompSource)) {
+    // Handle array of objects like [{name: "Strategic Planning"}, {name: "Team Leadership"}]
+    const coreCompList = coreCompSource
+      .map((comp: any) => {
+        if (typeof comp === 'string') {
+          return comp;
+        } else if (comp && typeof comp === 'object') {
+          // Try to get the competency name from common properties
+          return comp.name || comp.competency || comp.value || Object.values(comp)[0] || null;
+        }
+        return null;
+      })
+      .filter((c: string | null) => c !== null);
+    
+    if (coreCompList.length > 0) {
+      normalized.coreCompetencies = '<ul>' + coreCompList.map((c: string) => `<li>${c}</li>`).join('') + '</ul>';
+    }
+  } 
+  else if (typeof coreCompSource === 'object') {
+    // Handle object format {strategicPlanning: {}, teamLeadership: {}}
+    const coreCompArray = Object.keys(coreCompSource);
+    if (coreCompArray.length > 0) {
+      normalized.coreCompetencies = '<ul>' + coreCompArray.map(c => `<li>${c}</li>`).join('') + '</ul>';
+    }
+  }
+}
+
   // Experience
   if (source.experience || source.workExperience) {
     const expData = source.experience || source.workExperience;

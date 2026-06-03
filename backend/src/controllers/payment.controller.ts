@@ -514,8 +514,15 @@ export async function getInvoiceByResume(req, res) {
 
     if (!resumeId) return res.status(400).json({ error: "Resume ID required" });
 
-    // Find the latest invoice for this resume
-    const invoice = await Invoice.findOne({ resumeId }).sort({ createdAt: -1 });
+    // Find the matching invoice for this resume, filtered by type if provided
+    const typeFilter = req.query.type as string | undefined;
+    const query: any = { resumeId };
+    if (typeFilter) {
+      // 'ai' invoices may have type 'ai' or start with 'subscription_...:ai'
+      // 'download' invoices have type 'download'
+      query.type = typeFilter;
+    }
+    const invoice = await Invoice.findOne(query).sort({ createdAt: -1 });
     if (!invoice) return res.status(404).json({ error: "Invoice not found" });
 
     const resume = await Resume.findById(resumeId);

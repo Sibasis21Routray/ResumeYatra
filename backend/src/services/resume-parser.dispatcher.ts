@@ -70,13 +70,13 @@ async function extractTextFromPDF(filePath: string): Promise<string> {
       max: 0, // No page limit
       version: 'v1.10.100'
     });
-    
+
     const text = data.text;
-    
+
     if (!text || text.trim().length === 0) {
       throw new Error("No text content found in PDF file");
     }
-    
+
     console.log(`📝 Extracted ${text.length} characters from PDF (${data.numpages} pages)`);
     return text;
   } catch (err: any) {
@@ -89,13 +89,13 @@ async function extractTextFromPDF(filePath: string): Promise<string> {
 function fixMalformedJSON(text: string): string {
   // Remove markdown code blocks
   let cleaned = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
-  
+
   // Try to extract JSON object if there's other text
   const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
   if (jsonMatch) {
     cleaned = jsonMatch[0];
   }
-  
+
   // Fix common JSON errors
   cleaned = cleaned
     .replace(/\}\s*\{/g, '},{')
@@ -106,18 +106,18 @@ function fixMalformedJSON(text: string): string {
     .replace(/\s+/g, ' ')
     .replace(/\[\s*\]/g, '[]')
     .replace(/\{\s*\}/g, '{}');
-  
+
   // Fix trailing commas
   cleaned = cleaned.replace(/,(\s*[}\]])/g, '$1');
-  
+
   // Quick brace count and fix
   const openBraces = (cleaned.match(/{/g) || []).length;
   const closeBraces = (cleaned.match(/}/g) || []).length;
-  
+
   if (openBraces > closeBraces) {
     cleaned = cleaned + '}'.repeat(openBraces - closeBraces);
   }
-  
+
   return cleaned;
 }
 
@@ -125,9 +125,9 @@ function fixMalformedJSON(text: string): string {
 function fixSkillsExtraction(data: any): any {
   if (!data) return data;
   if (!data.skills) return data;
-  
+
   console.log("🔧 Fixing skills extraction...");
-  
+
   if (Array.isArray(data.skills)) {
     const cleanedSkills = data.skills
       .map((skill: any) => {
@@ -139,10 +139,10 @@ function fixSkillsExtraction(data: any): any {
         return null;
       })
       .filter((skill: any) => skill && skill !== '' && skill !== 'undefined')
-      .filter((skill: any, index: number, self: any[]) => 
+      .filter((skill: any, index: number, self: any[]) =>
         self.findIndex((s: any) => s.toLowerCase() === skill.toLowerCase()) === index
       );
-    
+
     if (cleanedSkills.length > 0) {
       data.skills = cleanedSkills;
       console.log(`✅ Extracted ${cleanedSkills.length} unique skills`);
@@ -151,7 +151,7 @@ function fixSkillsExtraction(data: any): any {
     }
     return data;
   }
-  
+
   if (typeof data.skills === 'object') {
     if (data.skills.list && Array.isArray(data.skills.list)) {
       data.skills = data.skills.list;
@@ -165,20 +165,20 @@ function fixSkillsExtraction(data: any): any {
       data.skills = data.skills.technical;
       return fixSkillsExtraction(data);
     }
-    
+
     const skillValues = Object.values(data.skills).filter(v => typeof v === 'string' && v.length > 0);
     if (skillValues.length > 0) {
       data.skills = skillValues;
       return fixSkillsExtraction(data);
     }
   }
-  
+
   return data;
 }
 
 function fixSummaryFormat(data: any): any {
   if (!data) return data;
-  
+
   if (data.summary) {
     if (typeof data.summary === 'object' && data.summary !== null) {
       if (data.summary.description) {
@@ -193,17 +193,17 @@ function fixSummaryFormat(data: any): any {
       delete data.summary;
     }
   }
-  
+
   if (data.careerObjective && typeof data.careerObjective === 'object') {
     data.careerObjective = data.careerObjective.description || data.careerObjective.text || data.careerObjective;
   }
-  
+
   return data;
 }
 
 function fixEducationDates(data: any): any {
   if (!data.education || !Array.isArray(data.education)) return data;
-  
+
   data.education = data.education.map((edu: any) => {
     if (edu.startDate && typeof edu.startDate === 'string' && edu.startDate.includes('-')) {
       const [start, end] = edu.startDate.split('-').map((s: string) => s.trim());
@@ -212,48 +212,48 @@ function fixEducationDates(data: any): any {
         edu.graduationDate = end;
       }
     }
-    
+
     if ((!edu.graduationDate || edu.graduationDate === '') && edu.endDate) {
       if (typeof edu.endDate === 'string' && edu.endDate !== 'undefined') {
         edu.graduationDate = edu.endDate;
       }
       delete edu.endDate;
     }
-    
+
     if (edu.graduationDate && typeof edu.graduationDate === 'string' && edu.graduationDate.includes('-') && (!edu.startDate || edu.startDate === '')) {
       const [start, end] = edu.graduationDate.split('-').map((s: string) => s.trim());
       edu.startDate = start;
       edu.graduationDate = end;
     }
-    
+
     delete edu.endDate;
     delete edu.duration;
-    
+
     return edu;
   });
-  
+
   return data;
 }
 
 function cleanupEducation(data: any): any {
   if (!data.education || !Array.isArray(data.education)) return data;
-  
+
   data.education = data.education.map((edu: any) => {
     const cleanedEdu: any = {};
-    
+
     cleanedEdu.id = edu.id || `edu-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
-    
+
     cleanedEdu.school = edu.school || edu.institution || edu.college || edu.university;
     if (cleanedEdu.school && cleanedEdu.school !== 'undefined') {
       cleanedEdu.school = cleanedEdu.school.trim();
     } else {
       delete cleanedEdu.school;
     }
-    
+
     if (edu.location && edu.location !== 'undefined' && edu.location !== '') {
       cleanedEdu.location = edu.location.trim();
     }
-    
+
     if (edu.degree && edu.degree !== 'undefined' && edu.degree !== '') {
       let degree = edu.degree.trim();
       const degreeMap: { [key: string]: string } = {
@@ -266,21 +266,21 @@ function cleanupEducation(data: any): any {
       };
       cleanedEdu.degree = degreeMap[degree.toLowerCase()] || degree;
     }
-    
+
     if (edu.field && edu.field !== 'undefined' && edu.field !== '') {
       cleanedEdu.field = edu.field.trim();
     }
-    
+
     if (edu.startDate && edu.startDate !== 'undefined' && edu.startDate !== '') {
       cleanedEdu.startDate = edu.startDate.includes('-') ? edu.startDate.split('-')[0].trim() : edu.startDate;
     }
-    
+
     if (edu.graduationDate && edu.graduationDate !== 'undefined' && edu.graduationDate !== '') {
-      cleanedEdu.graduationDate = edu.graduationDate.includes('-') 
-        ? edu.graduationDate.split('-').pop().trim() 
+      cleanedEdu.graduationDate = edu.graduationDate.includes('-')
+        ? edu.graduationDate.split('-').pop().trim()
         : edu.graduationDate;
     }
-    
+
     if (edu.grade && edu.grade !== 'undefined' && edu.grade !== '') {
       cleanedEdu.grade = edu.grade.trim();
     } else if (edu.percentage) {
@@ -290,32 +290,32 @@ function cleanupEducation(data: any): any {
     } else if (edu.gpa) {
       cleanedEdu.grade = `GPA: ${edu.gpa}`;
     }
-    
+
     if (edu.description && edu.description !== 'undefined' && edu.description !== '') {
       cleanedEdu.description = edu.description.trim();
     }
-    
+
     return Object.keys(cleanedEdu).length > 1 ? cleanedEdu : null;
   }).filter(Boolean);
-  
+
   data.education.sort((a: any, b: any) => (b.startDate || '0').localeCompare(a.startDate || '0'));
-  
+
   return data;
 }
 
 function fixCertifications(data: any): any {
   if (!data.education || !Array.isArray(data.education)) return data;
-  
+
   const certsToMove = [];
   const remainingEducation = [];
-  
+
   for (const edu of data.education) {
     const eduString = JSON.stringify(edu).toLowerCase();
-    if (eduString.includes('company secretary') || 
-        (eduString.includes('company') && eduString.includes('secretary')) ||
-        (edu.degree && edu.degree.toLowerCase().includes('company secretary')) ||
-        (edu.school && edu.school.toLowerCase().includes('icsi'))) {
-      
+    if (eduString.includes('company secretary') ||
+      (eduString.includes('company') && eduString.includes('secretary')) ||
+      (edu.degree && edu.degree.toLowerCase().includes('company secretary')) ||
+      (edu.school && edu.school.toLowerCase().includes('icsi'))) {
+
       certsToMove.push({
         name: 'Company Secretary',
         issuer: edu.school === 'secretary' ? 'ICSI' : (edu.school || 'ICSI'),
@@ -326,14 +326,14 @@ function fixCertifications(data: any): any {
       remainingEducation.push(edu);
     }
   }
-  
+
   data.education = remainingEducation;
-  
+
   if (certsToMove.length > 0) {
     if (!data.certifications) data.certifications = [];
-    
+
     for (const cert of certsToMove) {
-      const exists = data.certifications.some((c: any) => 
+      const exists = data.certifications.some((c: any) =>
         c.name && c.name.toLowerCase() === cert.name.toLowerCase()
       );
       if (!exists) {
@@ -341,20 +341,20 @@ function fixCertifications(data: any): any {
       }
     }
   }
-  
+
   return data;
 }
 
 function fixLanguages(data: any): any {
   if (!data.languages || !Array.isArray(data.languages)) return data;
-  
+
   data.languages = data.languages.map((lang: any) => {
     const cleanedLang: any = {};
-    
+
     if (lang.language && lang.language !== 'undefined') {
       cleanedLang.language = lang.language.trim();
     }
-    
+
     if (lang.level) {
       const level = lang.level.toString().toLowerCase();
       if (level.includes('native') || level.includes('bilingual')) {
@@ -371,7 +371,7 @@ function fixLanguages(data: any): any {
         cleanedLang.level = lang.level;
       }
     }
-    
+
     if (lang.capability) {
       cleanedLang.capability = lang.capability.toString().replace(/\//g, ', ');
     } else if (cleanedLang.level) {
@@ -384,29 +384,29 @@ function fixLanguages(data: any): any {
       };
       cleanedLang.capability = levelMap[cleanedLang.level];
     }
-    
+
     return cleanedLang;
   }).filter((lang: any) => lang.language);
-  
+
   return data;
 }
 
 function fixSocialProfiles(data: any): any {
   if (!data.socialProfiles || !Array.isArray(data.socialProfiles)) return data;
-  
+
   data.socialProfiles = data.socialProfiles
     .map((profile: any) => ({
       platform: profile.platform?.trim(),
       url: profile.url?.trim()
     }))
     .filter((profile: any) => profile.platform && profile.platform !== 'undefined');
-  
+
   return data;
 }
 
 function removeEmptyFields(obj: any): any {
   if (!obj || typeof obj !== 'object') return obj;
-  
+
   if (Array.isArray(obj)) {
     return obj
       .map(item => removeEmptyFields(item))
@@ -417,13 +417,13 @@ function removeEmptyFields(obj: any): any {
         return true;
       });
   }
-  
+
   const cleaned: any = {};
   for (const [key, value] of Object.entries(obj)) {
     const cleanedValue = removeEmptyFields(value);
-    
+
     if (cleanedValue === null || cleanedValue === undefined) continue;
-    
+
     if (typeof cleanedValue === 'string') {
       if (cleanedValue === '' || cleanedValue === 'undefined' || cleanedValue === 'null') continue;
       cleaned[key] = cleanedValue;
@@ -435,15 +435,15 @@ function removeEmptyFields(obj: any): any {
       cleaned[key] = cleanedValue;
     }
   }
-  
+
   return cleaned;
 }
 
 function postProcessParsedData(data: any): any {
   if (!data || typeof data !== 'object') return data;
-  
+
   console.log("\n🧹 Running optimized post-processing...");
-  
+
   data = fixSkillsExtraction(data);
   data = fixSummaryFormat(data);
   data = fixCertifications(data);
@@ -456,8 +456,8 @@ function postProcessParsedData(data: any): any {
 
   data = removeEmptyFields(data);
 
-  
-  
+
+
   console.log("✅ Post-processing complete");
   return data;
 }
@@ -508,11 +508,11 @@ const fieldMappings: { [key: string]: string } = {
 // ---------- CLEAN BULLET POINTS BUT PRESERVE LINE BREAKS ----------
 function cleanBulletPointsFromDescriptions(data: any): any {
   if (!data || typeof data !== 'object') return data;
-  
+
   // Clean experience descriptions
   if (data.experience && Array.isArray(data.experience)) {
     console.log("🧹 Cleaning bullet points from experience descriptions...");
-    
+
     data.experience = data.experience.map((exp: any) => {
       if (exp.description && typeof exp.description === 'string') {
         // Split into lines while preserving line breaks
@@ -527,14 +527,14 @@ function cleanBulletPointsFromDescriptions(data: any): any {
           cleaned = cleaned.replace(/^[◦▪▸›]\s*/, '');      // Remove other bullet symbols
           return cleaned;
         });
-        
+
         // Join back with newlines to preserve structure
         exp.description = cleanedLines.join('\n');
       }
       return exp;
     });
   }
-  
+
   // Clean internship descriptions
   if (data.internships && Array.isArray(data.internships)) {
     data.internships = data.internships.map((item: any) => {
@@ -552,7 +552,7 @@ function cleanBulletPointsFromDescriptions(data: any): any {
       return item;
     });
   }
-  
+
   // Clean project descriptions
   if (data.projects && Array.isArray(data.projects)) {
     data.projects = data.projects.map((project: any) => {
@@ -569,7 +569,7 @@ function cleanBulletPointsFromDescriptions(data: any): any {
       return project;
     });
   }
-  
+
   // Clean academicProjects descriptions
   if (data.academicProjects && Array.isArray(data.academicProjects)) {
     data.academicProjects = data.academicProjects.map((project: any) => {
@@ -586,7 +586,7 @@ function cleanBulletPointsFromDescriptions(data: any): any {
       return project;
     });
   }
-  
+
   // Clean clientProjects descriptions
   if (data.clientProjects && Array.isArray(data.clientProjects)) {
     data.clientProjects = data.clientProjects.map((project: any) => {
@@ -603,17 +603,17 @@ function cleanBulletPointsFromDescriptions(data: any): any {
       return project;
     });
   }
-  
+
   return data;
 }
 
 function mapFieldNames(data: any): any {
   if (!data || typeof data !== 'object') return data;
-  
+
   if (Array.isArray(data)) {
     return data.map(item => mapFieldNames(item));
   }
-  
+
   const mapped: any = {};
   for (const [key, value] of Object.entries(data)) {
     const mappedKey = fieldMappings[key] || key;
@@ -625,14 +625,14 @@ function mapFieldNames(data: any): any {
 // ---------- SINGLE AI CALL WITH TEXT ----------
 async function extractDataFromText(userId: string | null, text: string, guestId: string | null = null): Promise<any> {
   console.log("🔍 Processing resume text with AI (single call)...");
-  
+
   // Truncate text if too long
   let processedText = text;
   if (text.length > MAX_TEXT_LENGTH) {
     processedText = text.substring(0, MAX_TEXT_LENGTH);
     console.log(`⚠️ Text truncated from ${text.length} to ${MAX_TEXT_LENGTH} characters`);
   }
-  
+
   const prompt = `You are a strict resume parser. Extract ALL information from the provided resume text and return it as a JSON object.
 
 ⚠️ CRITICAL RULES (MUST FOLLOW STRICTLY):
@@ -814,7 +814,7 @@ ${processedText}`;
   while (attempt <= maxRetries) {
     try {
       console.log(`📤 Sending text to DeepInfra API (attempt ${attempt + 1})...`);
-      
+
       const response = await Promise.race([
         deepinfra.chat.completions.create({
           model: "meta-llama/Llama-4-Scout-17B-16E-Instruct",
@@ -827,7 +827,7 @@ ${processedText}`;
             },
           ],
         }),
-        new Promise((_, reject) => 
+        new Promise((_, reject) =>
           setTimeout(() => reject(new Error("API timeout")), API_TIMEOUT)
         )
       ]) as any;
@@ -871,7 +871,7 @@ ${processedText}`;
         console.log(`✅ Resume processed successfully (after fixing)`);
         return parsedData;
       }
-      
+
     } catch (err: any) {
       console.log(`⚠️ Processing failed on attempt ${attempt + 1}: ${err.message}`);
       attempt++;
@@ -923,7 +923,7 @@ async function parseResume(userId: string | null, filePath: string, guestId: str
   // Count tokens and enforce limit
   const tokenCount = countTokens(extractedText);
   console.log(`📊 Estimated tokens: ${tokenCount}`);
-  
+
   if (tokenCount > 10000) {
     console.error("Token count exceeds limit (10,000)");
     throw new Error("Exceed token limit , plese upload a smaller file");
@@ -932,7 +932,7 @@ async function parseResume(userId: string | null, filePath: string, guestId: str
   // Single AI call with the extracted text
   console.log("🤖 Sending text to AI for parsing...");
   let aiParsed = {};
-  
+
   try {
     aiParsed = await extractDataFromText(userId, extractedText, guestId);
   } catch (extractError: any) {
@@ -950,17 +950,17 @@ async function parseResume(userId: string | null, filePath: string, guestId: str
   // Apply field mapping
   console.log("\n🔄 Mapping field names...");
   const mappedData = mapFieldNames(aiParsed);
-  
+
   // Apply post-processing to fix all issues
   console.log("\n🔄 Post-processing parsed data...");
   const processedData = postProcessParsedData(mappedData);
-  
+
   // Normalize and return
   console.log("\n🔄 Normalizing parsed data...");
   const result = normalizeParsedResume(processedData);
 
   console.log("\n🎉 FINAL PARSING RESULT READY");
-  
+
   // Cache result
   processedCache.set(cacheKey, result);
   return result;

@@ -13,6 +13,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
     coCurricular = [],
     extracurricular = [],
     skills = "",
+    coreCompetencies = "",
     languages = [],
     hobbies = [],
     certifications = [],
@@ -113,6 +114,10 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
   const skillArray = typeof skills === "string" 
     ? skills.split(",").map(s => s.trim()).filter(s => s) 
     : Array.isArray(skills) ? skills : [];
+
+    const coreCompArray = typeof coreCompetencies === "string" 
+  ? coreCompetencies.split(",").map(s => s.trim()).filter(s => s) 
+  : Array.isArray(coreCompetencies) ? coreCompetencies : [];
 
   const linkedIn = socialProfiles.find((p: any) => p.platform?.toLowerCase().includes("linkedin"))?.url || "";
   
@@ -377,7 +382,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
         <h1 class="name">${personal.name || 'YOUR NAME'}</h1>
         <div class="contact-info">
           ${personal.phone ? `<span><b>Ph.</b> ${personal.phone}</span>` : ''}
-          ${personal.alternatePhone ? `<span><b>Alt Ph.</b> ${personal.alternatePhone}</span>` : ''}
+          ${personal.alternatePhone ? `<span><b>Alt Phone</b> ${personal.alternatePhone}</span>` : ''}
           ${personal.email ? `<span><b>Email</b> ${personal.email}</span>` : ''}
           ${personal.location ? `<span><b>Location</b> ${personal.location}</span>` : ''}
           ${personal.dob ? `<span><b>DOB</b> ${personal.dob}</span>` : ''}
@@ -416,7 +421,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           ${skillArray.length > 0 ? `
           <section class="section" data-section="skills">
             <div class="section-header">
-              <h2 class="section-title">Core Competencies</h2>
+              <h2 class="section-title">Skills</h2>
             </div>
               <div class="skill-list  ">
                 ${skillArray.map((skill: any, idx: number) => `<li data-index="${idx}">${skill}</li>`).join('')}
@@ -424,6 +429,18 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
            
           </section>
           ` : ''}
+
+          <!-- Core Competencies Section -->
+${coreCompArray.length > 0 ? `
+<section class="section" data-section="coreCompetencies">
+  <div class="section-header">
+    <h2 class="section-title">Core Competencies</h2>
+  </div>
+  <ul class="skill-list">
+    ${coreCompArray.map((comp: any, idx: number) => `<li data-index="${idx}">${comp}</li>`).join('')}
+  </ul>
+</section>
+` : ''}
 
           ${nonEmptyToolsTechnologies.length > 0 ? `
           <section class="section" data-section="toolsTechnologies">
