@@ -10,10 +10,10 @@ import { buildProfessionalTemplate } from "../templates/professional";
 import { buildAzurillTemplate } from "../templates/azurill";
 import { buildGengarTemplate } from "../templates/gengar";
 import { buildMinimalTemplate } from "../templates/minimal";
-import { buildExecutiveTemplate } from "../templates/executive";
-import { buildPikachuTemplate } from "../templates/pikachu";
-import { buildCharizardTemplate } from "../templates/charizard";
-import { buildBlastoiseTemplate } from "../templates/blastoise";
+import { buildModernSidebarTemplate } from "../templates/modern-sidebar";
+import { buildFormalIndianCvTemplate } from "../templates/formal-indian-cv";
+import { buildPhotoMinimalTemplate } from "../templates/photo-minimal";
+import { buildPhotoModernProTemplate } from "../templates/photo-modern-pro";
 import { buildDragoniteTemplate } from "../templates/dragonite";
 import { buildVenusaurTemplate } from "../templates/venusaur";
 import { buildAlakazamTemplate } from "../templates/alakazam";
@@ -30,14 +30,14 @@ import { buildTechItTemplate } from "../templates/tech-it";
 import { buildFresherEntryLevelTemplate } from "../templates/fresher-entry-level";
 import { buildConsultantFreelancerTemplate } from "../templates/consultant-freelancer";
 import { buildOperationsSupportTemplate } from "../templates/operations-support";
-import { buildSeniorIndividualContributorTemplate } from "../templates/senior-individual-contributor";
+import { buildCompactClassicTemplate } from "../templates/compact-classic";
 import { buildMinimalAtsTemplate } from "../templates/minimal-ats";
 import { buildCosmosTemplate } from "../templates/cosmos";
 import { buildNovaTemplate } from "../templates/nova";
 import { buildStellarTemplate } from "../templates/stellar";
 import { buildOrionTemplate } from "../templates/orion";
 import { buildNebulaTemplate } from "../templates/nebula";
-import { buildSaanviPatelTemplate } from "../templates/saanvi-patel";
+import { buildAtsClassicTemplate } from "../templates/ats-classic";
 import { buildModernExecutiveTemplate } from "../templates/modern-executive";
 import { buildImpactResumeTemplate } from "../templates/impactResume";
 import { buildStartupAndTechTemplate } from "../templates/startup&Tech";
@@ -412,8 +412,8 @@ function buildHtml(data: any, template: string, theme?: any): string {
   switch (template) {
     case "operations-support":
       return buildOperationsSupportTemplate(data, theme);
-    case "senior-individual-contributor":
-      return buildSeniorIndividualContributorTemplate(data, theme);
+    case "compact-classic":
+      return buildCompactClassicTemplate(data, theme);
     case "minimal-ats":
       return buildMinimalAtsTemplate(data, theme);
     case "cosmos":
@@ -438,8 +438,8 @@ function buildHtml(data: any, template: string, theme?: any): string {
       return buildSeniorLeadershipTemplate(data, theme);
     case "corporate-standard":
       return buildCorporateStandardTemplate(data, theme);
-    case "saanvi-patel":
-      return buildSaanviPatelTemplate(data, theme);
+    case "ats-classic":
+      return buildAtsClassicTemplate(data, theme);
     case "modern":
       return buildModernTemplate(data, theme);
     case "photographic":
@@ -454,14 +454,14 @@ function buildHtml(data: any, template: string, theme?: any): string {
       return buildGengarTemplate(data, theme);
     case "minimal":
       return buildMinimalTemplate(data, theme);
-    case "executive":
-      return buildExecutiveTemplate(data, theme);
-    case "pikachu":
-      return buildPikachuTemplate(data, theme);
-    case "charizard":
-      return buildCharizardTemplate(data, theme);
-    case "blastoise":
-      return buildBlastoiseTemplate(data, theme);
+    case "modern-sidebar":
+      return buildModernSidebarTemplate(data, theme);
+    case "formal-indian-cv":
+      return buildFormalIndianCvTemplate(data, theme);
+    case "photo-minimal":
+      return buildPhotoMinimalTemplate(data, theme);
+    case "photo-modern-pro":
+      return buildPhotoModernProTemplate(data, theme);
     case "dragonite":
       return buildDragoniteTemplate(data, theme);
     case "venusaur":

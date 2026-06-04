@@ -1,4 +1,4 @@
-export function buildSaanviPatelTemplate(data: any, theme?: any): string {
+export function buildAtsClassicTemplate(data: any, theme?: any): string {
   const {
     personal = {},
     summary = "",

@@ -1,4 +1,4 @@
-export function buildCharizardTemplate(data: any, theme?: any): string {
+export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
   const {
     personal = {},
     summary = "",
@@ -183,13 +183,23 @@ export function buildCharizardTemplate(data: any, theme?: any): string {
 
   const profileImage = personal.image || personal.photo || personal.avatar || null;
 
+  // SVG Icons (replacing Font Awesome)
+  const svgIcons = {
+    phone: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${currentTheme.primary}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
+    email: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${currentTheme.primary}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>`,
+    location: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${currentTheme.primary}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
+    calendar: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${currentTheme.primary}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+    user: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${currentTheme.primary}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+    heart: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${currentTheme.primary}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
+    linkedin: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${currentTheme.primary}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>`
+  };
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resume</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
    * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -290,11 +300,12 @@ export function buildCharizardTemplate(data: any, theme?: any): string {
    }
 
    .contact-icon {
-     color: ${currentTheme.primary};
-     width: 22px;
+     width: 18px;
+     height: 18px;
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
      margin-right: 8px;
-     font-size: ${Math.round(baseFontSize * 1.05)}px;
-     text-align: center;
    }
 
    .section {
@@ -419,17 +430,17 @@ export function buildCharizardTemplate(data: any, theme?: any): string {
       <hr class="header-line" />
 
       <div class="contact-grid">
-        ${personal.phone ? `<div class="contact-item"><span class="contact-icon"><i class="fa-solid fa-phone"></i></span><span>${personal.phone}</span></div>` : ""}
-        ${personal.alternatePhone ? `<div class="contact-item"><span class="contact-icon"><i class="fa-solid fa-phone"></i></span><span>${personal.alternatePhone} (Alt)</span></div>` : ""}
-        ${personal.email ? `<div class="contact-item"><span class="contact-icon"><i class="fa-solid fa-envelope"></i></span><span><a href="mailto:${personal.email}">${personal.email}</a></span></div>` : ""}
+        ${personal.phone ? `<div class="contact-item"><span class="contact-icon">${svgIcons.phone}</span><span>${personal.phone}</span></div>` : ""}
+        ${personal.alternatePhone ? `<div class="contact-item"><span class="contact-icon">${svgIcons.phone}</span><span>${personal.alternatePhone} (Alt)</span></div>` : ""}
+        ${personal.email ? `<div class="contact-item"><span class="contact-icon">${svgIcons.email}</span><span><a href="mailto:${personal.email}">${personal.email}</a></span></div>` : ""}
         ${(() => {
           const addressParts = [personal.fullAddress, personal.location, personal.country, personal.pinCode].filter(Boolean);
-          return addressParts.length > 0 ? `<div class="contact-item"><span class="contact-icon"><i class="fa-solid fa-location-dot"></i></span><span>${addressParts.join(", ")}</span></div>` : "";
+          return addressParts.length > 0 ? `<div class="contact-item"><span class="contact-icon">${svgIcons.location}</span><span>${addressParts.join(", ")}</span></div>` : "";
         })()}
-        ${personal.linkedinUrl ? `<div class="contact-item"><span class="contact-icon"><i class="fa-brands fa-linkedin"></i></span><span><a href="${personal.linkedinUrl}" target="_blank">${personal.linkedinUrl.replace(/https?:\/\/(www\.)?/, "")}</a></span></div>` : ""}
-        ${personal.dob ? `<div class="contact-item"><span class="contact-icon"><i class="fa-solid fa-calendar"></i></span><span>DOB: ${personal.dob}</span></div>` : ""}
-        ${personal.gender ? `<div class="contact-item"><span class="contact-icon"><i class="fa-solid fa-user"></i></span><span>${personal.gender}</span></div>` : ""}
-        ${personal.maritalStatus ? `<div class="contact-item"><span class="contact-icon"><i class="fa-solid fa-heart"></i></span><span>${personal.maritalStatus}</span></div>` : ""}
+        ${personal.linkedinUrl ? `<div class="contact-item"><span class="contact-icon">${svgIcons.linkedin}</span><span><a href="${personal.linkedinUrl}" target="_blank">${personal.linkedinUrl.replace(/https?:\/\/(www\.)?/, "")}</a></span></div>` : ""}
+        ${personal.dob ? `<div class="contact-item"><span class="contact-icon">${svgIcons.calendar}</span><span>DOB: ${personal.dob}</span></div>` : ""}
+        ${personal.gender ? `<div class="contact-item"><span class="contact-icon">${svgIcons.user}</span><span>${personal.gender}</span></div>` : ""}
+        ${personal.maritalStatus ? `<div class="contact-item"><span class="contact-icon">${svgIcons.heart}</span><span>${personal.maritalStatus}</span></div>` : ""}
       </div>
     </div>
   </div>
