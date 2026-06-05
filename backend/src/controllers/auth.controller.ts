@@ -85,7 +85,7 @@ export async function register(req: Request, res: Response) {
     // ✅ Set the token in an HttpOnly cookie
     res.cookie('token', result.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true, // Always true for SameSite: 'none' to work in cross-site
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
@@ -107,7 +107,7 @@ export async function login(req: Request, res: Response) {
     // ✅ Set the token in an HttpOnly cookie
     res.cookie('token', result.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true, // Always true for SameSite: 'none' to work in cross-site
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
@@ -275,6 +275,10 @@ export async function resetPassword(req: Request, res: Response) {
 }
 
 export async function logout(req: Request, res: Response) {
-  res.clearCookie('token');
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none'
+  });
   res.json({ message: 'Logged out successfully' });
 }

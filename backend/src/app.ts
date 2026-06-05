@@ -5,9 +5,12 @@ import routes from './routes'
 
 const app = express()
 
+// Trust proxy is required for secure cookies on Render/Vercel
+app.set('trust proxy', 1)
+
 // Update CORS to support cookies
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Adjust based on your frontend port
+  origin: process.env.FRONTEND_URL ? process.env.FRONTEND_URL.replace(/\/$/, '') : 'http://localhost:5173',
   credentials: true
 }))
 
