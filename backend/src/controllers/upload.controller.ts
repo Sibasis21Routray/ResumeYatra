@@ -117,7 +117,7 @@ export const uploadResume = async (req: Request, res: Response) => {
     // 6️⃣ Create a new resume document with the parsed data
     const newResume = new Resume({
       title: `Uploaded Resume - ${req.file.originalname}`,
-      template: "nebula", // Default template
+      template: "ats-classic", // Default template
       versions: [],
       files: [],
       isParsed: parsedResume && Object.keys(parsedResume).length > 0
