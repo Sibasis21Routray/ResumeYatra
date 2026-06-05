@@ -425,7 +425,13 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
     
     <div class="header-info">
       <div class="name">${personal.name || "Your Name "}</div>
-      <div class="role">${personal.role }</div>
+     ${
+  personal.role &&
+  personal.role !== "undefined" &&
+  personal.role !== "null"
+    ? `<div class="role">${personal.role}</div>`
+    : ""
+}
       
       <hr class="header-line" />
 

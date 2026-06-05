@@ -405,7 +405,12 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     <!-- HEADER AREA -->
     <div class="header-section" id="section-header" data-section="header">
       <div class="name">${personal?.name || "Your Name "}</div>
-      <div class="role">${personal?.role }</div>
+      ${
+  personal?.role &&
+  !["undefined", "null"].includes(String(personal.role).toLowerCase())
+    ? `<div class="role">${personal.role}</div>`
+    : ""
+}
       
       <div class="contact-container" >
         <div class="contact-flex">

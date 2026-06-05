@@ -720,7 +720,14 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     <div class="right-column" >
       <div class="header-identity" id="section-header" data-section="header">
         <div class="name">${personal?.name || "Your Name "}</div>
-        <div class="role">${personal?.role || personal?.title }</div>
+        ${
+  (personal?.role || personal?.title) &&
+  !["undefined", "null"].includes(
+    String(personal?.role || personal?.title).toLowerCase()
+  )
+    ? `<div class="role">${personal.role || personal.title}</div>`
+    : ""
+}
       </div>
 
       <!-- PROFESSIONAL SUMMARY -->

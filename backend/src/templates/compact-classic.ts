@@ -433,7 +433,12 @@ export function buildCompactClassicTemplate(
   <div class="header-container" id="section-header" data-section="header">
     <div class="meta-identity">
       <div class="name">${personal.name || "Your Name "}</div>
-      <div class="role-title">${personal.role }</div>
+      ${
+  personal?.role &&
+  !["undefined", "null"].includes(String(personal.role).toLowerCase())
+    ? `<div class="role-title">${personal.role}</div>`
+    : ""
+}
     </div>
     
     <div class="contact-pane">
