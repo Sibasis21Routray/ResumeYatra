@@ -35,13 +35,16 @@ export function TemplateSelectionModal({
   const [previewScale, setPreviewScale] = useState(1);
 
   const colorThemes = [
-    { primary: "#04477E", secondary: "#64748b", background: "#ffffff", name: "Blue" },
-    { primary: "#10B981", secondary: "#64748b", background: "#ffffff", name: "Green" },
-    { primary: "#8B5CF6", secondary: "#64748b", background: "#ffffff", name: "Purple" },
-    { primary: "#EF4444", secondary: "#64748b", background: "#ffffff", name: "Red" },
-    { primary: "#F97316", secondary: "#64748b", background: "#ffffff", name: "Orange" },
-    { primary: "#14B8A6", secondary: "#64748b", background: "#ffffff", name: "Teal" },
+    { name: 'Navy Blue', primary: '#1e3a8a', secondary: '#1d4ed8', background: '#ffffff', category: 'blue' },
+{ name: 'Royal Blue', primary: '#4169E1', secondary: '#3154C4', background: '#ffffff', category: 'blue' },
+{ name: 'Teal', primary: '#0f766e', secondary: '#115e59', background: '#ffffff', category: 'green' },
+{ name: 'Dark Green', primary: '#14532d', secondary: '#166534', background: '#ffffff', category: 'green' },
+{ name: 'Charcoal', primary: '#36454F', secondary: '#2C3A42', background: '#ffffff', category: 'neutral' },
+{ name: 'Maroon', primary: '#800000', secondary: '#6B0000', background: '#ffffff', category: 'red' },
+{ name: 'Slate Grey', primary: '#708090', secondary: '#5A6772', background: '#ffffff', category: 'neutral' },
+{ name: 'Brown / Coffee', primary: '#6F4E37', secondary: '#5C4033', background: '#ffffff', category: 'brown' },
   ];
+ 
 
   // Extract primary color from theme (handles both string and object formats)
   const themePrimaryColor = typeof selectedTheme === "string"
