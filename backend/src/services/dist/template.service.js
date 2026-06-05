@@ -180,13 +180,13 @@ function renderTemplateSample(templateId, theme) {
                     }
                     sampleData = {
                         personal: {
-                            name: "Ajaya Dugar",
-                            email: "ajaya@gmail.com",
+                            name: "Ajay Dugger",
+                            email: "ajay@gmail.com",
                             phone: "+91 98765 43210",
                             location: "Kolkata, West Bengal, India",
-                            linkedin: "https://linkedin.com/in/ajayadugar",
-                            github: "https://github.com/ajayadugar",
-                            portfolioUrl: "https://ajayadugar.dev",
+                            linkedin: "https://linkedin.com/in/ajaydugger",
+                            github: "https://github.com/ajaydugger",
+                            portfolioUrl: "https://ajaydugger.dev",
                             image: undefined
                         },
                         summary: "Results-driven Full Stack Developer with 6+ years of experience designing and developing scalable web applications. Skilled in React, Node.js, TypeScript, cloud technologies, and modern software development practices. Strong background in delivering high-performance solutions and collaborating with cross-functional teams.",
@@ -222,21 +222,21 @@ function renderTemplateSample(templateId, theme) {
                                 name: "E-Commerce Marketplace",
                                 description: "Developed a scalable multi-vendor e-commerce platform supporting secure payments, product management, and order tracking.",
                                 technologies: "React, Node.js, MongoDB, AWS",
-                                url: "https://github.com/ajayadugar/ecommerce-platform"
+                                url: "https://github.com/ajaydugger/ecommerce-platform"
                             },
                             {
                                 id: "proj2",
                                 name: "Hospital Management System",
                                 description: "Built a comprehensive healthcare management system for patient records, appointments, billing, and reporting.",
                                 technologies: "React, Express.js, PostgreSQL",
-                                url: "https://github.com/ajayadugar/hospital-management"
+                                url: "https://github.com/ajaydugger/hospital-management"
                             },
                             {
                                 id: "proj3",
                                 name: "Employee Attendance Portal",
                                 description: "Designed and developed a cloud-based attendance and leave management portal with real-time reporting.",
                                 technologies: "TypeScript, React, Firebase",
-                                url: "https://github.com/ajayadugar/attendance-portal"
+                                url: "https://github.com/ajaydugger/attendance-portal"
                             },
                         ],
                         education: [

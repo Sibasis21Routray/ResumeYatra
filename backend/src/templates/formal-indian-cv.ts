@@ -48,7 +48,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     headingFont: "'Cinzel', 'Times New Roman', serif",
     bodyFont: "'Inter', Arial, sans-serif"
   };
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
 
   const userFontSize = data.formatting?.bodyFontSize || data.fontSize || 11;
   const userFontFamily = data.formatting?.fontFamily || data.fontFamily || "'Inter', Arial, sans-serif";

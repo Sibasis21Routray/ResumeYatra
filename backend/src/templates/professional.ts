@@ -8,7 +8,7 @@ export function buildProfessionalTemplate(data: any, theme?: any): string {
     headingFont: "Arial",
     bodyFont: "Arial",
   };
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
 
   // Font size and family from data (user settings)
   const userFontSize = data.formatting?.bodyFontSize || data.fontSize || 11;

@@ -7,7 +7,7 @@ export function buildMinimalTemplate(data: any, theme?: any): string {
     bodyFont: "Inter",
   };
 
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
   const typography = theme?.typography || {
     fontSize: "medium",
     alignment: "left",

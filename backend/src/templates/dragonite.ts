@@ -8,7 +8,7 @@ export function buildDragoniteTemplate(data: any, theme?: any): string {
   }
   
   // --- PRESERVED CODE BLOCK ---
-  const currentTheme = theme || defaultTheme
+  const currentTheme = { ...defaultTheme, ...(theme || {}) }
   
   // Font size and family from data (user settings)
   const userFontSize = data.formatting?.bodyFontSize || data.fontSize || 14 // Default 14px

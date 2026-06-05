@@ -176,6 +176,27 @@ function fixSkillsExtraction(data: any): any {
   return data;
 }
 
+function fixCoreCompetenciesExtraction(data: any): any {
+  if (!data) return data;
+  if (!data.coreCompetencies) return data;
+
+  if (Array.isArray(data.coreCompetencies)) {
+    const cleaned = data.coreCompetencies
+      .map((item: any) => {
+        if (typeof item === "string") return item.trim();
+        if (typeof item === "object" && item !== null) {
+          return item.name || item.competency || null;
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    data.coreCompetencies = cleaned;
+  }
+
+  return data;
+}
+
 function fixSummaryFormat(data: any): any {
   if (!data) return data;
 
@@ -445,6 +466,7 @@ function postProcessParsedData(data: any): any {
   console.log("\n🧹 Running optimized post-processing...");
 
   data = fixSkillsExtraction(data);
+  data = fixCoreCompetenciesExtraction(data);
   data = fixSummaryFormat(data);
   data = fixCertifications(data);
   data = fixEducationDates(data);
@@ -639,7 +661,7 @@ async function extractDataFromText(userId: string | null, text: string, guestId:
 
 1. Hallucinate data a little for better completeness and field mapping.
 2. Use EXACTLY these section keys (camelCase):
-   - personal, careerObjective, summary, skills, experience, education,
+   - personal, careerObjective, summary, skills, coreCompetencies , experience, education,
      internships, trainingPrograms, academicProjects, leadershipPositions,
      coCurricular, extracurricular, languages, certifications, scholarships,
      awards, speakingEngagements, memberships, workshops, professionalContext,
@@ -691,6 +713,51 @@ async function extractDataFromText(userId: string | null, text: string, guestId:
    - If you see a "Skills" section with bullet points, extract each bullet point as a separate skill
    - For skills like "React.js" → extract as "React.js"
    - For skills like "• React.js" → extract as "React.js" (remove the bullet)
+   - Extract ONLY values that appear under the Skills section.
+- NEVER include Core Competencies values in Skills.
+- If both sections exist, keep them completely separate.
+   
+
+   CORE COMPETENCIES (VERY IMPORTANT):
+
+- Core Competencies and Skills are DIFFERENT sections.
+- NEVER merge Core Competencies into Skills.
+- NEVER place Core Competencies values inside the skills array.
+- If the resume contains a section named:
+  "Core Competencies",
+  "Core Competency",
+  "Key Competencies",
+  "Core Strengths"
+  then extract those values ONLY into "coreCompetencies".
+
+Example:
+
+Resume:
+
+Skills:
+- Recruitment
+- BFSI Hiring
+
+Core Competencies:
+- Team Lead
+- Work Management
+
+Output:
+
+{
+  "skills": [
+    "Recruitment",
+    "BFSI Hiring"
+  ],
+  "coreCompetencies": [
+    "Team Lead",
+    "Work Management"
+  ]
+}
+
+- Preserve wording exactly.
+- Do not rewrite.
+- Do not move values between sections.
    
    INTERNSHIPS:
    - title, company, description, duration
@@ -935,6 +1002,7 @@ async function parseResume(userId: string | null, filePath: string, guestId: str
 
   try {
     aiParsed = await extractDataFromText(userId, extractedText, guestId);
+    // console.log(JSON.stringify(aiParsed, null, 2));
   } catch (extractError: any) {
     console.error("❌ AI processing failed:", extractError.message);
     console.log("⚠️ Returning empty result");

@@ -6,7 +6,7 @@ export function buildAlakazamTemplate(data: any, theme?: any): string {
     headingFont: 'Arial, sans-serif',
     bodyFont: 'Arial, sans-serif'
   };
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
   
   const userFontSize = data.formatting?.bodyFontSize || data.fontSize || 12;
   const userFontFamily = data.formatting?.fontFamily || data.fontFamily || 'Arial, sans-serif';

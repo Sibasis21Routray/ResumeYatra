@@ -7,7 +7,7 @@ export function buildSkillsFirstTemplate(data: any, theme?: any): string {
     headingFont: "Arial, sans-serif",
     bodyFont: "Arial, sans-serif",
   };
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
 
   const bodyFontSize = "10pt";
   const headingFontSize = "12pt";

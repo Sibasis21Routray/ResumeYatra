@@ -1199,6 +1199,8 @@ function normalizeParsedResume(parsed) {
                 .filter(function (t) { return t !== null; });
         }
     }
+    //   console.log("NORMALIZED SKILLS:", normalized.skills);
+    // console.log("NORMALIZED CORE:", normalized.coreCompetencies);
     return normalized;
 }
 exports.normalizeParsedResume = normalizeParsedResume;

@@ -1207,7 +1207,8 @@ if (source.coreCompetencies || source.core_competencies) {
         .filter((t: any) => t !== null);
     }
   }
-
+//   console.log("NORMALIZED SKILLS:", normalized.skills);
+// console.log("NORMALIZED CORE:", normalized.coreCompetencies);
   return normalized;
 }
 

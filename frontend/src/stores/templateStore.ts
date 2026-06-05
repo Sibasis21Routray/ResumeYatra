@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
+import { resumeAPI } from '../services/apiClient';
 
 export interface Template {
   id: string;
@@ -7,6 +8,7 @@ export interface Template {
   description: string;
   preview: string;
   category: string;
+  defaultColor?: string;
 }
 
 export interface TemplateState {
@@ -34,14 +36,19 @@ export const useTemplateStore = create<TemplateState>()(
       set({ loading: true, error: null });
 
       try {
-        // TODO: Replace with actual API call
-       const mockTemplates: Template[] = [
+        // Fetch the latest colors from the backend
+        const metadataRes = await resumeAPI.getMetadata();
+        const colors = metadataRes.data;
+
+        const mockTemplates: Template[] = [
+          // ... (I'll pass the full list with dynamic colors)
   {
     id: "ats-classic",
     name: "Ats Classic",
     description: "Professional two-column layout with gray sidebar for contact details",
     preview: "/templates/ats-classic-preview.png",
     category: "classic",
+    defaultColor: "#002d62",
   },
   {
     id: "photo-minimal",
@@ -49,6 +56,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Clean and simple design with a focus on the candidate's photo",
     preview: "/templates/photo-minimal-preview.png",
     category: "photo",
+    defaultColor: "#005F5F",
   },
   {
     id: "modern-sidebar",
@@ -56,6 +64,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Sophisticated for senior roles",
     preview: "/templates/modern-sidebar-preview.png",
     category: "modern",
+    defaultColor: "#005F5F",
   },
   {
     id: "compact-classic",
@@ -63,6 +72,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Traditional design with a modern twist",
     preview: "/templates/compact-classic-preview.png",
     category: "classic",
+    defaultColor: "#7A0C2E",
   },
   {
     id: "photo-modern-pro",
@@ -70,6 +80,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Water-themed design with blue aquatic styling",
     preview: "/templates/photo-modern-pro-preview.png",
     category: "photo",
+    defaultColor: "#0A2540",
   },
   {
     id: "formal-indian-cv",
@@ -77,6 +88,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Energetic and fun design",
     preview: "/templates/formal-indian-cv-preview.png",
     category: "classic",
+    defaultColor: "#0c4354",
   },
   {
     id: "senior-leadership",
@@ -84,6 +96,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Elegant design for executive and senior roles",
     preview: "/templates/senior-leadership-preview.png",
     category: "modern",
+    defaultColor: "#0B1F3A",
   },
   {
     id: "azurill",
@@ -91,6 +104,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Fresh and vibrant design",
     preview: "/templates/azurill-preview.png",
     category: "photo",
+    defaultColor: "#004B87",
   },
   {
     id: "nova",
@@ -98,6 +112,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Professional card-based layout with clean typography",
     preview: "/templates/nova-preview.png",
     category: "classic",
+    defaultColor: "#80303d",
   },
   {
     id: "stellar",
@@ -105,6 +120,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Compact two-column design for efficient information display",
     preview: "/templates/stellar-preview.png",
     category: "classic",
+    defaultColor: "#004B87",
   },
   {
     id: "venusaur",
@@ -112,6 +128,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Nature-themed design with green organic styling",
     preview: "/templates/venusaur-preview.png",
     category: "photo",
+    defaultColor: "#0f172a",
   },
   {
     id: "cosmos",
@@ -119,6 +136,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Artistic design with gradient headers and elegant styling",
     preview: "/templates/cosmos-preview.png",
     category: "photo",
+    defaultColor: "#000000",
   },
   {
     id: "modern-executive",
@@ -126,6 +144,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Sleek and sophisticated layout for senior professionals",
     preview: "/templates/modern-executive-preview.png",
     category: "modern",
+    defaultColor: "#7aa333",
   },
   {
     id: "orion",
@@ -133,6 +152,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Modern timeline-style layout with gradient accents",
     preview: "/templates/orion-preview.png",
     category: "modern",
+    defaultColor: "#0f172a",
   },
   {
     id: "operations-support",
@@ -140,6 +160,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Process-focused template for support roles",
     preview: "/templates/operations-support-preview.png",
     category: "classic",
+    defaultColor: "#1a1a2e",
   },
   {
     id: "minimal-ats",
@@ -147,6 +168,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Ultra-fast parsing for high-volume hiring",
     preview: "/templates/minimal-ats-preview.png",
     category: "classic",
+    defaultColor: "#1a1a1a",
   },
   {
     id: "nebula",
@@ -154,6 +176,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Creative sidebar design with vibrant color schemes",
     preview: "/templates/nebula-preview.png",
     category: "photo",
+    defaultColor: "#abc9eb",
   },
   {
     id: "modern",
@@ -161,6 +184,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Clean and contemporary design",
     preview: "/templates/modern-preview.png",
     category: "modern",
+    defaultColor: "#4b5563",
   },
   {
     id: "photographic",
@@ -168,6 +192,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Perfect for creative professionals",
     preview: "/templates/photographic-preview.png",
     category: "classic",
+    defaultColor: "#000000",
   },
   {
     id: "minimal",
@@ -175,6 +200,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Simple and elegant",
     preview: "/templates/minimal-preview.png",
     category: "classic",
+    defaultColor: "#000000",
   },
   {
     id: "professional",
@@ -182,6 +208,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Traditional and trustworthy",
     preview: "/templates/professional-preview.png",
     category: "classic",
+    defaultColor: "#5B9BD5",
   },
   {
     id: "creative",
@@ -189,6 +216,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Bold and artistic design",
     preview: "/templates/creative-preview.png",
     category: "photo",
+    defaultColor: "#2c3e50",
   },
   {
     id: "gengar",
@@ -196,6 +224,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Mysterious and unique",
     preview: "/templates/gengar-preview.png",
     category: "photo",
+    defaultColor: "#7c3aed",
   },
   {
     id: "dragonite",
@@ -203,6 +232,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Dragon-themed design with powerful yellow colors",
     preview: "/templates/dragonite-preview.png",
     category: "classic",
+    defaultColor: "#d97706",
   },
   {
     id: "alakazam",
@@ -210,6 +240,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Psychic-themed design with purple mystical colors",
     preview: "/templates/alakazam-preview.png",
     category: "photo",
+    defaultColor: "#004369",
   },
   {
     id: "mewtwo",
@@ -217,6 +248,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Genetic-themed design with blue scientific styling",
     preview: "/templates/mewtwo-preview.png",
     category: "modern",
+    defaultColor: "#000000",
   },
   {
     id: "squirtle",
@@ -224,6 +256,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Water-themed design with teal aquatic styling",
     preview: "/templates/squirtle-preview.png",
     category: "modern",
+    defaultColor: "#373737",
   },
   {
     id: "bulbasaur",
@@ -231,6 +264,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Plant-themed design with green organic styling",
     preview: "/templates/bulbasaur-preview.png",
     category: "modern",
+    defaultColor: "#15803d",
   },
   {
     id: "eevee",
@@ -238,6 +272,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Evolution-themed design with orange adaptive colors",
     preview: "/templates/eevee-preview.png",
     category: "photo",
+    defaultColor: "#000000",
   },
   {
     id: "machamp",
@@ -245,6 +280,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Fighting-themed design with red powerful styling",
     preview: "/templates/machamp-preview.png",
     category: "classic",
+    defaultColor: "#000000",
   },
   {
     id: "classic-professional",
@@ -252,6 +288,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Traditional ATS-friendly layout for experienced candidates",
     preview: "/templates/classic-professional-preview.png",
     category: "classic",
+    defaultColor: "#000000",
   },
   {
     id: "skills-first",
@@ -259,6 +296,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "ATS-optimized for career transitions and freelancers",
     preview: "/templates/skills-first-preview.png",
     category: "classic",
+    defaultColor: "#000000",
   },
   {
     id: "metrics-driven",
@@ -266,6 +304,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Results-focused template for sales and business roles",
     preview: "/templates/metrics-driven-preview.png",
     category: "classic",
+    defaultColor: "#000000",
   },
   {
     id: "leadership-managerial",
@@ -273,6 +312,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Executive template for managers and senior roles",
     preview: "/templates/leadership-managerial-preview.png",
     category: "classic",
+    defaultColor: "#1e1b4b",
   },
   {
     id: "tech-it",
@@ -280,6 +320,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "ATS-optimized for developers and IT professionals",
     preview: "/templates/tech-it-preview.png",
     category: "classic",
+    defaultColor: "#1a1a1a",
   },
   {
     id: "fresher-entry-level",
@@ -287,6 +328,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Perfect for students and first-time job seekers",
     preview: "/templates/fresher-entry-level-preview.png",
     category: "classic",
+    defaultColor: "#334155",
   },
   {
     id: "consultant-freelancer",
@@ -294,6 +336,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Project-based template for contract professionals",
     preview: "/templates/consultant-freelancer-preview.png",
     category: "photo",
+    defaultColor: "#2563eb",
   },
   {
     id: "impact-resume",
@@ -301,6 +344,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Bold design focused on achievements and impact",
     preview: "/templates/impact-resume-preview.png",
     category: "modern",
+    defaultColor: "#3b82f6",
   },
   {
     id: "startup-tech",
@@ -308,6 +352,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Dynamic layout for fast-paced tech environments",
     preview: "/templates/startup-tech-preview.png",
     category: "modern",
+    defaultColor: "#2d3e50",
   },
   {
     id: "modern-corporate",
@@ -315,6 +360,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Sleek and professional for modern businesses",
     preview: "/templates/modern-corporate-preview.png",
     category: "modern",
+    defaultColor: "#000000",
   },
   {
     id: "corporate-standard",
@@ -322,6 +368,7 @@ export const useTemplateStore = create<TemplateState>()(
     description: "Classic and reliable corporate layout",
     preview: "/templates/corporate-standard-preview.png",
     category: "classic",
+    defaultColor: "#000000",
   },
 ];
         //------
@@ -338,22 +385,22 @@ export const useTemplateStore = create<TemplateState>()(
           "venusaur",
           "machamp",
           "stellar",
-          "nebula",
+          // "nebula",
           "modern",
           "orion",
           "consultant-freelancer",
           "photographic",
           "leadership-managerial",
           "impact-resume",
-          "startup-tech",
           "modern-corporate",
           "senior-leadership",
           "corporate-standard",
         ];
 
-        const filteredTemplates = mockTemplates.filter((t) =>
-          ALLOWED_TEMPLATES.includes(t.id),
-        );
+        const filteredTemplates = mockTemplates.map((t) => ({
+          ...t,
+          defaultColor: colors[t.id] || t.defaultColor,
+        })).filter((t) => ALLOWED_TEMPLATES.includes(t.id));
 
         set({
           templates: filteredTemplates,

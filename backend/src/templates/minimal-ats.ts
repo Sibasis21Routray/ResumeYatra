@@ -8,7 +8,7 @@ export function buildMinimalAtsTemplate(data: any, theme?: any): string {
     headingFont: "Arial, Helvetica, sans-serif",
     bodyFont: "Arial, Helvetica, sans-serif",
   };
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
 
   const bodyFontSize = "12pt";
   const headingFontSize = "14pt";

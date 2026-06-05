@@ -49,7 +49,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
     bodyFont: "sans-serif",
   };
 
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
 
   const userFontSize = data.formatting?.bodyFontSize || data.fontSize || 14;
   const userFontFamily = data.formatting?.fontFamily || data.fontFamily || "'Helvetica Neue', Helvetica, Arial, sans-serif";

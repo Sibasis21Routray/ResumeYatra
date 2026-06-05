@@ -49,7 +49,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     bodyFont: "Inter, sans-serif",
   };
 
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
   const sidebarBg = currentTheme.sidebarBg || defaultTheme.primary;
   const primaryAccent = currentTheme.secondary || defaultTheme.secondary;
 
@@ -260,7 +260,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
 
     /* Left Sidebar Styling */
     .left-column {
-      background: ${sidebarBg};
+      background: ${primaryAccent};
       color: #ffffff;
       padding: 30px 20px;
     }
@@ -277,7 +277,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
       margin: 0 auto;
       border: 3px solid rgba(255, 255, 255, 0.2);
       overflow: hidden;
-      background: rgba(255, 255, 255, 0.1);
+      background: ${primaryAccent};
       display: flex;
       align-items: center;
       justify-content: center;
@@ -297,6 +297,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     .sidebar-section {
       margin-top: 25px;
       margin-bottom: 10px;
+      
     }
 
     .sidebar-heading {
@@ -334,6 +335,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     .sidebar-list {
       list-style: none;
       padding-left: 0;
+      
     }
 
     .sidebar-list-item {

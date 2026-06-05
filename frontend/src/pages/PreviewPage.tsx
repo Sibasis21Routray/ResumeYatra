@@ -44,27 +44,27 @@ const colorPalettes = [
 ];
 
 // Font families
-const fontFamilies = [
+const fontFamilies = [  
   { name: 'Arial', value: 'Arial, sans-serif', category: 'sans' },
-  { name: 'Times New Roman', value: 'Times New Roman, serif', category: 'serif' },
+  { name: 'Times New Roman', value: '"Times New Roman", serif', category: 'serif' },
   { name: 'Georgia', value: 'Georgia, serif', category: 'serif' },
   { name: 'Verdana', value: 'Verdana, sans-serif', category: 'sans' },
   { name: 'Helvetica', value: 'Helvetica, sans-serif', category: 'sans' },
   { name: 'Tahoma', value: 'Tahoma, sans-serif', category: 'sans' },
-  { name: 'Trebuchet MS', value: 'Trebuchet MS, sans-serif', category: 'sans' },
+  { name: 'Trebuchet MS', value: '"Trebuchet MS", sans-serif', category: 'sans' },
   { name: 'Impact', value: 'Impact, sans-serif', category: 'display' },
   { name: 'Garamond', value: 'Garamond, serif', category: 'serif' },
-  { name: 'Palatino', value: 'Palatino, serif', category: 'serif' },
+  { name: 'Palatino', value: '"Palatino Linotype", "Book Antiqua", Palatino, serif', category: 'serif' },
   { name: 'Inter', value: 'Inter, system-ui, sans-serif', category: 'sans' },
   { name: 'Roboto', value: 'Roboto, sans-serif', category: 'sans' },
-  { name: 'Open Sans', value: 'Open Sans, sans-serif', category: 'sans' },
+  { name: 'Open Sans', value: '"Open Sans", sans-serif', category: 'sans' },
   { name: 'Montserrat', value: 'Montserrat, sans-serif', category: 'sans' },
   { name: 'Poppins', value: 'Poppins, sans-serif', category: 'sans' },
   { name: 'Lato', value: 'Lato, sans-serif', category: 'sans' },
-  { name: 'Source Code Pro', value: 'Source Code Pro, monospace', category: 'mono' },
+  { name: 'Source Code Pro', value: '"Source Code Pro", monospace', category: 'mono' },
   { name: 'Calibri', value: 'Calibri, sans-serif', category: 'sans' },
   { name: 'Cambria', value: 'Cambria, serif', category: 'serif' },
-  { name: 'Gill Sans', value: 'Gill Sans, sans-serif', category: 'sans' },
+  { name: 'Gill Sans', value: '"Gill Sans", sans-serif', category: 'sans' },
 ]
 
 export default function PreviewPage() {
@@ -79,6 +79,7 @@ export default function PreviewPage() {
   const [template, setTemplate] = useState<string>('modern')
   const [loading, setLoading] = useState(true)
   const [rendering, setRendering] = useState(false)
+  const [iframeLoading, setIframeLoading] = useState(false)
   const [exporting, setExporting] = useState<string | null>(null)
   const [error, setError] = useState('')
   const [templatePreviews, setTemplatePreviews] = useState<Record<string, string>>({})
@@ -328,6 +329,7 @@ export default function PreviewPage() {
       formatting: {
         primary: selectedTheme?.primary,
         fontFamily: selectedFontFamily,
+        fontSize: bodyFontSize,
         bodyFontSize: bodyFontSize,
         theme: selectedTheme
       },
@@ -353,6 +355,7 @@ export default function PreviewPage() {
         formatting: {
           primary: selectedTheme?.primary,
           fontFamily: selectedFontFamily,
+          fontSize: bodyFontSize,
           bodyFontSize: bodyFontSize,
           theme: selectedTheme
         },
@@ -713,6 +716,15 @@ export default function PreviewPage() {
       const templateValue = response.data.template || 'modern'
       setTemplate(templateValue)
       setSelectedTemplate(templateValue)
+
+      // Initialize formatting from resume data
+      if (response.data.formatting) {
+        const { theme, fontFamily, fontSize, bodyFontSize: bFontSize } = response.data.formatting
+        if (theme) setSelectedTheme(theme)
+        if (fontFamily) setSelectedFontFamily(fontFamily)
+        const sizeToSet = bFontSize || fontSize
+        if (sizeToSet) setBodyFontSize(sizeToSet)
+      }
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to fetch resume')
     } finally {
@@ -729,7 +741,7 @@ export default function PreviewPage() {
     if (templates.length > 0 && resumeData) {
       loadTemplatePreviews()
     }
-  }, [templates, resumeData, selectedTheme, selectedFontFamily, bodyFontSize])
+  }, [templates, resumeData])
 
   useEffect(() => {
     if (resume) {
@@ -748,6 +760,7 @@ export default function PreviewPage() {
       formatting: {
         primary: selectedTheme?.primary,
         fontFamily: selectedFontFamily,
+        fontSize: bodyFontSize,
         bodyFontSize: bodyFontSize,
         theme: selectedTheme
       },
@@ -765,6 +778,7 @@ export default function PreviewPage() {
           formatting: {
             primary: selectedTheme?.primary,
             fontFamily: selectedFontFamily,
+            fontSize: bodyFontSize,
             bodyFontSize: bodyFontSize,
             theme: selectedTheme
           },
@@ -813,6 +827,7 @@ export default function PreviewPage() {
       }
 
       setPreviewUrl(url)
+      setIframeLoading(true)
       setError('')
       
       setTimeout(() => {
@@ -831,28 +846,35 @@ export default function PreviewPage() {
   const loadTemplatePreviews = async () => {
     if (!id || !resumeData) return;
     
-    const previews: Record<string, string> = {}
-    const themeToUse = selectedTheme?.name === "None" ? null : selectedTheme;
+    const previews: Record<string, string> = {};
     
-    const formattedData = {
-      ...resumeData,
-      formatting: {
-        primary: selectedTheme?.primary,
-        fontFamily: selectedFontFamily,
-        bodyFontSize: bodyFontSize,
-        theme: selectedTheme
-      }
-    };
-
+    // Loop through each template to generate its thumbnail
+    
     for (const templateOption of templates) {
       try {
-        const response = await resumeAPI.preview(id!, templateOption.id, themeToUse, formattedData)
-        previews[templateOption.id] = response.data
+        // Create a specific theme for the preview using this template's default color
+        const previewTheme = templateOption.defaultColor 
+          ? { primary: templateOption.defaultColor, secondary: templateOption.defaultColor }
+          : null;
+
+        // Build data object without the global selectedTheme to show template defaults
+        const previewData = {
+          ...resumeData,
+          formatting: {
+            ...(resumeData as any).formatting,
+            fontFamily: selectedFontFamily,
+            fontSize: bodyFontSize,
+            bodyFontSize: bodyFontSize,
+          },
+        };
+
+        const response = await resumeAPI.preview(id!, templateOption.id, previewTheme, previewData);
+        previews[templateOption.id] = response.data;
       } catch (error) {
-        console.error(`Failed to load preview for ${templateOption.id}:`, error)
+        console.error(`Failed to load preview for ${templateOption.id}:`, error);
       }
     }
-    setTemplatePreviews(previews)
+    setTemplatePreviews(previews);
   }
 
   const handleLogout = () => {
@@ -1033,7 +1055,22 @@ export default function PreviewPage() {
                 <div className="relative">
                   <select
                     value={selectedFontFamily}
-                    onChange={(e) => setSelectedFontFamily(e.target.value)}
+                    onChange={async (e) => {
+                      const newFont = e.target.value;
+                      setSelectedFontFamily(newFont);
+                      try {
+                        await resumeAPI.update(id!, {
+                          formatting: {
+                            theme: selectedTheme,
+                            fontFamily: newFont,
+                            fontSize: bodyFontSize,
+                            bodyFontSize: bodyFontSize
+                          }
+                        } as any);
+                      } catch (err) {
+                        console.error("Failed to save font:", err);
+                      }
+                    }}
                     className="appearance-none h-9 pl-3 pr-8 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:ring-2 focus:ring-[#04477E]/10"
                     style={{ fontFamily: selectedFontFamily }}
                   >
@@ -1061,7 +1098,22 @@ export default function PreviewPage() {
               </span>
               <div className="flex items-center bg-slate-100/50 rounded-lg p-0.5 border border-slate-200">
                 <button
-                  onClick={() => setBodyFontSize(Math.max(10, bodyFontSize - 1))}
+                  onClick={async () => {
+                    const newSize = Math.max(10, bodyFontSize - 1);
+                    setBodyFontSize(newSize);
+                    try {
+                      await resumeAPI.update(id!, {
+                        formatting: {
+                          theme: selectedTheme,
+                          fontFamily: selectedFontFamily,
+                          fontSize: newSize,
+                          bodyFontSize: newSize
+                        }
+                      } as any);
+                    } catch (e) {
+                      console.error("Failed to save font size:", e);
+                    }
+                  }}
                   className="p-1.5 hover:bg-white rounded-md text-slate-500 transition-all"
                 >
                   -
@@ -1070,7 +1122,22 @@ export default function PreviewPage() {
                   {bodyFontSize}px
                 </span>
                 <button
-                  onClick={() => setBodyFontSize(Math.min(24, bodyFontSize + 1))}
+                  onClick={async () => {
+                    const newSize = Math.min(24, bodyFontSize + 1);
+                    setBodyFontSize(newSize);
+                    try {
+                      await resumeAPI.update(id!, {
+                        formatting: {
+                          theme: selectedTheme,
+                          fontFamily: selectedFontFamily,
+                          fontSize: newSize,
+                          bodyFontSize: newSize
+                        }
+                      } as any);
+                    } catch (e) {
+                      console.error("Failed to save font size:", e);
+                    }
+                  }}
                   className="p-1.5 hover:bg-white rounded-md text-slate-500 transition-all"
                 >
                   +
@@ -1375,19 +1442,27 @@ export default function PreviewPage() {
                 </div>
               )}
 
-              {/* Loading overlay for rendering/exporting */}
-              {(rendering || exporting) && !enhancing && (
-                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-20 flex items-center justify-center rounded-xl">
+              {/* Loading overlay - Solid white to hide all transitional blinking */}
+              {(rendering || iframeLoading || exporting) && !enhancing && (
+                <div className="absolute inset-0 z-[60] bg-white flex items-center justify-center rounded-xl">
                   <div className="text-center">
-                    <div className="relative inline-block">
-                      <div className="w-12 h-12 border-4 border-gray-200 rounded-full"></div>
-                      <div className="w-12 h-12 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+                    <div className="relative inline-block scale-110 mb-5">
+                      <div className="w-14 h-14 border-4 border-gray-100 rounded-full"></div>
+                      <div className="w-14 h-14 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Loader2 className="w-5 h-5 text-[#04477E]/30" />
+                      </div>
                     </div>
-                    <p className="text-gray-600 mt-4 text-sm">
-                      {exporting
-                        ? `Exporting as ${exporting.toUpperCase()}...`
-                        : "Updating preview..."}
-                    </p>
+                    <div className="flex flex-col items-center gap-2">
+                       <h3 className="text-lg font-bold text-gray-900">
+                         {exporting ? "Finalizing File..." : "Updating Design"}
+                       </h3>
+                       <p className="text-sm text-gray-500 font-medium animate-pulse">
+                         {exporting 
+                           ? `Your ${exporting.toUpperCase()} is almost ready` 
+                           : "Applying your changes..."}
+                       </p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1411,6 +1486,7 @@ export default function PreviewPage() {
                       title="Resume Preview"
                       sandbox="allow-same-origin allow-scripts"
                       onLoad={() => {
+                        setIframeLoading(false);
                         if (mainPreviewIframeRef.current) {
                           injectSectionDetectionScript(mainPreviewIframeRef.current);
                         }
@@ -1455,7 +1531,21 @@ export default function PreviewPage() {
                           {filteredPalettes.map((palette) => (
                             <button
                               key={palette.name}
-                              onClick={() => setSelectedTheme(palette)}
+                              onClick={async () => {
+                                setSelectedTheme(palette);
+                                try {
+                                  await resumeAPI.update(id!, {
+                                    formatting: {
+                                      theme: palette,
+                                      fontFamily: selectedFontFamily,
+                                      fontSize: bodyFontSize,
+                                      bodyFontSize: bodyFontSize
+                                    }
+                                  } as any);
+                                } catch (e) {
+                                  console.error("Failed to save theme:", e);
+                                }
+                              }}
                               className={`relative aspect-square rounded-full border-2 transition-all h-8 ${
                                 selectedTheme?.primary === palette.primary
                                   ? "border-[#04477E] ring-2 ring-[#04477E]/20 scale-105"
@@ -1492,12 +1582,40 @@ export default function PreviewPage() {
                               <button
                                 key={templateOption.id}
                                 onClick={async () => {
+                                  if (template === templateOption.id) return;
+                                  
                                   try {
-                                    await resumeAPI.update(id!, {
-                                      template: templateOption.id,
-                                    });
+                                    // 1. Prepare defaults
+                                    const defaultFont = "Arial, sans-serif";
+                                    const defaultSize = 14;
+                                    const defaultTheme = (templateOption as any).defaultColor 
+                                      ? { 
+                                          name: 'Default', 
+                                          primary: (templateOption as any).defaultColor, 
+                                          secondary: (templateOption as any).defaultColor, 
+                                          background: '#ffffff', 
+                                          category: 'custom' 
+                                        }
+                                      : colorPalettes[0];
+
+                                    // 2. Immediate UI update (Optimistic)
                                     setTemplate(templateOption.id);
                                     setSelectedTemplate(templateOption.id);
+                                    setSelectedTheme(defaultTheme);
+                                    setSelectedFontFamily(defaultFont);
+                                    setBodyFontSize(defaultSize);
+
+                                    // 3. Persist to database in background
+                                    await resumeAPI.update(id!, {
+                                      template: templateOption.id,
+                                      formatting: {
+                                        theme: defaultTheme,
+                                        fontFamily: defaultFont,
+                                        fontSize: defaultSize,
+                                        bodyFontSize: defaultSize,
+                                      },
+                                    } as any);
+
                                   } catch (error) {
                                     console.error("Failed to update template:", error);
                                     toast.error("Failed to update template. Please try again.");
@@ -1573,10 +1691,27 @@ export default function PreviewPage() {
                       </div>
 
                       <button
-                        onClick={() => {
-                          setSelectedTheme(colorPalettes[1]);
-                          setSelectedFontFamily("Arial, sans-serif");
-                          setBodyFontSize(14);
+                        onClick={async () => {
+                          const defaultTheme = colorPalettes[0];
+                          const defaultFont = "Arial, sans-serif";
+                          const defaultSize = 14;
+
+                          setSelectedTheme(defaultTheme);
+                          setSelectedFontFamily(defaultFont);
+                          setBodyFontSize(defaultSize);
+
+                          try {
+                            await resumeAPI.update(id!, {
+                              formatting: {
+                                theme: defaultTheme,
+                                fontFamily: defaultFont,
+                                fontSize: defaultSize,
+                                bodyFontSize: defaultSize,
+                              },
+                            } as any);
+                          } catch (e) {
+                            console.error("Failed to reset to defaults:", e);
+                          }
                         }}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-xs font-medium flex items-center justify-center gap-2"
                       >

@@ -12,6 +12,11 @@ export interface IResume extends Document {
   title: string
   candidateName?: string
   template: string
+  formatting?: {
+    theme?: any
+    fontFamily?: string
+    fontSize?: number
+  }
   createdAt: Date
   updatedAt: Date
   versions: mongoose.Types.ObjectId[]
@@ -35,6 +40,11 @@ const ResumeSchema: Schema = new Schema({
   title: { type: String, required: true },
   candidateName: { type: String },
   template: { type: String, default: 'modern' },
+  formatting: {
+    theme: { type: Schema.Types.Mixed },
+    fontFamily: { type: String },
+    fontSize: { type: Number }
+  },
 
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

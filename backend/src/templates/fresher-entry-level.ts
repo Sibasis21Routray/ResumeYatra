@@ -7,7 +7,7 @@ export function buildFresherEntryLevelTemplate(data: any, theme?: any): string {
     headingFont: 'Inter, Arial, sans-serif',
     bodyFont: 'Inter, Arial, sans-serif'
   };
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
 
   const bodyFontSize = '10pt';
   const headingFontSize = '11pt';

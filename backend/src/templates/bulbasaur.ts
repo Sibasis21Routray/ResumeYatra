@@ -8,7 +8,7 @@ export function buildBulbasaurTemplate(data: any, theme?: any): string {
   }
   
   // --- PRESERVED LOGIC START ---
-  const currentTheme = theme || defaultTheme
+  const currentTheme = { ...defaultTheme, ...(theme || {}) }
 
   // Font size and family from data (user settings)
   const userFontSize = data.formatting?.bodyFontSize || data.fontSize || 12 // Default 12px

@@ -165,10 +165,10 @@ export const resumeAPI = {
   // ) => api.put(`/resumes/${id}`, payload),
 
   update: (
-  id: string,
-  payload: { data?: any; template?: string; title?: string }
-) => {
-  // console.log("[resumeAPI] Updating resume:", id, payload);
+    id: string,
+    payload: { data?: any; template?: string; title?: string; formatting?: any }
+  ) => {
+    // console.log("[resumeAPI] Updating resume:", id, payload);
 
   return api
     .put(`/resumes/${id}`, payload)
@@ -213,6 +213,7 @@ export const resumeAPI = {
     if (theme) params.append("theme", JSON.stringify(theme));
     return api.get(`/resumes/${id}/render?${params.toString()}`);
   },
+  getMetadata: () => api.get("/templates/metadata"),
   preview: (
     id: string,
     template: string = "modern",

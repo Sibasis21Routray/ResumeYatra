@@ -7,7 +7,7 @@ export function buildTechItTemplate(data: any, theme?: any): string {
     headingFont: 'serif', // Matches the screenshot's classic style
     bodyFont: 'Arial, sans-serif'
   };
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
 
   // Font sizes for the classic look
   const bodyFontSize = '10pt';

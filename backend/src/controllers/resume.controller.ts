@@ -729,7 +729,7 @@ export async function updateResume(req: Request, res: Response) {
     const userId = (req as any).userId || null;
 
     const guestId = getGuestId(req.headers);
-    const { data, template, title } = req.body;
+    const { data, template, title, formatting } = req.body;
 
     console.log("[updateResume] Received data keys:", Object.keys(data || {}));
 
@@ -741,10 +741,10 @@ export async function updateResume(req: Request, res: Response) {
       return res.status(400).json({ error: "Invalid resume ID" });
     if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(400).json({ error: "Invalid resume ID" });
-    if (!data && !template && !title)
+    if (!data && !template && !title && !formatting)
       return res
         .status(400)
-        .json({ error: "data, template, or title required" });
+        .json({ error: "data, template, title, or formatting required" });
 
     // Verify resume ownership - use single field based on auth type
     let query: any = { _id: id };
@@ -776,6 +776,12 @@ export async function updateResume(req: Request, res: Response) {
     // Update title if provided
     if (title) {
       resume.title = title;
+      await resume.save();
+    }
+
+    // Update formatting if provided
+    if (formatting) {
+      resume.formatting = formatting;
       await resume.save();
     }
 

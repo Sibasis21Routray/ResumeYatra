@@ -50,7 +50,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     borderColor: "#004B87"
   };
 
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
   
   // Dynamic font size from user settings
   const userFontSize = data.fontSize || 13;
@@ -304,8 +304,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       font-weight: 700;
       color: ${currentTheme.primary};
       padding-bottom: 3px;
-      border-bottom: 2px solid ${currentTheme.borderColor};
-      margin-bottom: 12px;
+      margin-bottom: 6px;
       text-transform: uppercase;
     }
 

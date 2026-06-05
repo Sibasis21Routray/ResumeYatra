@@ -791,7 +791,7 @@ export function Heading({
 
                 <StyledInput
                   label="Last Name"
-                  placeholder="Duggar"
+                  placeholder="Dugger"
                   value={lastName}
                   onChange={(e) => handleLastNameChange(e.target.value)}
                   icon={<User className="w-4 h-4" />}
@@ -825,7 +825,7 @@ export function Heading({
 
                 <StyledInput
                   label="Email"
-                  placeholder="ajay.duggar@example.com"
+                  placeholder="ajay.dugger@example.com"
                   value={personal.email || ""}
                   onChange={(e) => handleFieldChange("email", e.target.value)}
                   onBlur={() => handleFieldBlur("personal.email")}

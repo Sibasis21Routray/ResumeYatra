@@ -51,7 +51,7 @@ export function buildCompactClassicTemplate(
     headingFont: "sans-serif",
     bodyFont: "sans-serif",
   };
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
 
   const bodyFontSize = "10.5pt";
   const headingFontSize = "13pt";

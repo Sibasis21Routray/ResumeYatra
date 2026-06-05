@@ -49,7 +49,7 @@ export function buildNebulaTemplate(data: any, theme?: any): string {
     textLight: "#666666",
   };
 
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
   
   // User font settings
   const userFontSize = data.formatting?.bodyFontSize || data.fontSize || 14;

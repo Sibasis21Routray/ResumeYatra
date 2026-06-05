@@ -7,7 +7,7 @@ export function buildCosmosTemplate(data: any, theme?: any): string {
     bodyFont: "Arial, sans-serif",
   };
 
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
   const userFontSize = data.fontSize || 10;
   const userFontFamily = data.fontFamily || "Arial, sans-serif";
 

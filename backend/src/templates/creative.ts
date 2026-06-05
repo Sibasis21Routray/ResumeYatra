@@ -7,7 +7,7 @@ export function buildCreativeTemplate(data: any, theme?: any): string {
     bodyFont: "Inter",
   };
 
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
 
   // Font size and family from data (user settings)
   const userFontSize = data.formatting?.bodyFontSize || data.fontSize || 13; // Default 13px

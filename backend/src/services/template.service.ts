@@ -3,6 +3,7 @@ import ResumeVersion from "../models/ResumeVersion";
 import * as pdfService from "./pdf.service";
 import * as storageService from "./storage.service";
 import * as cloudinaryService from "./cloudinary.service";
+import { TEMPLATE_COLORS } from "../config/template-colors";
 import { buildModernTemplate } from "../templates/modern";
 import { buildPhotographicTemplate } from "../templates/photographic";
 import { buildCreativeTemplate } from "../templates/creative";
@@ -53,6 +54,10 @@ const PREVIEW_TTL_MS = 1000 * 60 * 60; // 1 hour
 const imageCache: Record<string, { base64: string; expiresAt: number }> = {};
 const IMAGE_CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
 
+export function getAllTemplatesMetadata() {
+  return TEMPLATE_COLORS;
+}
+
 export async function renderResume(
   resumeId: string,
   templateId?: string,
@@ -67,6 +72,18 @@ export async function renderResume(
     .lean();
 
   const data = (latestVersion?.data as any) || {};
+
+  // Normalize formatting for backwards compatibility
+  if (data.formatting) {
+    if (data.formatting.fontFamily) data.fontFamily = data.formatting.fontFamily;
+    if (data.formatting.bodyFontSize) data.fontSize = data.formatting.bodyFontSize;
+    if (data.formatting.fontSize) {
+      data.fontSize = data.formatting.fontSize;
+      data.formatting.bodyFontSize = data.formatting.bodyFontSize || data.formatting.fontSize;
+    }
+    if (!theme && data.formatting.theme) theme = data.formatting.theme;
+  }
+
   const processedData = await processImageForTemplate(data);
   const html = buildHtml(processedData, template, theme);
   return pdfService.generatePdf(html);
@@ -118,12 +135,87 @@ export async function renderResumeHtml(
     }
   }
 
+  // ── Normalize formatting ──────────────────────────────────────────
+  // Some templates read from data.formatting.fontFamily / bodyFontSize,
+  // while older ones read from data.fontFamily / data.fontSize.
+  // Mirror the formatting values to top-level so every template works.
+  if (data.formatting) {
+    if (data.formatting.fontFamily) {
+      data.fontFamily = data.formatting.fontFamily;
+    }
+    if (data.formatting.bodyFontSize) {
+      data.fontSize = data.formatting.bodyFontSize;
+    }
+    if (data.formatting.fontSize) {
+      data.fontSize = data.formatting.fontSize;
+      // Also set bodyFontSize so templates that read it specifically work
+      data.formatting.bodyFontSize = data.formatting.bodyFontSize || data.formatting.fontSize;
+    }
+    // If no explicit theme argument was provided, use the one from formatting
+    if (!theme && data.formatting.theme) {
+      theme = data.formatting.theme;
+    }
+  }
+
   const processedData =
     template === "photographic" ? await processImageForTemplate(data) : data;
   console.log("[renderResumeHtml] Building HTML for template:", template);
-  const html = buildHtml(processedData, template, theme);
+  let html = buildHtml(processedData, template, theme);
+  
+  // Inject Google Fonts if needed to ensure font changes work
+  html = injectGoogleFonts(html, data.fontFamily || data.formatting?.fontFamily);
+  
   console.log("[renderResumeHtml] Generated HTML length:", html.length);
 
+  return html;
+}
+
+/**
+ * Injects Google Font link tags into the HTML head based on the chosen fontFamily.
+ */
+function injectGoogleFonts(html: string, fontFamily?: string): string {
+  if (!fontFamily) return html;
+  
+  // Clean font family string (remove quotes and fallbacks for matching)
+  const cleanFont = fontFamily.split(',')[0].replace(/['"]/g, '').trim();
+  
+  const fontMap: Record<string, string> = {
+    'Inter': 'Inter:wght@300;400;500;600;700;800',
+    'Roboto': 'Roboto:wght@300;400;500;700;900',
+    'Open Sans': 'Open+Sans:wght@300;400;600;700;800',
+    'Montserrat': 'Montserrat:wght@300;400;500;600;700;800;900',
+    'Poppins': 'Poppins:wght@200;300;400;500;600;700;800;900',
+    'Lato': 'Lato:wght@100;300;400;700;900',
+    'Garamond': 'EB+Garamond:wght@400;500;600;700;800',
+    'Palatino': 'Palatino',
+    'Source Code Pro': 'Source+Code+Pro:wght@200;300;400;500;600;700;800;900',
+    'Verdana': 'Verdana',
+    'Georgia': 'Georgia',
+    'Times New Roman': 'Times+New+Roman',
+    'Trebuchet MS': 'Trebuchet+MS',
+  };
+
+  const matchedFont = Object.keys(fontMap).find(key => 
+    cleanFont.toLowerCase() === key.toLowerCase() || 
+    fontFamily.toLowerCase().includes(key.toLowerCase())
+  );
+  
+  if (matchedFont) {
+    const fontQuery = fontMap[matchedFont];
+    const googleFontLink = `<link href="https://fonts.googleapis.com/css2?family=${fontQuery}&display=swap" rel="stylesheet">`;
+    const debugComment = `<!-- Font Injected: ${matchedFont} -->`;
+    
+    // Check if it's already there
+    if (html.includes(`family=${fontQuery}`)) return html;
+
+    const headRegex = /<\/head>/i;
+    if (headRegex.test(html)) {
+      return html.replace(headRegex, `${debugComment}\n${googleFontLink}\n</head>`);
+    } else {
+      return `${debugComment}\n${googleFontLink}\n${html}`;
+    }
+  }
+  
   return html;
 }
 
@@ -135,7 +227,8 @@ export async function renderTemplateSample(templateId?: string, theme?: any) {
     template
   );
   // Use cache key based on template and theme
-  const cacheKey = `${template}:${theme ? JSON.stringify(theme) : "default"}`;
+  const defaultColor = TEMPLATE_COLORS[template] || "default";
+  const cacheKey = `${template}:${theme ? JSON.stringify(theme) : `default-${defaultColor}`}`;
   const now = Date.now();
   const cached = previewCache[cacheKey];
   if (cached && cached.expiresAt > now) {
@@ -147,13 +240,13 @@ export async function renderTemplateSample(templateId?: string, theme?: any) {
 
 const sampleData = {
   personal: {
-    name: "Ajaya Dugar",
-    email: "ajaya@gmail.com",
+    name: "Ajay Dugger",
+    email: "ajay@gmail.com",
     phone: "+91 98765 43210",
     location: "Kolkata, West Bengal, India",
-    linkedin: "https://linkedin.com/in/ajayadugar",
-    github: "https://github.com/ajayadugar",
-    portfolioUrl: "https://ajayadugar.dev",
+    linkedin: "https://linkedin.com/in/ajaydugger",
+    github: "https://github.com/ajaydugger",
+    portfolioUrl: "https://ajaydugger.dev",
     image: undefined as string | undefined,
   },
 
@@ -213,7 +306,7 @@ const sampleData = {
       description:
         "Developed a scalable multi-vendor e-commerce platform supporting secure payments, product management, and order tracking.",
       technologies: "React, Node.js, MongoDB, AWS",
-      url: "https://github.com/ajayadugar/ecommerce-platform",
+      url: "https://github.com/ajaydugger/ecommerce-platform",
     },
 
     {
@@ -222,7 +315,7 @@ const sampleData = {
       description:
         "Built a comprehensive healthcare management system for patient records, appointments, billing, and reporting.",
       technologies: "React, Express.js, PostgreSQL",
-      url: "https://github.com/ajayadugar/hospital-management",
+      url: "https://github.com/ajaydugger/hospital-management",
     },
 
     {
@@ -231,7 +324,7 @@ const sampleData = {
       description:
         "Designed and developed a cloud-based attendance and leave management portal with real-time reporting.",
       technologies: "TypeScript, React, Firebase",
-      url: "https://github.com/ajayadugar/attendance-portal",
+      url: "https://github.com/ajaydugger/attendance-portal",
     },
   ],
 
@@ -409,89 +502,95 @@ async function processImageForTemplate(data: any): Promise<any> {
 }
 
 function buildHtml(data: any, template: string, theme?: any): string {
+  // Ensure we use the central branding colors as a default theme
+  const finalTheme = {
+    primary: TEMPLATE_COLORS[template] || "#000000",
+    ...(theme || {}),
+  };
+
   switch (template) {
     case "operations-support":
-      return buildOperationsSupportTemplate(data, theme);
+      return buildOperationsSupportTemplate(data, finalTheme);
     case "compact-classic":
-      return buildCompactClassicTemplate(data, theme);
+      return buildCompactClassicTemplate(data, finalTheme);
     case "minimal-ats":
-      return buildMinimalAtsTemplate(data, theme);
+      return buildMinimalAtsTemplate(data, finalTheme);
     case "cosmos":
-      return buildCosmosTemplate(data, theme);
+      return buildCosmosTemplate(data, finalTheme);
     case "modern-executive":
-      return buildModernExecutiveTemplate(data, theme);
+      return buildModernExecutiveTemplate(data, finalTheme);
     case "nova":
-      return buildNovaTemplate(data, theme);
+      return buildNovaTemplate(data, finalTheme);
     case "stellar":
-      return buildStellarTemplate(data, theme);
+      return buildStellarTemplate(data, finalTheme);
     case "orion":
-      return buildOrionTemplate(data, theme);
+      return buildOrionTemplate(data, finalTheme);
     case "nebula":
-      return buildNebulaTemplate(data, theme);
+      return buildNebulaTemplate(data, finalTheme);
     case "impact-resume":
-      return buildImpactResumeTemplate(data, theme);
+      return buildImpactResumeTemplate(data, finalTheme);
     case "startup-tech":
-      return buildStartupAndTechTemplate(data, theme);
+      return buildStartupAndTechTemplate(data, finalTheme);
     case "modern-corporate":
-      return buildModernCorporateTemplate(data, theme);
+      return buildModernCorporateTemplate(data, finalTheme);
     case "senior-leadership":
-      return buildSeniorLeadershipTemplate(data, theme);
+      return buildSeniorLeadershipTemplate(data, finalTheme);
     case "corporate-standard":
-      return buildCorporateStandardTemplate(data, theme);
+      return buildCorporateStandardTemplate(data, finalTheme);
     case "ats-classic":
-      return buildAtsClassicTemplate(data, theme);
+      return buildAtsClassicTemplate(data, finalTheme);
     case "modern":
-      return buildModernTemplate(data, theme);
+      return buildModernTemplate(data, finalTheme);
     case "photographic":
-      return buildPhotographicTemplate(data, theme);
+      return buildPhotographicTemplate(data, finalTheme);
     case "creative":
-      return buildCreativeTemplate(data, theme);
+      return buildCreativeTemplate(data, finalTheme);
     case "professional":
-      return buildProfessionalTemplate(data, theme);
+      return buildProfessionalTemplate(data, finalTheme);
     case "azurill":
-      return buildAzurillTemplate(data, theme);
+      return buildAzurillTemplate(data, finalTheme);
     case "gengar":
-      return buildGengarTemplate(data, theme);
+      return buildGengarTemplate(data, finalTheme);
     case "minimal":
-      return buildMinimalTemplate(data, theme);
+      return buildMinimalTemplate(data, finalTheme);
     case "modern-sidebar":
-      return buildModernSidebarTemplate(data, theme);
+      return buildModernSidebarTemplate(data, finalTheme);
     case "formal-indian-cv":
-      return buildFormalIndianCvTemplate(data, theme);
+      return buildFormalIndianCvTemplate(data, finalTheme);
     case "photo-minimal":
-      return buildPhotoMinimalTemplate(data, theme);
+      return buildPhotoMinimalTemplate(data, finalTheme);
     case "photo-modern-pro":
-      return buildPhotoModernProTemplate(data, theme);
+      return buildPhotoModernProTemplate(data, finalTheme);
     case "dragonite":
-      return buildDragoniteTemplate(data, theme);
+      return buildDragoniteTemplate(data, finalTheme);
     case "venusaur":
-      return buildVenusaurTemplate(data, theme);
+      return buildVenusaurTemplate(data, finalTheme);
     case "alakazam":
-      return buildAlakazamTemplate(data, theme);
+      return buildAlakazamTemplate(data, finalTheme);
     case "mewtwo":
-      return buildMewtwoTemplate(data, theme);
+      return buildMewtwoTemplate(data, finalTheme);
     case "squirtle":
-      return buildSquirtleTemplate(data, theme);
+      return buildSquirtleTemplate(data, finalTheme);
     case "bulbasaur":
-      return buildBulbasaurTemplate(data, theme);
+      return buildBulbasaurTemplate(data, finalTheme);
     case "eevee":
-      return buildEeveeTemplate(data, theme);
+      return buildEeveeTemplate(data, finalTheme);
     case "machamp":
-      return buildMachampTemplate(data, theme);
+      return buildMachampTemplate(data, finalTheme);
     case "classic-professional":
-      return buildClassicProfessionalTemplate(data, theme);
+      return buildClassicProfessionalTemplate(data, finalTheme);
     case "skills-first":
-      return buildSkillsFirstTemplate(data, theme);
+      return buildSkillsFirstTemplate(data, finalTheme);
     case "metrics-driven":
-      return buildMetricsDrivenTemplate(data, theme);
+      return buildMetricsDrivenTemplate(data, finalTheme);
     case "leadership-managerial":
-      return buildLeadershipManagerialTemplate(data, theme);
+      return buildLeadershipManagerialTemplate(data, finalTheme);
     case "tech-it":
-      return buildTechItTemplate(data, theme);
+      return buildTechItTemplate(data, finalTheme);
     case "fresher-entry-level":
-      return buildFresherEntryLevelTemplate(data, theme);
+      return buildFresherEntryLevelTemplate(data, finalTheme);
     case "consultant-freelancer":
-      return buildConsultantFreelancerTemplate(data, theme);
+      return buildConsultantFreelancerTemplate(data, finalTheme);
     default:
       return buildModernTemplate(data, theme);
   }

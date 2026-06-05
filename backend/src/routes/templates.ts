@@ -21,4 +21,14 @@ router.get("/preview/:templateId", async (req: Request, res: Response) => {
   }
 });
 
+// Returns metadata for all templates (currently just default colors)
+router.get("/metadata", async (req: Request, res: Response) => {
+  try {
+    const metadata = templateService.getAllTemplatesMetadata();
+    res.json(metadata);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "internal error" });
+  }
+});
+
 export default router;

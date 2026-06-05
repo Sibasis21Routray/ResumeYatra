@@ -7,7 +7,7 @@ export function buildNovaTemplate(data: any, theme?: any): string {
     bodyFont: "Roboto",
   };
 
-  const currentTheme = theme || defaultTheme;
+  const currentTheme = { ...defaultTheme, ...(theme || {}) };
   const userFontSize = data.fontSize || 16;
   const userFontFamily = data.fontFamily || "'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif";
 
