@@ -424,8 +424,8 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
     </div>
     
     <div class="header-info">
-      <div class="name">${personal.name || "ARJUN MEHRA"}</div>
-      <div class="role">${personal.role || "SENIOR OPERATIONS MANAGER"}</div>
+      <div class="name">${personal.name || "Your Name "}</div>
+      <div class="role">${personal.role }</div>
       
       <hr class="header-line" />
 

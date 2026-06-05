@@ -1,23 +1,23 @@
 import { useState, useEffect } from 'react'
 
 export function useAuth() {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'))
-  const [user, setUser] = useState<any>(null)
-
-  useEffect(() => {
-    if (token) localStorage.setItem('token', token)
-    else localStorage.removeItem('token')
-  }, [token])
+  const [user, setUser] = useState<any>(() => {
+    try {
+      const item = localStorage.getItem('user');
+      return item ? JSON.parse(item) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const logout = () => {
-    localStorage.removeItem('token');
     localStorage.removeItem('user');
-    setToken(null);
+    localStorage.removeItem('guestId');
     setUser(null);
     window.dispatchEvent(new Event('auth-change'));
   };
 
-  return { token, setToken, user, setUser, logout }
+  return { user, setUser, logout }
 }
 
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => void] {

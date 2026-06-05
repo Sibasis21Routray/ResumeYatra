@@ -82,7 +82,15 @@ export async function register(req: Request, res: Response) {
   }
 );
 
-    res.status(201).json(result);
+    // ✅ Set the token in an HttpOnly cookie
+    res.cookie('token', result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    res.status(201).json({ user: result.user });
   } catch (err: any) {
     console.error("register error:", err);
     res.status(400).json({ error: err.message || "registration failed" });
@@ -95,7 +103,16 @@ export async function login(req: Request, res: Response) {
     if (!email || !password) return res.status(400).json({ error: 'email and password required' })
 
     const result = await authService.login(email, password)
-    res.json(result)
+
+    // ✅ Set the token in an HttpOnly cookie
+    res.cookie('token', result.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    res.json({ user: result.user })
   } catch (err: any) {
     console.error('login error:', err)
     res.status(401).json({ error: err.message || 'login failed' })
@@ -255,4 +272,9 @@ export async function resetPassword(req: Request, res: Response) {
     console.error("reset password error:", err);
     res.status(500).json({ error: "Something went wrong" });
   }
+}
+
+export async function logout(req: Request, res: Response) {
+  res.clearCookie('token');
+  res.json({ message: 'Logged out successfully' });
 }

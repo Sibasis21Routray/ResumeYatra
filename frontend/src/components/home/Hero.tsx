@@ -65,8 +65,8 @@ const Hero: React.FC = () => {
 
   // Check if user is logged in
   const isLoggedIn = () => {
-    const token = localStorage.getItem('token');
-    return !!token;
+    const user = localStorage.getItem('user');
+    return !!user;
   };
 
   // Handle navigation for membership plans

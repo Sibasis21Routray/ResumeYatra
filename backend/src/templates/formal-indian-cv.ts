@@ -404,8 +404,8 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     
     <!-- HEADER AREA -->
     <div class="header-section" id="section-header" data-section="header">
-      <div class="name">${personal?.name || "VIKRAM DESHPANDE"}</div>
-      <div class="role">${personal?.role || personal?.title || "SENIOR MANAGER – OPERATIONS"}</div>
+      <div class="name">${personal?.name || "Your Name "}</div>
+      <div class="role">${personal?.role }</div>
       
       <div class="contact-container" >
         <div class="contact-flex">

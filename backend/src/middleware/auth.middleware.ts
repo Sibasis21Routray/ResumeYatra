@@ -11,16 +11,16 @@ declare global {
 }
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization
-  console.log('[Auth] Authorization header:', authHeader ? 'Present' : 'Missing')
+  // ✅ Read token from cookies instead of Authorization header
+  const token = req.cookies.token;
+  console.log('[Auth] Token from cookie present:', !!token)
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    console.log('[Auth] Missing or invalid authorization header')
-    return res.status(401).json({ error: 'Missing or invalid authorization header' })
+  if (!token) {
+    console.log('[Auth] Missing authentication cookie')
+    return res.status(401).json({ error: 'Authentication required' })
   }
 
-  const token = authHeader.substring(7)
-  console.log('[Auth] Token extracted, length:', token.length)
+  console.log('[Auth] Token length:', token.length)
 
   const decoded = authService.verifyToken(token)
   console.log('[Auth] Token verification result:', decoded ? 'Success' : 'Failed')
@@ -63,10 +63,10 @@ export async function adminMiddleware(req: Request, res: Response, next: NextFun
 
 
 export function optionalAuthMiddleware(req: Request, res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization;
+  // ✅ Read token from cookies instead of Authorization header
+  const token = req.cookies.token;
 
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.substring(7);
+  if (token) {
 
     const decoded = authService.verifyToken(token);
 

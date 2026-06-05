@@ -146,18 +146,16 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
     formData.append("file", file);
 
     try {
-      let token = localStorage.getItem("token");
       let guestId = localStorage.getItem("guestId");
+      const user = localStorage.getItem("user");
 
-      if (!token && !guestId) {
+      if (!user && !guestId) {
         guestId = crypto.randomUUID();
         localStorage.setItem("guestId", guestId);
       }
 
       const headers: any = {};
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      } else if (guestId) {
+      if (!user && guestId) {
         headers["x-guest-id"] = guestId;
       }
 
@@ -166,6 +164,7 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
         {
           method: "POST",
           headers,
+          credentials: "include",
           body: formData,
         },
       );

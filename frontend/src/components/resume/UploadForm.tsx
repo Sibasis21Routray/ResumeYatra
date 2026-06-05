@@ -33,21 +33,14 @@ export function UploadForm({ onUploadSuccess }: UploadFormProps) {
     setError(null);
 
     try {
-      // Get token from localStorage or wherever it's stored
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Authentication required. Please log in.');
-      }
-
-
       // Create a new resume first
       const API_BASE = import.meta.env?.VITE_API_URL || 'http://localhost:4000/api';
       const createResponse = await fetch(`${API_BASE}/resumes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify({ title: `Uploaded Resume - ${file.name}` })
       });
 
@@ -72,7 +65,7 @@ export function UploadForm({ onUploadSuccess }: UploadFormProps) {
       }
 
       // Upload the file
-      const uploadResponse = await uploadResume(resumeId, file, token);
+      const uploadResponse = await uploadResume(resumeId, file);
       
       if (uploadResponse && uploadResponse.structured) {
         // console.log('[UploadForm] Upload successful, calling onUploadSuccess with ID:', resumeId)

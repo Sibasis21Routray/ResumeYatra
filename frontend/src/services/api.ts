@@ -7,13 +7,13 @@ type FetchOptions = {
 }
 
 async function apiCall(endpoint: string, options: FetchOptions = {}) {
-  const { method = 'GET', body, token } = options
+  const { method = 'GET', body } = options
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-  if (token) headers.Authorization = `Bearer ${token}`
 
   const response = await fetch(`${API_BASE}${endpoint}`, {
     method,
     headers,
+    credentials: 'include',
     body: body ? JSON.stringify(body) : undefined,
   })
 
@@ -68,13 +68,13 @@ export async function deleteResume(id: string, token: string) {
 }
 
 // Upload
-export async function uploadResume(id: string, file: File, token: string) {
+export async function uploadResume(id: string, file: File) {
   const formData = new FormData()
   formData.append('file', file)
 
   const response = await fetch(`${API_BASE}/resumes/${id}/upload`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
+    credentials: 'include',
     body: formData,
   })
 

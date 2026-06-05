@@ -458,8 +458,8 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
   <div class="sidebar">
     
     <div class="sidebar-header" id="section-sidebar-header" data-section="sidebar-header">
-      <div class="name">${personal?.name || "RITIKA SHARMA"}</div>
-      <div class="role">${personal?.title || personal?.role || "MARKETING MANAGER"}</div>
+      <div class="name">${personal?.name || "Your Name "}</div>
+      <div class="role">${personal?.title }</div>
     </div>
 
     <hr class="sidebar-divider" />

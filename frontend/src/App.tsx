@@ -20,7 +20,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 
 export default function App() {
-  const [isAuth, setIsAuth] = useState(!!localStorage.getItem('token'))
+  const [isAuth, setIsAuth] = useState(!!localStorage.getItem('user'))
   const [userRole, setUserRole] = useState(
     JSON.parse(localStorage.getItem('user') || '{}').role || 'guest'
   )
@@ -28,9 +28,8 @@ export default function App() {
 
   useEffect(() => {
     const syncAuth = () => {
-      const token = localStorage.getItem('token')
       const user = JSON.parse(localStorage.getItem('user') || '{}')
-      setIsAuth(!!token)
+      setIsAuth(!!user.id)
       setUserRole(user.role || 'guest')
     }
 

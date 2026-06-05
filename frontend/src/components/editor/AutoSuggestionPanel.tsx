@@ -47,8 +47,8 @@ export function AutoSuggestionPanel({
 
     try {
       setIsLoading(true)
-      const token = localStorage.getItem('token')
-      if (!token) return
+      const user = localStorage.getItem('user')
+      if (!user) return
 
       const response = await resumeAPI.autoSuggestions(resumeId, currentText, context, metadata)
 

@@ -19,7 +19,7 @@ export default function LoginPage({ onSuccess }: { onSuccess: () => void }) {
 
     try {
       const response = await authAPI.login(email, password)
-      localStorage.setItem('token', response.data.token)
+      // Token is now set via HttpOnly cookie by the backend
       localStorage.setItem('user', JSON.stringify(response.data.user))
       window.dispatchEvent(new Event('auth-change'))
       onSuccess()

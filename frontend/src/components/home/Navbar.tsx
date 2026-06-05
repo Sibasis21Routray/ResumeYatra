@@ -9,6 +9,7 @@ import {
   FiX
 } from "react-icons/fi";
 import { FaRegGem, FaRocket, FaBuilding, FaBriefcase } from "react-icons/fa";
+import { authAPI } from "../../services/apiClient";
 
 export default function Navbar() {
   const location = useLocation();
@@ -45,9 +46,8 @@ const getSubscriptionPlanName = (plan: string) => {
   useEffect(() => {
     const checkAuth = () => {
       try {
-        const token = localStorage.getItem('token');
         const userStr = localStorage.getItem('user');
-        if (token && userStr) {
+        if (userStr) {
           const userData = JSON.parse(userStr);
           setUser(userData);
           setIsAuthenticated(true);
@@ -81,8 +81,12 @@ const getSubscriptionPlanName = (plan: string) => {
     setProfileDropdownOpen(false);
   }, [location]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
+  const handleLogout = async () => {
+    try {
+      await authAPI.logout();
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
     localStorage.removeItem('user');
     localStorage.removeItem('guestId');
     setIsAuthenticated(false);

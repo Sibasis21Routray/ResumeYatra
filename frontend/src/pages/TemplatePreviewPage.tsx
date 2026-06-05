@@ -79,7 +79,7 @@ export function TemplatePreviewPage() {
 
   const handleUseTemplate = async () => {
     try {
-      if (!localStorage.getItem('token')) {
+      if (!localStorage.getItem('user')) {
         navigate(`/login?next=/templates/preview/${templateId}`)
         return
       }

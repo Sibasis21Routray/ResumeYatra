@@ -432,8 +432,8 @@ export function buildCompactClassicTemplate(
   <!-- HEADER SECTION -->
   <div class="header-container" id="section-header" data-section="header">
     <div class="meta-identity">
-      <div class="name">${personal.name || "Ajaya Dugar"}</div>
-      <div class="role-title">${personal.role || "SENIOR OPERATIONS MANAGER"}</div>
+      <div class="name">${personal.name || "Your Name "}</div>
+      <div class="role-title">${personal.role }</div>
     </div>
     
     <div class="contact-pane">

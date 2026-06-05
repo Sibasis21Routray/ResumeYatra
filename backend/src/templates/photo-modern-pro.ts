@@ -719,8 +719,8 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     <!-- MAIN RIGHT CONTENT COLUMN -->
     <div class="right-column" >
       <div class="header-identity" id="section-header" data-section="header">
-        <div class="name">${personal?.name || "ARJUN MEHRA"}</div>
-        <div class="role">${personal?.role || personal?.title || "SENIOR OPERATIONS MANAGER"}</div>
+        <div class="name">${personal?.name || "Your Name "}</div>
+        <div class="role">${personal?.role || personal?.title }</div>
       </div>
 
       <!-- PROFESSIONAL SUMMARY -->

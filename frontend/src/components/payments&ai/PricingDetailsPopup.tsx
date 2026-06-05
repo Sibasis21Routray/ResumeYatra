@@ -21,7 +21,7 @@ export default function PricingDetailsPopup({ resumeId }: ActivityFeedProps) {
       });
   }, []);
 
-  const isUser = !!localStorage.getItem("token");
+  const isUser = !!localStorage.getItem("user");
   
   const getUserSubscription = () => {
     try {
@@ -103,7 +103,7 @@ export default function PricingDetailsPopup({ resumeId }: ActivityFeedProps) {
           ) : (
             <p className="text-sm text-gray-700">
               <span className="font-medium">Price:</span>{' '}
-              <span className="text-[#01467d] font-semibold">₹{aiPrice.original?.toFixed(2)}</span>
+              <span className="text-[#01467d] font-semibold">₹{aiPrice.original?.toFixed(0)}</span>
               {isUser && (
                 <span className="text-[#dea42c] text-xs ml-2">(Subscribe for discount)</span>
               )}
@@ -149,7 +149,7 @@ export default function PricingDetailsPopup({ resumeId }: ActivityFeedProps) {
         <div className="mb-3">
           <p className="text-sm text-gray-700">
             <span className="font-medium">Price:</span>{' '}
-            <span className="text-[#01467d] font-semibold">₹{downloadPrice.original?.toFixed(2)}</span>
+            <span className="text-[#01467d] font-semibold">₹{downloadPrice.original?.toFixed(0)}</span>
             <span className="text-gray-500 text-xs ml-2">(one-time payment)</span>
           </p>
         </div>

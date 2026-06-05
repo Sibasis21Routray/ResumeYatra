@@ -54,7 +54,7 @@ export default function PaymentModal({
 
   if (!open) return null;
 
-  const isUser = !!localStorage.getItem("token");
+  const isUser = !!localStorage.getItem("user");
 
   // Helper functions to format prices with 2 decimals
   const formatPrice = (rupees: number) => {
@@ -516,7 +516,7 @@ export default function PaymentModal({
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-[#1e293b] text-base">
-                        ₹0.00
+                        ₹0
                       </span>
                       <div className="w-[3px] h-4 bg-orange-400 rounded-full" />
                     </div>
@@ -541,7 +541,7 @@ export default function PaymentModal({
                           </span>
                         </div>
                         <span className="text-xs text-gray-400 font-medium">
-                          ₹{formatPrice(getPlanPrice("candidate"))} /{" "}
+                          ₹{getPlanPrice("candidate").toFixed(0)} /{" "}
                           {getPlanDuration("candidate") * 30} days · Save up to{" "}
                           {getResumeLimit("candidate")} resumes ·
                           {getAIDiscount("candidate")}% AI discount
@@ -550,7 +550,7 @@ export default function PaymentModal({
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-[#1e293b] text-base">
-                        + ₹{formatPrice(getPlanPrice("candidate"))}
+                        + ₹{getPlanPrice("candidate").toFixed(0)}
                       </span>
                       <div className="w-[3px] h-4 bg-slate-300 rounded-full" />
                     </div>

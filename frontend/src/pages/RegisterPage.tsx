@@ -289,7 +289,7 @@ export default function RegisterPage({ onSuccess }: { onSuccess: () => void }) {
             resumeId: resumeId
           });
 
-          localStorage.setItem("token", registerRes.data.token);
+          // Token is now set via HttpOnly cookie by the backend
           localStorage.setItem("user", JSON.stringify(registerRes.data.user));
           window.dispatchEvent(new Event('auth-change'));
           toast.success("Registration successful 🎉");

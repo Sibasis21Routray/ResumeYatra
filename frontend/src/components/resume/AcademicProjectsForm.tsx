@@ -308,7 +308,7 @@ export function AcademicProjectsForm({
 
                                 {item.technologies && item.technologies.length > 0 && (
                                     <div className="flex flex-wrap gap-1 mt-2">
-                                        {item.technologies.map((tech, i) => (
+                                        {item.technologies.map((tech:any, i:any) => (
                                             <span key={i} className="bg-accent/10 text-accent dark:text-dark-accent px-2 py-1 rounded-lg text-xs">
                                                 {tech}
                                             </span>

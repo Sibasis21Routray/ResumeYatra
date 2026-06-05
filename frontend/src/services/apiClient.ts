@@ -27,24 +27,21 @@ function formatMongooseError(raw: string): string {
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true, // ✅ CRITICAL for cookies
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-  // Add auth token and guest ID to requests
+  // Add guest ID to requests (Authentication is now handled by cookies automatically)
   api.interceptors.request.use((config: any) => {
-    const token = localStorage.getItem("token");
     const guestId = localStorage.getItem("guestId");
+    const user = localStorage.getItem("user");
 
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-
-    if (guestId) {
+    if (guestId && !user) {
       config.headers["x-guest-id"] = guestId;
-    } else if (!token) {
-      // If no token and no guestId, generate one for the guest session
+    } else if (!user) {
+      // If no user and no guestId, generate one for the guest session
       const newGuestId = crypto.randomUUID();
       localStorage.setItem("guestId", newGuestId);
       config.headers["x-guest-id"] = newGuestId;
@@ -81,12 +78,12 @@ if (!isPaymentRequired && !isSubscriptionRequired) {
 }
 
  if (error.response?.status === 401) {
-  const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
 
-  if (token) {
-    console.warn("[API] Token might be invalid (not clearing immediately)");
+    if (user) {
+      console.warn("[API] Session might be invalid or expired");
+    }
   }
-}
 
   return Promise.reject(error);
 }
@@ -98,6 +95,7 @@ export const authAPI = {
     api.post("/auth/register", { email, name, password, ...paymentData }),
   login: (email: string, password: string) =>
     api.post("/auth/login", { email, password }),
+  logout: () => api.post("/auth/logout"),
   me: () => api.get("/auth/me"),
   forgotPassword: (email: string) => api.post("/auth/forgot-password", { email }),
   resetPassword: (password: string, token: string) => api.post(`/auth/reset-password/${token}`, { password }),

@@ -147,10 +147,10 @@ export default function PreviewPage() {
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
+    const user = localStorage.getItem('user')
     const guestId = localStorage.getItem('guestId')
     
-    if (!token && guestId) {
+    if (!user && guestId) {
       const timer = setTimeout(() => {
         setShowPricingPopup(true)
       }, 1000)

@@ -35,8 +35,8 @@ export function HomePage() {
 
   // Check if user is logged in
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    setIsLoggedIn(!!token)
+    const user = localStorage.getItem('user')
+    setIsLoggedIn(!!user)
   }, [])
 
   // Fetch pricing data

@@ -249,12 +249,6 @@ export function DashboardPage() {
     setLoading(true);
     setError("");
     try {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        throw new Error("No authentication token found. Please log in again.");
-      }
-
       // Get fresh user to determine plan
       let user = currentUser;
       try {
