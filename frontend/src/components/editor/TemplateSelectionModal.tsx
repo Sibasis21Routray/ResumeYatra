@@ -130,7 +130,7 @@ export function TemplateSelectionModal({
         {/* BODY */}
         <div className="flex flex-1 overflow-hidden">
           {/* LEFT BIG PREVIEW */}
-          <div className="flex-1 p-6 bg-gray-50 overflow-auto">
+          <div className="flex-1 p-6 bg-white overflow-hidden">
             <div
               ref={previewContainerRef}
               className="bg-white mx-auto shadow-lg rounded-lg w-full max-w-[900px]"
