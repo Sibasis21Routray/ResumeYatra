@@ -36,7 +36,6 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
     publications = [],
     patents = [],
     toolsTechnologies = [],
-    professionalContext = {},
     availabilityWorkAuth = {},
     socialProfiles = []
   } = data;
@@ -464,18 +463,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
     </div>
   </div>` : ""}
 
-  <!-- PROFESSIONAL CONTEXT SECTION -->
-  ${professionalContext && hasObjectValues(professionalContext) ? `
-  <div class="section" id="section-professionalContext" data-section="professionalContext">
-    <div class="section-title-container">
-      <div class="section-title">Professional Context</div>
-    </div>
-    <div class="skills-list">
-      ${professionalContext.totalExperience ? `<span class="skill-tag">Exp: ${professionalContext.totalExperience} years</span>` : ''}
-      ${professionalContext.industry ? `<span class="skill-tag">Industry: ${professionalContext.industry}</span>` : ''}
-      ${professionalContext.functionalDomain ? `<span class="skill-tag">Domain: ${professionalContext.functionalDomain}</span>` : ''}
-    </div>
-  </div>` : ""}
+  
 
   <!-- SUMMARY SECTION - Priority over Career Objective -->
   ${summary && summary.trim() ? `

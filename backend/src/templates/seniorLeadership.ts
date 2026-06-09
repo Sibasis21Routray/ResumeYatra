@@ -36,7 +36,6 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
     publications = [],
     patents = [],
     toolsTechnologies = [],
-    professionalContext = {},
     availabilityWorkAuth = {},
     socialProfiles = []
   } = data;
@@ -360,11 +359,12 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           font-size: ${baseFontSize}px;
           color: #1f2937;
         }
-        .contact-item svg {
-          flex-shrink: 0;
-          margin-right: 8px;
-          color: ${primaryColor};
-        }
+        .contact-item {
+  width: 100%;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
           .skill-list {
             margin-left: 20px;
           }

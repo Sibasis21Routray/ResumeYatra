@@ -11,7 +11,8 @@ app.set('trust proxy', 1)
 // Update CORS to support cookies
 app.use(cors({
   origin: process.env.FRONTEND_URL ? process.env.FRONTEND_URL.replace(/\/$/, '') : 'http://localhost:5173',
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-guest-id']
 }))
 
 app.use(cookieParser())

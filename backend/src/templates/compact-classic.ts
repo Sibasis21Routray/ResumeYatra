@@ -39,7 +39,6 @@ export function buildCompactClassicTemplate(
     publications = [],
     patents = [],
     toolsTechnologies = [],
-    professionalContext = {},
     availabilityWorkAuth = {},
     socialProfiles = []
   } = data;
@@ -501,19 +500,6 @@ export function buildCompactClassicTemplate(
     </div>
   </div>` : ""}
 
-  <!-- PROFESSIONAL CONTEXT SECTION -->
-  ${professionalContext && hasObjectValues(professionalContext) ? `
-  <div class="section" id="section-professionalContext" data-section="professionalContext">
-    <div class="section-header">
-      <span class="section-icon">${icons.chart}</span>
-      <span class="section-title">Professional Context</span>
-    </div>
-    <div class="skills-list">
-      ${professionalContext.totalExperience ? `<span class="skill-tag">Exp: ${professionalContext.totalExperience} years</span>` : ''}
-      ${professionalContext.industry ? `<span class="skill-tag">Industry: ${professionalContext.industry}</span>` : ''}
-      ${professionalContext.functionalDomain ? `<span class="skill-tag">Domain: ${professionalContext.functionalDomain}</span>` : ''}
-    </div>
-  </div>` : ""}
 
   <!-- PROFESSIONAL SUMMARY SECTION -->
   ${summary && summary.trim() ? `

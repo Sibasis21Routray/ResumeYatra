@@ -36,7 +36,6 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
     publications = [],
     patents = [],
     toolsTechnologies = [],
-    professionalContext = {},
     availabilityWorkAuth = {},
     socialProfiles = []
   } = data;
@@ -436,17 +435,7 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
           </section>
         ` : ""}
 
-        <!-- Professional Context Section -->
-        ${professionalContext && hasObjectValues(professionalContext) ? `
-          <section class="section" id="section-professionalContext" data-section="professionalContext">
-            <h2 class="section-title">Professional Context</h2>
-            <div class="context-grid">
-              ${professionalContext.currentRole ? `<div class="context-item"><span class="context-label">Current Role:</span> ${professionalContext.currentRole}</div>` : ''}
-              ${professionalContext.yearsOfExperience ? `<div class="context-item"><span class="context-label">Experience:</span> ${professionalContext.yearsOfExperience} years</div>` : ''}
-              ${professionalContext.industry ? `<div class="context-item"><span class="context-label">Industry:</span> ${professionalContext.industry}</div>` : ''}
-            </div>
-          </section>
-        ` : ""}
+        
 
         <!-- Summary Section -->
         ${summary && summary.trim() ? `

@@ -36,7 +36,6 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     publications = [],
     patents = [],
     toolsTechnologies = [],
-    professionalContext = {},
     availabilityWorkAuth = {},
     socialProfiles = []
   } = data;
@@ -623,16 +622,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
         </ul>
       </div>` : ""}
 
-      <!-- PROFESSIONAL CONTEXT -->
-      ${professionalContext && hasObjectValues(professionalContext) ? `
-      <div class="sidebar-section" id="section-professionalContext" data-section="professionalContext">
-        <div class="sidebar-heading">Professional Context</div>
-        <ul class="sidebar-bullet-list">
-          ${professionalContext.totalExperience ? `<li>Experience: ${professionalContext.totalExperience} years</li>` : ''}
-          ${professionalContext.industry ? `<li>Industry: ${professionalContext.industry}</li>` : ''}
-          ${professionalContext.functionalDomain ? `<li>Domain: ${professionalContext.functionalDomain}</li>` : ''}
-        </ul>
-      </div>` : ""}
+      
 
       <!-- SKILLS -->
       ${skillsList.length > 0 ? `

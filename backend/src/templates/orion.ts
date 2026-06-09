@@ -277,6 +277,10 @@ const currentTheme = {
           color: ${currentTheme.sidebarText};
         }
         .contact-item {
+           width: 100%;
+           word-break: break-all;
+          overflow-wrap: break-word;
+
           display: flex;
           align-items: center;
           margin-bottom: 12px;

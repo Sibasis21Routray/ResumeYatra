@@ -42,6 +42,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { resumeAPI } from "../services/apiClient";
 
 interface UploadFormProps {
   onUploadSuccess: (resumeId: string) => void;
@@ -142,36 +143,9 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
     setCurrentStep(0);
     setSuccess(false);
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
-      let guestId = localStorage.getItem("guestId");
-      const user = localStorage.getItem("user");
-
-      if (!user && !guestId) {
-        guestId = crypto.randomUUID();
-        localStorage.setItem("guestId", guestId);
-      }
-
-      const headers: any = {};
-      if (!user && guestId) {
-        headers["x-guest-id"] = guestId;
-      }
-
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/resumes/upload`,
-        {
-          method: "POST",
-          headers,
-          credentials: "include",
-          body: formData,
-        },
-      );
-
-      const data = await response.json();
-      if (!response.ok)
-        throw new Error(data.message || data.error || "Upload failed");
+      const response = await resumeAPI.parse(file);
+      const data = response.data;
 
       if (!data.resume || !data.resume.id) {
         throw new Error("Invalid response from server: missing resume ID");
@@ -189,8 +163,9 @@ function UploadForm({ onUploadSuccess }: UploadFormProps) {
       }, 600);
     } catch (err: any) {
       console.error("[UploadForm] Upload error:", err);
-      setError(err.message || "Failed to parse resume. Please try again.");
-      toast.error(err.message || "Failed to parse resume. Please try again.");
+      const msg = err.response?.data?.message || err.message || "Failed to parse resume. Please try again.";
+      setError(msg);
+      toast.error(msg);
       setUploading(false);
       setCurrentStep(0);
     }

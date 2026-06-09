@@ -42,6 +42,7 @@ const api = axios.create({
       config.headers["x-guest-id"] = guestId;
     } else if (!user) {
       // If no user and no guestId, generate one for the guest session
+      // This ensures even the very first request has a guest ID
       const newGuestId = crypto.randomUUID();
       localStorage.setItem("guestId", newGuestId);
       config.headers["x-guest-id"] = newGuestId;
@@ -198,6 +199,13 @@ export const resumeAPI = {
     const formData = new FormData();
     formData.append("file", file);
     return api.post(`/resumes/${id}/upload`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+  parse: (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    return api.post("/resumes/upload", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },

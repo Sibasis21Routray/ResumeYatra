@@ -36,7 +36,6 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     publications = [],
     patents = [],
     toolsTechnologies = [],
-    professionalContext = {},
     availabilityWorkAuth = {},
     socialProfiles = []
   } = data;
@@ -477,17 +476,6 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     </div>
     ` : ""}
 
-    <!-- PROFESSIONAL CONTEXT SECTION -->
-    ${professionalContext && hasObjectValues(professionalContext) ? `
-    <div class="section-divider" id="section-professionalContext-divider" data-section="professionalContext-divider">
-      <span class="section-title">Professional Context</span>
-    </div>
-    <div class="summary-text" id="section-professionalContext" data-section="professionalContext">
-      ${professionalContext.totalExperience ? `Total Experience: ${professionalContext.totalExperience} years<br>` : ''}
-      ${professionalContext.industry ? `Industry: ${professionalContext.industry}<br>` : ''}
-      ${professionalContext.functionalDomain ? `Domain: ${professionalContext.functionalDomain}` : ''}
-    </div>
-    ` : ""}
 
     <!-- CAREER OBJECTIVE / SUMMARY SECTION -->
     ${summary || careerObjective ? `
