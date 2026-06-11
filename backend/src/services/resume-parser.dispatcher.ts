@@ -645,7 +645,7 @@ function mapFieldNames(data: any): any {
 }
 
 // ---------- SINGLE AI CALL WITH TEXT ----------
-async function extractDataFromText(userId: string | null, text: string, guestId: string | null = null): Promise<any> {
+async function extractDataFromText(userId: string | null, text: string, guestId: string | null = null, resumeId?: string): Promise<any> {
   console.log("🔍 Processing resume text with AI (single call)...");
 
   // Truncate text if too long
@@ -908,6 +908,7 @@ ${processedText}`;
           await TokenUsage.create({
             userId,
             guestId,
+            resumeId,
             promptTokens: usage.prompt_tokens ?? usage.promptTokens ?? usage.input_tokens ?? usage.inputTokens ?? 0,
             completionTokens: usage.completion_tokens ?? usage.completionTokens ?? usage.output_tokens ?? usage.outputTokens ?? 0,
             totalTokens: usage.total_tokens ?? usage.totalTokens ?? 0,
@@ -956,7 +957,7 @@ ${processedText}`;
 }
 
 // ---------- MAIN FUNCTION (Handles both PDF and DOCX) ----------
-async function parseResume(userId: string | null, filePath: string, guestId: string | null = null) {
+async function parseResume(userId: string | null, filePath: string, guestId: string | null = null, resumeId?: string) {
   console.log("🚀 Starting resume parsing pipeline (Text-based)...");
   console.log(`📂 File: ${filePath}`);
 
@@ -1001,7 +1002,7 @@ async function parseResume(userId: string | null, filePath: string, guestId: str
   let aiParsed = {};
 
   try {
-    aiParsed = await extractDataFromText(userId, extractedText, guestId);
+    aiParsed = await extractDataFromText(userId, extractedText, guestId, resumeId);
     // console.log(JSON.stringify(aiParsed, null, 2));
   } catch (extractError: any) {
     console.error("❌ AI processing failed:", extractError.message);

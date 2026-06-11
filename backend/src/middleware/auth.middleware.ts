@@ -12,7 +12,7 @@ declare global {
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
   // ✅ Read token from cookies instead of Authorization header
-  console.log(">>>>>>>>>>>>>>>>>>>1")
+  
 
  
   const token = req.cookies.token;
@@ -39,7 +39,7 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
 }
 
 export async function adminMiddleware(req: Request, res: Response, next: NextFunction) {
-  console.log(">>>>>>>>>>>>>>>>>>>2")
+  
 
   if (!req.userId) {
     console.log('[Admin] No user ID found, auth middleware must be called first')
@@ -69,9 +69,7 @@ export async function adminMiddleware(req: Request, res: Response, next: NextFun
 
 export function optionalAuthMiddleware(req: Request, res: Response, next: NextFunction) {
   // ✅ Read token from cookies instead of Authorization header
-  console.log(">>>>>>>>>>>>>>>>>>>3")
-   console.log('Cookies:', req.cookies);
-  console.log('Cookie Header:', req.headers.cookie);
+  
   const token = req.cookies.token;
 
   if (token) {

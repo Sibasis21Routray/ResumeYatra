@@ -105,9 +105,12 @@ export const uploadResume = async (req: Request, res: Response) => {
       ? req.headers["x-guest-id"][0] 
       : req.headers["x-guest-id"] as string || null;
 
+    // Pre-generate resume ID so we can associate token usage with it
+    const resumeId = new mongoose.Types.ObjectId();
+
     // 5️⃣ Parse resume (dispatcher handles PDF/DOCX logic)
     console.log("Starting resume parsing...");
-    const parsedResume = await parseResume(ownerId, tempFilePath, guestId);
+    const parsedResume = await parseResume(ownerId, tempFilePath, guestId, resumeId.toString());
     console.log("Resume parsing completed successfully");
 
     if (!ownerId && !guestId) {
@@ -116,6 +119,7 @@ export const uploadResume = async (req: Request, res: Response) => {
 
     // 6️⃣ Create a new resume document with the parsed data
     const newResume = new Resume({
+      _id: resumeId,
       title: `Uploaded Resume - ${req.file.originalname}`,
       template: "ats-classic", // Default template
       versions: [],
@@ -182,7 +186,7 @@ export const uploadResume = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: error.message,
-      error: error.message || "Unknown error occurred",
+      error: "We couldn’t read this resume properly, Upload Another Resume.",
     });
   }
 };

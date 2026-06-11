@@ -25,7 +25,7 @@ router.get('/token-usage', async (req, res) => {
 
     const formattedLogs = usageLogs.map(log => {
       const user = log.userId as any;
-      
+
       // Categorize action
       let category = 'AI Enhancement';
       if (log.action.includes('parsing') || log.action.includes('extract')) {
@@ -42,6 +42,7 @@ router.get('/token-usage', async (req, res) => {
         totalTokens: log.totalTokens,
         category: category,
         action: log.action,
+        resumeId: log.resumeId,
         model: log.aiModel,
         date: log.createdAt
       };
@@ -117,7 +118,10 @@ router.get('/resumes', async (req, res) => {
         }
       },
       {
-        $unwind: '$owner'
+        $unwind: {
+          path: '$owner',
+          preserveNullAndEmptyArrays: true
+        }
       },
       {
         $project: {
@@ -126,7 +130,9 @@ router.get('/resumes', async (req, res) => {
           template: 1,
           createdAt: 1,
           updatedAt: 1,
-           isParsed: 1,
+          isParsed: 1,
+          isAiEnhanced: 1,
+          guestId: 1,
           owner: {
             id: '$owner._id',
             email: '$owner.email',
@@ -147,10 +153,15 @@ router.get('/resumes', async (req, res) => {
       createdAt: resume.createdAt,
       updatedAt: resume.updatedAt,
       isParsed: resume.isParsed,
-      owner: {
+      isAiEnhanced: resume.isAiEnhanced,
+      owner: resume.owner.id ? {
         id: resume.owner.id.toString(),
         email: resume.owner.email,
         name: resume.owner.name
+      } : {
+        id: resume.guestId || 'guest',
+        email: 'Guest User',
+        name: resume.guestId ? `Guest (${resume.guestId.substring(0, 8)})` : 'Guest'
       }
     }))
 
@@ -169,8 +180,8 @@ router.get('/stats', async (req, res) => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const [
-      userCount, 
-      resumeCount, 
+      userCount,
+      resumeCount,
       activeSubsCount,
       freelancerCount,
       candidateCount,
@@ -201,10 +212,17 @@ router.get('/stats', async (req, res) => {
       activeSubscriptions: activeSubsCount,
       freelancerCount: freelancerCount,
       candidateCount: candidateCount,
-      revenue: (revenueResult[0]?.total || 0) / 100, // Convert from cents if needed? Wait, I should check if amount is in paise/cents.
-      aiCreditsUsed: aiUsageResult[0]?.total || 0,
-      totalAiEnhancements: await TokenUsage.countDocuments({ action: { $in: ['enhanceResume', 'enhanceSkillsWithAI'] } }),
-      aiAdoptionRate: userCount > 0 ? Math.round((await TokenUsage.distinct('userId')).length / userCount * 100) : 0
+      revenue: Math.round(revenueResult[0]?.total || 0), 
+      totalTokensUsed: aiUsageResult[0]?.total || 0,
+      aiCreditsUsed: aiUsageResult[0]?.total || 0, // Keep for backward compatibility
+      totalAiEnhancements: await TokenUsage.countDocuments({ 
+        action: { $in: ['enhanceResume', 'enhanceSkillsWithAI'] } 
+      }),
+      totalParsings: await TokenUsage.countDocuments({ 
+        action: 'resume_parsing' 
+      }),
+      activeAiUsers: (await TokenUsage.distinct('userId', { userId: { $ne: null } })).length,
+      aiAdoptionRate: userCount > 0 ? Math.round((await TokenUsage.distinct('userId', { userId: { $ne: null } })).length / userCount * 100) : 0
     })
   } catch (error) {
     console.error('Error fetching stats:', error)
@@ -311,7 +329,7 @@ router.get('/resumes/:id', async (req, res) => {
       template: resume.template,
       createdAt: resume.createdAt,
       updatedAt: resume.updatedAt,
-      isParsed: (resume as any).isParsed, 
+      isParsed: (resume as any).isParsed,
       owner: resume.ownerId ? {
         id: resume.ownerId._id.toString(),
         name: (resume.ownerId as any).name,

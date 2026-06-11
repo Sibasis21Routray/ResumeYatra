@@ -521,6 +521,58 @@ export function buildCompactClassicTemplate(
     <p class="summary-text">${careerObjective}</p>
   </div>` : ""}
 
+
+    <!-- EDUCATION SECTION -->
+  ${nonEmptyEducation.length > 0 ? `
+  <div class="section" id="section-education" data-section="education">
+    <div class="section-header">
+      <span class="section-icon">${icons.graduation}</span>
+      <span class="section-title">Education</span>
+    </div>
+    ${nonEmptyEducation.map((edu, idx) => {
+      const eduDate = edu.graduationDate || formatDateRange(edu.startDate || edu.startYear, edu.endDate || edu.endYear);
+      const schoolContext = formatSubtitle([edu.school, edu.location]);
+      return `
+      <div class="entry-block" data-index="${idx}">
+        <div class="entry-meta-row">
+          <div class="entry-primary-line">${edu.degree || ""}${edu.field ? ` – ${edu.field}` : ""}</div>
+          ${eduDate ? `<div class="entry-date">${eduDate}</div>` : ""}
+        </div>
+        ${schoolContext ? `<div style="font-size: 10pt; color: #333333;">${schoolContext}</div>` : ""}
+        ${edu.grade ? `<div style="font-size: 9.5pt; color: #444444; font-weight: 500; margin-top: 2px;">${edu.grade}</div>` : ""}
+        ${edu.description ? `<div class="summary-text" style="margin-top: 5px;">${edu.description}</div>` : ""}
+      </div>
+    `}).join("")}
+  </div>` : ""}
+
+
+  <!-- EXPERIENCE SECTION -->
+  ${nonEmptyExperience.length > 0 ? `
+  <div class="section" id="section-experience" data-section="experience">
+    <div class="section-header">
+      <span class="section-icon">${icons.briefcase}</span>
+      <span class="section-title">Experience</span>
+    </div>
+    ${nonEmptyExperience.map((exp, idx) => {
+      const dateRange = formatDateRange(exp.startDate, exp.endDate, exp.isCurrent);
+      const compositeSub = [exp.company, exp.location].filter(Boolean).join(", ");
+      return `
+      <div class="entry-block" data-index="${idx}">
+        <div class="entry-meta-row">
+          <div class="entry-primary-line">
+            ${exp.title || ""}
+            ${compositeSub ? `<span class="divider-dash">–</span><span class="subtitle-context">${compositeSub}</span>` : ""}
+          </div>
+          ${dateRange ? `<div class="entry-date">${dateRange}</div>` : ""}
+        </div>
+        ${exp.description ? renderDescription(exp.description) : ""}
+        ${exp.achievements ? `<div class="entry-content"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
+      </div>
+    `}).join("")}
+  </div>` : ""}
+
+
+
   <!-- SKILLS SECTION -->
   ${skillsArray.length > 0 ? `
   <div class="section" id="section-skills" data-section="skills">
@@ -569,30 +621,7 @@ export function buildCompactClassicTemplate(
     </div>
   </div>` : ""}
 
-  <!-- EXPERIENCE SECTION -->
-  ${nonEmptyExperience.length > 0 ? `
-  <div class="section" id="section-experience" data-section="experience">
-    <div class="section-header">
-      <span class="section-icon">${icons.briefcase}</span>
-      <span class="section-title">Experience</span>
-    </div>
-    ${nonEmptyExperience.map((exp, idx) => {
-      const dateRange = formatDateRange(exp.startDate, exp.endDate, exp.isCurrent);
-      const compositeSub = [exp.company, exp.location].filter(Boolean).join(", ");
-      return `
-      <div class="entry-block" data-index="${idx}">
-        <div class="entry-meta-row">
-          <div class="entry-primary-line">
-            ${exp.title || ""}
-            ${compositeSub ? `<span class="divider-dash">–</span><span class="subtitle-context">${compositeSub}</span>` : ""}
-          </div>
-          ${dateRange ? `<div class="entry-date">${dateRange}</div>` : ""}
-        </div>
-        ${exp.description ? renderDescription(exp.description) : ""}
-        ${exp.achievements ? `<div class="entry-content"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
-      </div>
-    `}).join("")}
-  </div>` : ""}
+  
 
   <!-- PROJECTS SECTION -->
   ${nonEmptyProjects.length > 0 ? `
@@ -730,28 +759,7 @@ export function buildCompactClassicTemplate(
     `).join("")}
   </div>` : ""}
 
-  <!-- EDUCATION SECTION -->
-  ${nonEmptyEducation.length > 0 ? `
-  <div class="section" id="section-education" data-section="education">
-    <div class="section-header">
-      <span class="section-icon">${icons.graduation}</span>
-      <span class="section-title">Education</span>
-    </div>
-    ${nonEmptyEducation.map((edu, idx) => {
-      const eduDate = edu.graduationDate || formatDateRange(edu.startDate || edu.startYear, edu.endDate || edu.endYear);
-      const schoolContext = formatSubtitle([edu.school, edu.location]);
-      return `
-      <div class="entry-block" data-index="${idx}">
-        <div class="entry-meta-row">
-          <div class="entry-primary-line">${edu.degree || ""}${edu.field ? ` – ${edu.field}` : ""}</div>
-          ${eduDate ? `<div class="entry-date">${eduDate}</div>` : ""}
-        </div>
-        ${schoolContext ? `<div style="font-size: 10pt; color: #333333;">${schoolContext}</div>` : ""}
-        ${edu.grade ? `<div style="font-size: 9.5pt; color: #444444; font-weight: 500; margin-top: 2px;">${edu.grade}</div>` : ""}
-        ${edu.description ? `<div class="summary-text" style="margin-top: 5px;">${edu.description}</div>` : ""}
-      </div>
-    `}).join("")}
-  </div>` : ""}
+
 
   <!-- CERTIFICATIONS SECTION -->
   ${nonEmptyCertifications.length > 0 ? `

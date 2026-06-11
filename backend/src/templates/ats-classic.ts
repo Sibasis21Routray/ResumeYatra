@@ -450,6 +450,44 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
           </section>
         ` : ""}
 
+        <!-- Experience Section -->
+        ${nonEmptyExperience.length > 0 ? `
+          <section class="section" id="section-experience" data-section="experience">
+            <h2 class="section-title">Experience</h2>
+            ${nonEmptyExperience.map((exp: any, idx: number) => `
+              <div class="entry" data-index="${idx}">
+                <div class="entry-header"><span class="entry-title">${exp.title || exp.designation || exp.role || ""}</span><span class="entry-date">${formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}</span></div>
+                <div class="entry-subtitle">${exp.company ? exp.company : ""}${exp.location ? `, ${exp.location}` : ""}</div>
+                ${exp.description ? renderDescription(exp.description) : ""}
+                ${exp.achievements ? `<div><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
+              </div>
+            `).join("")}
+          </section>
+        ` : ""}
+
+
+         <!-- Education Section -->
+        ${nonEmptyEducation.length > 0 ? `
+          <section class="section" id="section-education" data-section="education">
+            <h2 class="section-title">Education</h2>
+            ${nonEmptyEducation.map((edu: any, idx: number) => {
+              const startDate = edu.startDate || edu.startYear;
+              const endDate = edu.endDate || edu.endYear || edu.graduationDate;
+              const dateDisplay = startDate && endDate ? `${startDate} – ${endDate}` : (startDate || endDate || "");
+              return `
+                <div class="entry" data-index="${idx}">
+                  <div class="entry-header"><span class="entry-title">${edu.degree || edu.course || ""}${edu.field ? ` – ${edu.field}` : ""}</span><span class="entry-date">${dateDisplay}</span></div>
+                  <div class="entry-subtitle">${edu.school || edu.institution || edu.university || ""}${edu.location ? `, ${edu.location}` : ""}</div>
+                  ${edu.grade ? `<div>${edu.grade}</div>` : ""}
+                  ${edu.description ? `<div>${edu.description}</div>` : ""}
+                </div>
+              `;
+            }).join("")}
+          </section>
+        ` : ""}
+
+
+        
         <!-- Skills Section -->
         ${skillsArray.length > 0 ? `
           <section class="section" id="section-skills" data-section="skills">
@@ -501,20 +539,7 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
           </section>
         ` : ""}
 
-        <!-- Experience Section -->
-        ${nonEmptyExperience.length > 0 ? `
-          <section class="section" id="section-experience" data-section="experience">
-            <h2 class="section-title">Experience</h2>
-            ${nonEmptyExperience.map((exp: any, idx: number) => `
-              <div class="entry" data-index="${idx}">
-                <div class="entry-header"><span class="entry-title">${exp.title || exp.designation || exp.role || ""}</span><span class="entry-date">${formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}</span></div>
-                <div class="entry-subtitle">${exp.company ? exp.company : ""}${exp.location ? `, ${exp.location}` : ""}</div>
-                ${exp.description ? renderDescription(exp.description) : ""}
-                ${exp.achievements ? `<div><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
-              </div>
-            `).join("")}
-          </section>
-        ` : ""}
+        
 
         <!-- Projects Section -->
         ${nonEmptyProjects.length > 0 ? `
@@ -531,26 +556,7 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
           </section>
         ` : ""}
 
-        <!-- Education Section -->
-        ${nonEmptyEducation.length > 0 ? `
-          <section class="section" id="section-education" data-section="education">
-            <h2 class="section-title">Education</h2>
-            ${nonEmptyEducation.map((edu: any, idx: number) => {
-              const startDate = edu.startDate || edu.startYear;
-              const endDate = edu.endDate || edu.endYear || edu.graduationDate;
-              const dateDisplay = startDate && endDate ? `${startDate} – ${endDate}` : (startDate || endDate || "");
-              return `
-                <div class="entry" data-index="${idx}">
-                  <div class="entry-header"><span class="entry-title">${edu.degree || edu.course || ""}${edu.field ? ` – ${edu.field}` : ""}</span><span class="entry-date">${dateDisplay}</span></div>
-                  <div class="entry-subtitle">${edu.school || edu.institution || edu.university || ""}${edu.location ? `, ${edu.location}` : ""}</div>
-                  ${edu.grade ? `<div>${edu.grade}</div>` : ""}
-                  ${edu.description ? `<div>${edu.description}</div>` : ""}
-                </div>
-              `;
-            }).join("")}
-          </section>
-        ` : ""}
-
+       
         <!-- Internships Section -->
         ${nonEmptyInternships.length > 0 ? `
           <section class="section" id="section-internships" data-section="internships">

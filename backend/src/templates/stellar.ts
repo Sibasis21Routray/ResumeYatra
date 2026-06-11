@@ -501,6 +501,56 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       </div>
     ` : ""}
 
+    <!-- Education Section -->
+    ${nonEmptyEducation.length > 0 ? `
+      <div class="cv-section">
+        <h2 class="cv-section-title">Education</h2>
+        <div class="divider"></div>
+        ${nonEmptyEducation.map((edu: any, idx: number) => {
+          const dateParts = [edu.startDate, edu.graduationDate || edu.endDate].filter(Boolean);
+          const dateRange = dateParts.join(" - ");
+          return `
+            <div class="timeline-entry" data-section="education" data-index="${idx}">
+              <div class="entry-row-header">
+                <span class="institution-name">${edu.school || ""}</span>
+                ${dateRange ? `<span class="date-badge">${dateRange}</span>` : ""}
+              </div>
+              <div class="entry-row-subhead">
+                <span>${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}${edu.grade ? `, ${edu.grade}` : ""}</span>
+                
+              </div>
+              ${edu.description ? `<div class="bullets-container"><p>${edu.description}</p></div>` : ""}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    ` : ""}
+
+    <!-- Experience Section -->
+    ${nonEmptyExperience.length > 0 ? `
+      <div class="cv-section">
+        <h2 class="cv-section-title">Experience</h2>
+        <div class="divider"></div>
+        ${nonEmptyExperience.map((exp: any, idx: number) => {
+          const dateParts = [exp.startDate, exp.isCurrent ? "Present" : exp.endDate].filter(Boolean);
+          return `
+            <div class="timeline-entry" data-section="experience" data-index="${idx}">
+              <div class="entry-row-header">
+                <span>${exp.company || ""}</span>
+                <span class="date-badge">${dateParts.join(" - ")}</span>
+              </div>
+              <div class="entry-row-subhead">
+                <span style="font-weight: 600;">${exp.title || ""}</span>
+              </div>
+              ${exp.description ? renderDescription(exp.description) : ""}
+              ${exp.achievements ? `<div class="bullets-container"><p><strong>Achievements:</strong> ${exp.achievements}</p></div>` : ""}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    ` : ""}
+
+
     <!-- Skills Section -->
     ${skillsArray.length > 0 ? `
       <div class="cv-section" data-section="skills">
@@ -566,55 +616,9 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       </div>
     ` : ""}
 
-    <!-- Education Section -->
-    ${nonEmptyEducation.length > 0 ? `
-      <div class="cv-section">
-        <h2 class="cv-section-title">Education</h2>
-        <div class="divider"></div>
-        ${nonEmptyEducation.map((edu: any, idx: number) => {
-          const dateParts = [edu.startDate, edu.graduationDate || edu.endDate].filter(Boolean);
-          const dateRange = dateParts.join(" - ");
-          return `
-            <div class="timeline-entry" data-section="education" data-index="${idx}">
-              <div class="entry-row-header">
-                <span class="institution-name">${edu.school || ""}</span>
-                ${dateRange ? `<span class="date-badge">${dateRange}</span>` : ""}
-              </div>
-              <div class="entry-row-subhead">
-                <span>${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}${edu.grade ? `, ${edu.grade}` : ""}</span>
-                
-              </div>
-              ${edu.description ? `<div class="bullets-container"><p>${edu.description}</p></div>` : ""}
-            </div>
-          `;
-        }).join('')}
-      </div>
-    ` : ""}
+    
 
-    <!-- Experience Section -->
-    ${nonEmptyExperience.length > 0 ? `
-      <div class="cv-section">
-        <h2 class="cv-section-title">Experience</h2>
-        <div class="divider"></div>
-        ${nonEmptyExperience.map((exp: any, idx: number) => {
-          const dateParts = [exp.startDate, exp.isCurrent ? "Present" : exp.endDate].filter(Boolean);
-          return `
-            <div class="timeline-entry" data-section="experience" data-index="${idx}">
-              <div class="entry-row-header">
-                <span>${exp.company || ""}</span>
-                <span class="date-badge">${dateParts.join(" - ")}</span>
-              </div>
-              <div class="entry-row-subhead">
-                <span style="font-weight: 600;">${exp.title || ""}</span>
-              </div>
-              ${exp.description ? renderDescription(exp.description) : ""}
-              ${exp.achievements ? `<div class="bullets-container"><p><strong>Achievements:</strong> ${exp.achievements}</p></div>` : ""}
-            </div>
-          `;
-        }).join('')}
-      </div>
-    ` : ""}
-
+    
     <!-- Projects Section -->
     ${nonEmptyProjects.length > 0 ? `
       <div class="cv-section">

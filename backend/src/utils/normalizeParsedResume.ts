@@ -172,71 +172,79 @@ if (source.summary || source.professionalSummary) {
   }
 }
 
-// Skills - preserve HTML format
+// Skills - preserve HTML format with LIMIT
 if (source.skills) {
+  let skillsArray: string[] = [];
+  
   if (typeof source.skills === 'string') {
-    // If it's already a string (hopefully HTML), keep it
-    normalized.skills = source.skills;
-  } 
-  else if (Array.isArray(source.skills)) {
-    // Handle array of objects like [{name: "java"}, {name: "py"}]
-    const skillsList = source.skills
-      .map((skill: any) => {
-        if (typeof skill === 'string') {
-          return skill;
-        } else if (skill && typeof skill === 'object') {
-          // Try to get the skill name from common properties
-          return skill.name || skill.skill || skill.value || Object.values(skill)[0] || null;
+    // If it's HTML or pipe-separated, parse it first
+    if (source.skills.includes('<ul>')) {
+      const ulMatch = source.skills.match(/<ul>(.*?)<\/ul>/s);
+      if (ulMatch) {
+        const liMatches = ulMatch[1].match(/<li>(.*?)<\/li>/g);
+        if (liMatches) {
+          skillsArray = liMatches.map((li: string) => li.replace(/<\/?li>/g, "").trim());
         }
-        return null;
-      })
-      .filter((s: string | null) => s !== null);
-    
-    if (skillsList.length > 0) {
-      normalized.skills = '<ul>' + skillsList.map((s: string) => `<li>${s}</li>`).join('') + '</ul>';
+      }
+    } else if (source.skills.includes('|')) {
+      skillsArray = source.skills.split('|').map((s: string) => s.trim());
+    } else {
+      skillsArray = [source.skills];
     }
-  } 
-  else if (typeof source.skills === 'object') {
-    // Handle object format {java: {}, py: {}}
-    const skillsArray = Object.keys(source.skills);
-    if (skillsArray.length > 0) {
-      normalized.skills = '<ul>' + skillsArray.map(s => `<li>${s}</li>`).join('') + '</ul>';
-    }
+  } else if (Array.isArray(source.skills)) {
+    skillsArray = source.skills.map((skill: any) => {
+      if (typeof skill === 'string') return skill;
+      if (skill && typeof skill === 'object') return skill.name || skill.skill || skill.value || null;
+      return null;
+    }).filter(Boolean);
+  }
+  
+  // ENFORCE LIMIT: Max 15 skills
+  if (skillsArray.length > 15) {
+    skillsArray = skillsArray.slice(0, 15);
+    console.log(`[normalizeParsedResume] Limited skills from ${source.skills.length} to ${skillsArray.length}`);
+  }
+  
+  if (skillsArray.length > 0) {
+    normalized.skills = '<ul>' + skillsArray.map((s: string) => `<li>${s}</li>`).join('') + '</ul>';
   }
 }
 
-// Core Competencies - preserve HTML format (same as skills)
+// Core Competencies - preserve HTML format with LIMIT
 if (source.coreCompetencies || source.core_competencies) {
   const coreCompSource = source.coreCompetencies || source.core_competencies;
+  let coreCompArray: string[] = [];
   
   if (typeof coreCompSource === 'string') {
-    // If it's already a string (hopefully HTML), keep it
-    normalized.coreCompetencies = coreCompSource;
-  } 
-  else if (Array.isArray(coreCompSource)) {
-    // Handle array of objects like [{name: "Strategic Planning"}, {name: "Team Leadership"}]
-    const coreCompList = coreCompSource
-      .map((comp: any) => {
-        if (typeof comp === 'string') {
-          return comp;
-        } else if (comp && typeof comp === 'object') {
-          // Try to get the competency name from common properties
-          return comp.name || comp.competency || comp.value || Object.values(comp)[0] || null;
+    if (coreCompSource.includes('<ul>')) {
+      const ulMatch = coreCompSource.match(/<ul>(.*?)<\/ul>/s);
+      if (ulMatch) {
+        const liMatches = ulMatch[1].match(/<li>(.*?)<\/li>/g);
+        if (liMatches) {
+          coreCompArray = liMatches.map((li: string) => li.replace(/<\/?li>/g, "").trim());
         }
-        return null;
-      })
-      .filter((c: string | null) => c !== null);
-    
-    if (coreCompList.length > 0) {
-      normalized.coreCompetencies = '<ul>' + coreCompList.map((c: string) => `<li>${c}</li>`).join('') + '</ul>';
+      }
+    } else if (coreCompSource.includes('|')) {
+      coreCompArray = coreCompSource.split('|').map((c: string) => c.trim());
+    } else {
+      coreCompArray = [coreCompSource];
     }
-  } 
-  else if (typeof coreCompSource === 'object') {
-    // Handle object format {strategicPlanning: {}, teamLeadership: {}}
-    const coreCompArray = Object.keys(coreCompSource);
-    if (coreCompArray.length > 0) {
-      normalized.coreCompetencies = '<ul>' + coreCompArray.map(c => `<li>${c}</li>`).join('') + '</ul>';
-    }
+  } else if (Array.isArray(coreCompSource)) {
+    coreCompArray = coreCompSource.map((comp: any) => {
+      if (typeof comp === 'string') return comp;
+      if (comp && typeof comp === 'object') return comp.name || comp.competency || comp.value || null;
+      return null;
+    }).filter(Boolean);
+  }
+  
+  // ENFORCE LIMIT: Max 8 core competencies
+  if (coreCompArray.length > 8) {
+    coreCompArray = coreCompArray.slice(0, 8);
+    console.log(`[normalizeParsedResume] Limited core competencies from ${coreCompSource.length} to ${coreCompArray.length}`);
+  }
+  
+  if (coreCompArray.length > 0) {
+    normalized.coreCompetencies = '<ul>' + coreCompArray.map((c: string) => `<li>${c}</li>`).join('') + '</ul>';
   }
 }
 

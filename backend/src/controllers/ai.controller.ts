@@ -136,7 +136,7 @@ async function enhanceSkillsWithAI(
 
   const uniqueTechFromExp = [...new Set(techFromExp)];
 
-  const skillPrompt = `You are a technical skills analyst. Based on the following information, suggest 10-15 RELEVANT professional skills and 5-8 core competencies.
+  const skillPrompt = `You are a technical skills analyst. Based on the following information, suggest RELEVANT professional skills and core competencies.
 
 EXISTING SKILLS: ${existingSkills.join(", ")}
 EXISTING CORE COMPETENCIES: ${existingCoreComp.join(", ")}
@@ -153,6 +153,7 @@ RULES:
 6. Return ONLY a JSON object: { "skills": ["skill1", ...], "coreCompetencies": ["competency1", ...] }
 7. Skills should be technical/hard skills
 8. Core competencies should be soft skills, leadership, strategic thinking
+9. Return AT MOST 15 skills and AT MOST 8 core competencies
 
 Return ONLY valid JSON.`;
 
@@ -203,19 +204,46 @@ Return ONLY valid JSON.`;
     aiText = aiText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
     const parsed = JSON.parse(aiText);
 
-    const suggestedSkills = parsed.skills || [];
-    const suggestedCoreComp = parsed.coreCompetencies || [];
+    let suggestedSkills = parsed.skills || [];
+    let suggestedCoreComp = parsed.coreCompetencies || [];
 
-    const allSkills = [...new Set([...existingSkills, ...suggestedSkills])];
-    const allCoreComp = [...new Set([...existingCoreComp, ...suggestedCoreComp])];
+    // Limit AI suggestions to maximum allowed
+    suggestedSkills = suggestedSkills.slice(0, 15);
+    suggestedCoreComp = suggestedCoreComp.slice(0, 8);
 
-    console.log(`[enhanceSkillsWithAI] Skills enhanced from ${existingSkills.length} to ${allSkills.length}`);
-    console.log(`[enhanceSkillsWithAI] Core competencies enhanced from ${existingCoreComp.length} to ${allCoreComp.length}`);
+    // Merge existing with suggestions, then enforce limits
+    let mergedSkills = [...new Set([...existingSkills, ...suggestedSkills])];
+    let mergedCoreComp = [...new Set([...existingCoreComp, ...suggestedCoreComp])];
 
-    return { skills: allSkills, coreCompetencies: allCoreComp, usage: usageData };
+    // Enforce maximum limits after merge
+    if (mergedSkills.length > 15) {
+      mergedSkills = mergedSkills.slice(0, 15);
+    }
+    
+    if (mergedCoreComp.length > 8) {
+      mergedCoreComp = mergedCoreComp.slice(0, 8);
+    }
+
+   console.log(`[enhanceSkillsWithAI] Skills: ${existingSkills.length} existing + ${suggestedSkills.length} suggested = ${mergedSkills.length} final (max 15)`);
+console.log(`[enhanceSkillsWithAI] Final skills: ${JSON.stringify(mergedSkills)}`);
+console.log(`[enhanceSkillsWithAI] Core competencies: ${existingCoreComp.length} existing + ${suggestedCoreComp.length} suggested = ${mergedCoreComp.length} final (max 8)`);
+console.log(`[enhanceSkillsWithAI] Final core comps: ${JSON.stringify(mergedCoreComp)}`);
+
+return { skills: mergedSkills, coreCompetencies: mergedCoreComp, usage: usageData };
   } catch (err: any) {
     console.error("[enhanceSkillsWithAI] Failed:", err.message);
-    return { skills: existingSkills, coreCompetencies: existingCoreComp, usage: null };
+    // On error, ensure existing data doesn't exceed limits
+    let safeSkills = existingSkills;
+    let safeCoreComp = existingCoreComp;
+    
+    if (safeSkills.length > 15) {
+      safeSkills = safeSkills.slice(0, 15);
+    }
+    if (safeCoreComp.length > 8) {
+      safeCoreComp = safeCoreComp.slice(0, 8);
+    }
+    
+    return { skills: safeSkills, coreCompetencies: safeCoreComp, usage: null };
   }
 }
 
@@ -376,6 +404,45 @@ function cleanPhoneNumbersInData(data: any): any {
   return data;
 }
 
+
+// function to check and enhance education descriptions
+function enhanceEducationDescriptions(education: any[]): any[] {
+  if (!education || !Array.isArray(education)) return education;
+  
+  return education.map((edu: any) => {
+    // Only enhance if description exists and is not empty
+    if (edu.description && typeof edu.description === "string" && edu.description.trim().length > 0) {
+      // Enhance existing description
+      edu.description = edu.description.trim();
+      
+      // Add professional touch to descriptions that are too brief
+      if (edu.description.length < 50) {
+        const course = edu.degree || edu.field || edu.course || "";
+        const institution = edu.institution || "";
+        
+        if (course && !edu.description.toLowerCase().includes(course.toLowerCase())) {
+          edu.description = `${edu.description} Focused on ${course}.`;
+        }
+        
+        if (institution && !edu.description.toLowerCase().includes(institution.toLowerCase())) {
+          edu.description = `${edu.description} Completed at ${institution}.`;
+        }
+      }
+      
+      // Capitalize first letter and ensure proper punctuation
+      if (!edu.description.endsWith('.') && !edu.description.endsWith('!') && !edu.description.endsWith('?')) {
+        edu.description = edu.description + '.';
+      }
+      
+      edu.description = edu.description.charAt(0).toUpperCase() + edu.description.slice(1);
+    }
+    // If description doesn't exist or is empty, leave it as is (don't add anything)
+    
+    return edu;
+  });
+}
+
+
 // ─────────────────────────────────────────────
 // ENHANCED PROMPT BUILDER with experience calculation
 // ─────────────────────────────────────────────
@@ -390,6 +457,10 @@ function buildEnhancementPrompt(data: any): string {
   const coreCompList = Array.isArray(data.coreCompetencies) ? data.coreCompetencies :
     (typeof data.coreCompetencies === "string" ? data.coreCompetencies.split(/[,\n]/) : []);
   const topCoreComp = coreCompList.slice(0, 5).join(", ");
+
+  // Check if education items have descriptions
+  const educationHasDescriptions = data.education && Array.isArray(data.education) && 
+    data.education.some((edu: any) => edu.description && edu.description.trim().length > 0);
 
   return `You are a world-class career strategist, ATS optimization expert, and professional resume writer with 20+ years of experience.
 
@@ -446,7 +517,7 @@ PRIORITY SECTIONS (Enhance these with EXTRA care)
 
 🟡 HIGH PRIORITY:
 4. CAREER OBJECTIVE - Clear, focused, NO experience repetition
-5. EDUCATION - Enhanced descriptions
+5. EDUCATION - ${educationHasDescriptions ? "Enhance existing descriptions only" : "DO NOT ADD descriptions - only keep what exists"}
 6. PROJECTS - Impact-focused descriptions
 
 ═══════════════════════════════════════════════════════
@@ -470,15 +541,22 @@ For EACH job:
 - description: 4-5 achievement points
 - Each point: Action verb + what + impact
 
+── EDUCATION ──
+${educationHasDescriptions ? 
+  `For EACH education entry:
+- If description field exists and is NOT empty: ENHANCE it with academic achievements, relevant coursework, or honors
+- If description field is empty or missing: LEAVE IT EMPTY - DO NOT add description
+- Format: Keep as concise, professional sentence(s)` :
+  `- DO NOT add description fields to education entries that don't have them
+- Only enhance descriptions that already exist
+- If an education entry has no description, leave it as is (empty or null)`}
+
 ── SKILLS & CORE COMPETENCIES ──
 - Return as arrays: ["React.js", "Node.js", "MongoDB"]
 - Expand abbreviations: "py" → "Python", "js" → "JavaScript"
 - Remove duplicates
 - Skills = technical/hard skills
 - Core Competencies = soft/leadership skills
-
-── EDUCATION ──
-- Enhance description with 1-2 sentences
 
 ═══════════════════════════════════════════════════════
 INPUT RESUME JSON:
@@ -487,6 +565,7 @@ ${JSON.stringify(data, null, 2)}
 
 Return ONLY the enhanced resume as valid JSON.`;
 }
+
 
 // ─────────────────────────────────────────────
 // DEEP MERGE: preserve keys the AI might drop
@@ -657,6 +736,7 @@ export async function enhanceResume(req: Request, res: Response) {
           await TokenUsage.create({
             userId,
             guestId,
+            resumeId: resume._id,
             promptTokens: currentCallUsage.promptTokens + (skillsUsage?.promptTokens || 0),
             completionTokens: currentCallUsage.completionTokens + (skillsUsage?.completionTokens || 0),
             totalTokens: currentCallUsage.totalTokens + (skillsUsage?.totalTokens || 0),
@@ -706,6 +786,31 @@ export async function enhanceResume(req: Request, res: Response) {
 
     // STEP 7: Ensure phone numbers remain clean in AI output
     const cleanedData3 = cleanPhoneNumbersInData(cleanedData2);
+
+    // STEP 7.5: Enhance only existing education descriptions
+    if (cleanedData3.education && Array.isArray(cleanedData3.education)) {
+      // Check which education entries had descriptions in original data
+      const originalEducation = currentData.education || [];
+      cleanedData3.education = cleanedData3.education.map((enhancedEdu: any, index: number) => {
+        const originalEdu = originalEducation[index] || {};
+        // Only enhance description if it existed in the original
+        if (originalEdu.description && originalEdu.description.trim().length > 0) {
+          // Keep AI-enhanced description if available and non-empty, otherwise keep original
+          if (enhancedEdu.description && enhancedEdu.description.trim().length > 0) {
+            // Description exists and was enhanced by AI
+            return enhancedEdu;
+          } else {
+            // Keep original description if AI removed it
+            return { ...enhancedEdu, description: originalEdu.description };
+          }
+        } else {
+          // Original had no description - ensure AI didn't add one
+          const { description, ...eduWithoutDescription } = enhancedEdu;
+          return eduWithoutDescription;
+        }
+      });
+      console.log("[enhanceResume] Education descriptions preserved only where originally present");
+    }
 
     // STEP 8: Normalize
     const normalized = normalizeParsedResume(cleanedData3);

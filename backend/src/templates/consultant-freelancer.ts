@@ -547,6 +547,38 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
           </div>
         </div>` : ''}
 
+
+         ${nonEmptyEducation.length > 0 ? `
+        <div class="section" data-section="education">
+          <div class="section-label">Education</div>
+          <div class="section-content">
+            ${nonEmptyEducation.map((edu, idx) => {
+              const dateParts = [];
+              if (edu.startDate && edu.startDate.trim()) dateParts.push(edu.startDate.trim());
+              if (edu.graduationDate && edu.graduationDate.trim()) dateParts.push(edu.graduationDate.trim());
+              else if (edu.endDate && edu.endDate.trim()) dateParts.push(edu.endDate.trim());
+              const dateRange = dateParts.length > 0 ? dateParts.join(" - ") : "";
+              
+              const schoolParts = [];
+              if (edu.school && edu.school.trim()) schoolParts.push(edu.school.trim());
+              if (edu.location && edu.location.trim()) schoolParts.push(edu.location.trim());
+              const schoolLine = schoolParts.length > 0 ? schoolParts.join(", ") : "";
+              
+              const firstLine = [];
+              if (schoolLine) firstLine.push(`<b>${schoolLine}</b>`);
+              if (dateRange) firstLine.push(dateRange);
+              
+              return `
+              <p class="edu-line" data-index="${idx}">
+                ${firstLine.length > 0 ? firstLine.join(", ") + "<br/>" : ""}
+                ${edu.degree || ''}${edu.field ? ' in ' + edu.field : ''}
+                ${edu.grade ? `<br/><span style="font-size: ${smallTextFontSize}px;">${edu.grade}</span>` : ''}
+                ${edu.description ? `<br/><span style="font-size: ${smallTextFontSize}px;">${edu.description}</span>` : ''}
+              </p>
+            `}).join('')}
+          </div>
+        </div>` : ''}
+
         ${nonEmptyExperience.length > 0 ? `
         <div class="section" data-section="experience">
           <div class="section-label">Experience</div>
@@ -1101,36 +1133,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
           </div>
         </div>` : ''}
 
-        ${nonEmptyEducation.length > 0 ? `
-        <div class="section" data-section="education">
-          <div class="section-label">Education</div>
-          <div class="section-content">
-            ${nonEmptyEducation.map((edu, idx) => {
-              const dateParts = [];
-              if (edu.startDate && edu.startDate.trim()) dateParts.push(edu.startDate.trim());
-              if (edu.graduationDate && edu.graduationDate.trim()) dateParts.push(edu.graduationDate.trim());
-              else if (edu.endDate && edu.endDate.trim()) dateParts.push(edu.endDate.trim());
-              const dateRange = dateParts.length > 0 ? dateParts.join(" - ") : "";
-              
-              const schoolParts = [];
-              if (edu.school && edu.school.trim()) schoolParts.push(edu.school.trim());
-              if (edu.location && edu.location.trim()) schoolParts.push(edu.location.trim());
-              const schoolLine = schoolParts.length > 0 ? schoolParts.join(", ") : "";
-              
-              const firstLine = [];
-              if (schoolLine) firstLine.push(`<b>${schoolLine}</b>`);
-              if (dateRange) firstLine.push(dateRange);
-              
-              return `
-              <p class="edu-line" data-index="${idx}">
-                ${firstLine.length > 0 ? firstLine.join(", ") + "<br/>" : ""}
-                ${edu.degree || ''}${edu.field ? ' in ' + edu.field : ''}
-                ${edu.grade ? `<br/><span style="font-size: ${smallTextFontSize}px;">${edu.grade}</span>` : ''}
-                ${edu.description ? `<br/><span style="font-size: ${smallTextFontSize}px;">${edu.description}</span>` : ''}
-              </p>
-            `}).join('')}
-          </div>
-        </div>` : ''}
+       
       </div>
     </body>
     </html>

@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ITokenUsage extends Document {
   userId?: mongoose.Types.ObjectId;
   guestId?: string;
+  resumeId?: mongoose.Types.ObjectId;
   promptTokens: number;
   completionTokens: number;
   totalTokens: number;
@@ -14,6 +15,7 @@ export interface ITokenUsage extends Document {
 const TokenUsageSchema: Schema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
   guestId: { type: String, required: false },
+  resumeId: { type: Schema.Types.ObjectId, ref: 'Resume', required: false },
   promptTokens: { type: Number, required: true },
   completionTokens: { type: Number, required: true },
   totalTokens: { type: Number, required: true },

@@ -483,6 +483,52 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
     <p class="summary-text">${careerObjective}</p>
   </div>` : ""}
 
+
+   <!-- EDUCATION SECTION -->
+  ${nonEmptyEducation.length > 0 ? `
+  <div class="section" id="section-education" data-section="education">
+    <div class="section-title-container">
+      <div class="section-title">Education</div>
+    </div>
+    ${nonEmptyEducation.map((edu) => {
+      const startDate = edu.startDate || edu.startYear;
+      const endDate = edu.endDate || edu.endYear || edu.graduationDate;
+      const dateDisplay = startDate && endDate ? `${startDate} – ${endDate}` : (startDate || endDate || "");
+      return `
+      <div class="entry">
+        <div class="entry-header">
+          <div class="entry-title">${edu.degree || edu.course || ""}${edu.field ? ` in ${edu.field}` : ""}</div>
+          <div class="entry-date">${dateDisplay}</div>
+        </div>
+        <div class="entry-subtitle">${formatSubtitle([edu.school || edu.institution || edu.university, edu.location])}</div>
+        ${edu.grade ? `<div class="entry-content">${edu.grade}</div>` : ""}
+        ${edu.description ? `<div class="entry-content">${edu.description}</div>` : ""}
+      </div>
+    `}).join("")}
+  </div>` : ""}
+
+   <!-- EXPERIENCE SECTION -->
+  ${nonEmptyExperience.length > 0 ? `
+  <div class="section" id="section-experience" data-section="experience">
+    <div class="section-title-container">
+      <div class="section-title">Experience</div>
+    </div>
+    ${nonEmptyExperience.map((exp) => {
+      const dateRange = formatDateRange(exp.startDate, exp.endDate, exp.isCurrent);
+      const subtitle = formatSubtitle([exp.company, exp.location]);
+      return `
+      <div class="entry">
+        <div class="entry-header">
+          <div class="entry-title">${exp.title || exp.designation || exp.role || ""}</div>
+          ${dateRange ? `<div class="entry-date">${dateRange}</div>` : ""}
+        </div>
+        ${subtitle ? `<div class="entry-subtitle">${subtitle}</div>` : ""}
+        ${exp.description ? renderDescription(exp.description) : ""}
+        ${exp.achievements ? `<div class="entry-content"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
+      </div>
+    `}).join("")}
+  </div>` : ""}
+
   <!-- SKILLS SECTION -->
   ${skillsArray.length > 0 ? `
   <div class="section" id="section-skills" data-section="skills">
@@ -527,27 +573,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
     </div>
   </div>` : ""}
 
-  <!-- EXPERIENCE SECTION -->
-  ${nonEmptyExperience.length > 0 ? `
-  <div class="section" id="section-experience" data-section="experience">
-    <div class="section-title-container">
-      <div class="section-title">Experience</div>
-    </div>
-    ${nonEmptyExperience.map((exp) => {
-      const dateRange = formatDateRange(exp.startDate, exp.endDate, exp.isCurrent);
-      const subtitle = formatSubtitle([exp.company, exp.location]);
-      return `
-      <div class="entry">
-        <div class="entry-header">
-          <div class="entry-title">${exp.title || exp.designation || exp.role || ""}</div>
-          ${dateRange ? `<div class="entry-date">${dateRange}</div>` : ""}
-        </div>
-        ${subtitle ? `<div class="entry-subtitle">${subtitle}</div>` : ""}
-        ${exp.description ? renderDescription(exp.description) : ""}
-        ${exp.achievements ? `<div class="entry-content"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
-      </div>
-    `}).join("")}
-  </div>` : ""}
+ 
 
   <!-- PROJECTS SECTION -->
   ${nonEmptyProjects.length > 0 ? `
@@ -1006,28 +1032,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
     `).join("")}
   </div>` : ""}
 
-  <!-- EDUCATION SECTION -->
-  ${nonEmptyEducation.length > 0 ? `
-  <div class="section" id="section-education" data-section="education">
-    <div class="section-title-container">
-      <div class="section-title">Education</div>
-    </div>
-    ${nonEmptyEducation.map((edu) => {
-      const startDate = edu.startDate || edu.startYear;
-      const endDate = edu.endDate || edu.endYear || edu.graduationDate;
-      const dateDisplay = startDate && endDate ? `${startDate} – ${endDate}` : (startDate || endDate || "");
-      return `
-      <div class="entry">
-        <div class="entry-header">
-          <div class="entry-title">${edu.degree || edu.course || ""}${edu.field ? ` in ${edu.field}` : ""}</div>
-          <div class="entry-date">${dateDisplay}</div>
-        </div>
-        <div class="entry-subtitle">${formatSubtitle([edu.school || edu.institution || edu.university, edu.location])}</div>
-        ${edu.grade ? `<div class="entry-content">${edu.grade}</div>` : ""}
-        ${edu.description ? `<div class="entry-content">${edu.description}</div>` : ""}
-      </div>
-    `}).join("")}
-  </div>` : ""}
+ 
 
   <!-- HOBBIES SECTION -->
   ${nonEmptyHobbies.length > 0 ? `

@@ -520,6 +520,68 @@ export function buildMachampTemplate(data: any, theme?: any): string {
       : ""
   }
 
+
+    ${
+    hasNonEmptyItems(data.education)
+      ? `
+  <div class="section" data-section="education">
+    <div class="section-title">Education</div>
+    ${getNonEmptyArray(data.education)
+      .map(
+        (edu: any, index: number) => `
+      <div class="entry" data-index="${index}">
+        <div class="entry-header">
+          <div class="entry-title">${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}</div>
+          <div class="entry-date">${edu.graduationDate || edu.endDate || ""}</div>
+        </div>
+        <div class="entry-subheader">
+          <div>${edu.school || ""}${edu.location ? `, ${edu.location}` : ""}</div>
+        </div>
+        ${edu.startDate ? `<div class="entry-content" style="margin-top:-4px;">Start: ${edu.startDate}</div>` : ""}
+        ${edu.grade ? `<div class="entry-content" style="margin-top:-4px; margin-bottom:8px; font-weight:500;">Grade: ${edu.grade}</div>` : ""}
+        ${edu.description ? `<div class="entry-content">${renderDescription(edu.description)}</div>` : ""}
+      </div>
+    `,
+      )
+      .join("")}
+  </div>`
+      : ""
+  }
+
+    ${
+    hasNonEmptyItems(data.experience)
+      ? `
+  <div class="section" data-section="experience">
+    <div class="section-title">Experience</div>
+    ${getNonEmptyArray(data.experience)
+      .map((exp: any, index: number) => {
+        const dateRange = formatDateRange(
+          exp.startDate,
+          exp.endDate,
+          exp.isCurrent,
+        );
+        return `
+      <div class="entry" data-index="${index}">
+        <div class="entry-header">
+          <div class="entry-title">${exp.title || ""}</div>
+          <div class="entry-date">${dateRange}</div>
+        </div>
+        <div class="entry-subheader">
+          <div>${exp.company || ""}${exp.location ? `, ${exp.location}` : ""}</div>
+        </div>
+        <div class="entry-content">
+          ${exp.description ? renderDescription(exp.description) : ""}
+          ${exp.achievements ? `<p><strong>Achievements:</strong> ${exp.achievements}</p>` : ""}
+        </div>
+      </div>
+    `;
+      })
+      .join("")}
+  </div>`
+      : ""
+  }
+
+
   ${
   nonEmptySkills.length > 0
     ? `
@@ -604,38 +666,7 @@ ${
     : ""
 }
 
-  ${
-    hasNonEmptyItems(data.experience)
-      ? `
-  <div class="section" data-section="experience">
-    <div class="section-title">Experience</div>
-    ${getNonEmptyArray(data.experience)
-      .map((exp: any, index: number) => {
-        const dateRange = formatDateRange(
-          exp.startDate,
-          exp.endDate,
-          exp.isCurrent,
-        );
-        return `
-      <div class="entry" data-index="${index}">
-        <div class="entry-header">
-          <div class="entry-title">${exp.title || ""}</div>
-          <div class="entry-date">${dateRange}</div>
-        </div>
-        <div class="entry-subheader">
-          <div>${exp.company || ""}${exp.location ? `, ${exp.location}` : ""}</div>
-        </div>
-        <div class="entry-content">
-          ${exp.description ? renderDescription(exp.description) : ""}
-          ${exp.achievements ? `<p><strong>Achievements:</strong> ${exp.achievements}</p>` : ""}
-        </div>
-      </div>
-    `;
-      })
-      .join("")}
-  </div>`
-      : ""
-  }
+
 
   ${
     nonEmptyInternships.length > 0
@@ -718,32 +749,7 @@ ${
       : ""
   }
 
-  ${
-    hasNonEmptyItems(data.education)
-      ? `
-  <div class="section" data-section="education">
-    <div class="section-title">Education</div>
-    ${getNonEmptyArray(data.education)
-      .map(
-        (edu: any, index: number) => `
-      <div class="entry" data-index="${index}">
-        <div class="entry-header">
-          <div class="entry-title">${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}</div>
-          <div class="entry-date">${edu.graduationDate || edu.endDate || ""}</div>
-        </div>
-        <div class="entry-subheader">
-          <div>${edu.school || ""}${edu.location ? `, ${edu.location}` : ""}</div>
-        </div>
-        ${edu.startDate ? `<div class="entry-content" style="margin-top:-4px;">Start: ${edu.startDate}</div>` : ""}
-        ${edu.grade ? `<div class="entry-content" style="margin-top:-4px; margin-bottom:8px; font-weight:500;">Grade: ${edu.grade}</div>` : ""}
-        ${edu.description ? `<div class="entry-content">${renderDescription(edu.description)}</div>` : ""}
-      </div>
-    `,
-      )
-      .join("")}
-  </div>`
-      : ""
-  }
+
 
   ${
     nonEmptyProjects.length > 0

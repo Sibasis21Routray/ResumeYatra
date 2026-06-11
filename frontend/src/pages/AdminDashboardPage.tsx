@@ -28,6 +28,7 @@ interface Resume {
   createdAt: string;
   updatedAt: string;
   isParsed: boolean;
+  isAiEnhanced: boolean;
   owner: { id: string; email: string; name: string };
 }
 
@@ -37,7 +38,8 @@ interface Stats {
   templates: number;
   activeSubscriptions?: number;
   revenue?: number;
-  aiCreditsUsed?: number;
+  totalTokensUsed?: number;
+  totalParsings?: number;
   freelancerCount?: number;
   candidateCount?: number;
   totalAiEnhancements?: number;
@@ -407,7 +409,8 @@ export function AdminDashboardPage() {
 
         {activeTab === 'resumes' && (
           <ResumesTable 
-            resumes={resumes} 
+            resumes={resumes}
+            tokenUsage={tokenUsage} 
             onViewResume={(id, title) => setViewModal({ isOpen: true, id, title })}
             onDownloadResume={handleDownloadResume}
             onDeleteResume={(id, title) => setDeleteModal({ isOpen: true, type: 'resume', id, name: title })}
@@ -415,7 +418,15 @@ export function AdminDashboardPage() {
         )}
 
         {activeTab === 'token-usage' && (
-          <TokenUsageTable tokenUsage={tokenUsage} onRefresh={fetchData} />
+          <TokenUsageTable 
+            tokenUsage={tokenUsage} 
+            onRefresh={fetchData} 
+            globalStats={stats ? {
+              totalTokens: stats.totalTokensUsed || 0,
+              totalRequests: (stats.totalAiEnhancements || 0) + (stats.totalParsings || 0),
+              avgTokensPerUser: stats.users > 0 ? Math.round((stats.totalTokensUsed || 0) / stats.users) : 0
+            } : undefined}
+          />
         )}
 
         {activeTab === 'pricing' && pricing && (

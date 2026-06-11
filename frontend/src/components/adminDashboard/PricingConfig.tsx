@@ -170,7 +170,7 @@ export const PricingConfig: React.FC<PricingConfigProps> = ({ pricing, onSave, o
           icon={Star}
           color={{
             gradient: 'from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10',
-            bg: 'bg-blue-100 dark:bg-blue-900/30',
+          
             text: 'text-blue-600 dark:text-blue-400',
             description: 'High volume configuration'
           }}
@@ -186,7 +186,7 @@ export const PricingConfig: React.FC<PricingConfigProps> = ({ pricing, onSave, o
           icon={Users}
           color={{
             gradient: 'from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10',
-            bg: 'bg-green-100 dark:bg-green-900/30',
+           
             text: 'text-green-600 dark:text-green-400',
             description: 'Regular user configuration'
           }}
@@ -200,7 +200,7 @@ export const PricingConfig: React.FC<PricingConfigProps> = ({ pricing, onSave, o
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg">
+              <div className="p-2rounded-lg">
                 <RefreshCw className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
               <div>
@@ -226,7 +226,7 @@ export const PricingConfig: React.FC<PricingConfigProps> = ({ pricing, onSave, o
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/10 dark:to-amber-900/10">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
+              <div className="p-2  rounded-lg">
                 <FaMoneyBill className="w-5 h-5 text-orange-600 dark:text-orange-400" />
               </div>
               <div>
@@ -263,7 +263,7 @@ export const PricingConfig: React.FC<PricingConfigProps> = ({ pricing, onSave, o
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <div className="p-2  rounded-lg">
                 <CreditCard className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
@@ -289,7 +289,7 @@ export const PricingConfig: React.FC<PricingConfigProps> = ({ pricing, onSave, o
                     disabled={uploadingSignature || !signatureFile}
                     className="px-4 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 flex items-center gap-2 whitespace-nowrap transition-all"
                   >
-                    {uploadingSignature ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    {uploadingSignature ? <RefreshCw className="w-4 h-4 animate-spin" /> : ""}
                     Upload
                   </button>
                 </div>
@@ -324,7 +324,7 @@ export const PricingConfig: React.FC<PricingConfigProps> = ({ pricing, onSave, o
               </>
             ) : (
               <>
-                <Save className="w-5 h-5" />
+                {/* <Save className="w-5 h-5" /> */}
                 Save All Changes
               </>
             )}

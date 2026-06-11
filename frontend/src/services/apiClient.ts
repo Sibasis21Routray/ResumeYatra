@@ -33,23 +33,23 @@ const api = axios.create({
   },
 });
 
-  // Add guest ID to requests (Authentication is now handled by cookies automatically)
-  api.interceptors.request.use((config: any) => {
-    const guestId = localStorage.getItem("guestId");
-    const user = localStorage.getItem("user");
+// Add guest ID to requests (Authentication is now handled by cookies automatically)
+api.interceptors.request.use((config: any) => {
+  const guestId = localStorage.getItem("guestId");
+  const user = localStorage.getItem("user");
 
-    if (guestId && !user) {
-      config.headers["x-guest-id"] = guestId;
-    } else if (!user) {
-      // If no user and no guestId, generate one for the guest session
-      // This ensures even the very first request has a guest ID
-      const newGuestId = crypto.randomUUID();
-      localStorage.setItem("guestId", newGuestId);
-      config.headers["x-guest-id"] = newGuestId;
-    }
+  if (guestId && !user) {
+    config.headers["x-guest-id"] = guestId;
+  } else if (!user) {
+    // If no user and no guestId, generate one for the guest session
+    // This ensures even the very first request has a guest ID
+    const newGuestId = crypto.randomUUID();
+    localStorage.setItem("guestId", newGuestId);
+    config.headers["x-guest-id"] = newGuestId;
+  }
 
-    return config;
-  });
+  return config;
+});
 
 // Handle response errors
 api.interceptors.response.use(
@@ -63,31 +63,31 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-const rawMessage =
-  error?.response?.data?.error ||
-  error?.response?.data?.message ||
-  error?.message ||
-  "Something went wrong";
+    const rawMessage =
+      error?.response?.data?.error ||
+      error?.response?.data?.message ||
+      error?.message ||
+      "Something went wrong";
 
-const formattedMessage = formatMongooseError(rawMessage);
+    const formattedMessage = formatMongooseError(rawMessage);
 
-const isPaymentRequired = error?.response?.status === 402;
-const isSubscriptionRequired = error?.response?.data?.type === 'subscription_required';
+    const isPaymentRequired = error?.response?.status === 402;
+    const isSubscriptionRequired = error?.response?.data?.type === 'subscription_required';
 
-if (!isPaymentRequired && !isSubscriptionRequired) {
-  toast.error(formattedMessage);
-}
-
- if (error.response?.status === 401) {
-    const user = localStorage.getItem("user");
-
-    if (user) {
-      console.warn("[API] Session might be invalid or expired");
+    if (!isPaymentRequired && !isSubscriptionRequired) {
+      toast.error(formattedMessage);
     }
-  }
 
-  return Promise.reject(error);
-}
+    if (error.response?.status === 401) {
+      const user = localStorage.getItem("user");
+
+      if (user) {
+        console.warn("[API] Session might be invalid or expired");
+      }
+    }
+
+    return Promise.reject(error);
+  }
 );
 
 // Auth endpoints
@@ -145,8 +145,8 @@ export const resumeAPI = {
 
       // Validate MongoDB ObjectId format (basic check)
       if (!/^[a-fA-F0-9]{24}$/.test(resumeId)) {
-  throw new Error("Invalid Mongo ID received from backend");
-}
+        throw new Error("Invalid Mongo ID received from backend");
+      }
       // console.log(
       //   "[resumeAPI] ✓ Resume created successfully with ID:",
       //   resumeId
@@ -158,7 +158,7 @@ export const resumeAPI = {
   get: (id: string) => api.get(`/resumes/${id}`),
 
   rename: (id: string, title: string) =>
-  api.patch(`/resumes/${id}/rename`, { title }),
+    api.patch(`/resumes/${id}/rename`, { title }),
 
   // update: (
   //   id: string,
@@ -171,27 +171,27 @@ export const resumeAPI = {
   ) => {
     // console.log("[resumeAPI] Updating resume:", id, payload);
 
-  return api
-    .put(`/resumes/${id}`, payload)
-    .then((response) => {
-      // console.log("[resumeAPI] Update response:", response);
-      return response;
-    })
-    .catch((error: any) => {
-      console.error("[resumeAPI] Update error:", error);
+    return api
+      .put(`/resumes/${id}`, payload)
+      .then((response) => {
+        // console.log("[resumeAPI] Update response:", response);
+        return response;
+      })
+      .catch((error: any) => {
+        console.error("[resumeAPI] Update error:", error);
 
-      // 🔥 Extract backend error properly
-      const message =
-        error?.response?.data?.error ||   // your backend format
-        error?.response?.data?.message || // fallback
-        error?.message ||
-        "Failed to update resume";
+        // 🔥 Extract backend error properly
+        const message =
+          error?.response?.data?.error ||   // your backend format
+          error?.response?.data?.message || // fallback
+          error?.message ||
+          "Failed to update resume";
 
-      console.error("[resumeAPI] Clean error message:", message);
+        console.error("[resumeAPI] Clean error message:", message);
 
-      throw new Error(message); // VERY IMPORTANT
-    });
-},
+        throw new Error(message); // VERY IMPORTANT
+      });
+  },
 
   delete: (id: string) => api.delete(`/resumes/${id}`),
   markDownloaded: (id: string) => api.post(`/resumes/${id}/mark-downloaded`),
@@ -412,7 +412,7 @@ export const paymentAPI = {
 
   verifyPayment: (payload: any) =>
     api.post("/payment/verify", payload),
-  
+
   // Add this method to check payment status
   checkPaymentStatus: (resumeId: string, type: string) =>
     api.get(`/payment/status/${resumeId}?type=${type}`),

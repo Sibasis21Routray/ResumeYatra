@@ -433,6 +433,24 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
       </div>
       ` : ''}
 
+        ${nonEmptyEducation.length > 0 ? `
+      <div class="section" data-section="education">
+        <h2 class="section-title">Education</h2>
+        ${nonEmptyEducation.map((edu, idx) => {
+          const dateRange = formatEducationDate(edu.startDate, edu.endDate, edu.graduationDate);
+          return `
+          <div class="edu-item" data-index="${idx}">
+            <p>
+              <b>${dateRange ? `${dateRange} ` : ''}${edu.school || ''}</b>${edu.location ? ` - ${edu.location}` : ''}
+            </p>
+            <p><b>${edu.degree || ''}${edu.field ? ' in ' + edu.field : ''}</b></p>
+            ${edu.grade ? `<p>${edu.grade}</p>` : ''}
+            ${edu.description ? `<p style="color: ${currentTheme.textLight};">${edu.description}</p>` : ''}
+          </div>
+        `}).join('')}
+      </div>
+      ` : ''}
+
       ${nonEmptyExperience.length > 0 ? `
       <div class="section" data-section="experience">
         <h2 class="section-title">Experience</h2>
@@ -953,23 +971,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
       </div>
       ` : ''}
 
-      ${nonEmptyEducation.length > 0 ? `
-      <div class="section" data-section="education">
-        <h2 class="section-title">Education</h2>
-        ${nonEmptyEducation.map((edu, idx) => {
-          const dateRange = formatEducationDate(edu.startDate, edu.endDate, edu.graduationDate);
-          return `
-          <div class="edu-item" data-index="${idx}">
-            <p>
-              <b>${dateRange ? `${dateRange} ` : ''}${edu.school || ''}</b>${edu.location ? ` - ${edu.location}` : ''}
-            </p>
-            <p><b>${edu.degree || ''}${edu.field ? ' in ' + edu.field : ''}</b></p>
-            ${edu.grade ? `<p>${edu.grade}</p>` : ''}
-            ${edu.description ? `<p style="color: ${currentTheme.textLight};">${edu.description}</p>` : ''}
-          </div>
-        `}).join('')}
-      </div>
-      ` : ''}
+    
     </body>
     </html>
   `;
