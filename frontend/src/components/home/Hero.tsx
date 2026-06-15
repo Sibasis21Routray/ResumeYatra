@@ -291,7 +291,7 @@ const Hero: React.FC = () => {
                       },
                       {
                         label: 'Startup Cost',
-                        value: '₹99',
+                        value: `${formatPrice(pricing?.freelancerPrice || 499)}`,
                         desc: 'Low-entry business model for freelance resume writers.',
                       },
                       {
@@ -374,7 +374,7 @@ const Hero: React.FC = () => {
                 {[
                   'Serve multiple candidates quickly',
                   'Earn from each resume you create',
-                  'Start with investment as low as ₹99',
+                  `Start with investment as low as ${formatPrice(pricing?.candidatePrice || 29)}`,
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-sm font-medium text-gray-700">
                     <span className="text-[#dda431] font-bold">✓</span> {item}

@@ -35,17 +35,19 @@ const api = axios.create({
 
 // Add guest ID to requests (Authentication is now handled by cookies automatically)
 api.interceptors.request.use((config: any) => {
-  const guestId = localStorage.getItem("guestId");
+  let guestId = localStorage.getItem("guestId");
   const user = localStorage.getItem("user");
 
-  if (guestId && !user) {
+  // If no guestId and no user, generate one to track this session
+  if (!guestId && !user) {
+    guestId = crypto.randomUUID();
+    localStorage.setItem("guestId", guestId);
+  }
+
+  // Always send guestId if we have one, even if logged in.
+  // This allows the backend to link guest resumes to the user account.
+  if (guestId) {
     config.headers["x-guest-id"] = guestId;
-  } else if (!user) {
-    // If no user and no guestId, generate one for the guest session
-    // This ensures even the very first request has a guest ID
-    const newGuestId = crypto.randomUUID();
-    localStorage.setItem("guestId", newGuestId);
-    config.headers["x-guest-id"] = newGuestId;
   }
 
   return config;

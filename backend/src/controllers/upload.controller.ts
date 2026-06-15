@@ -185,7 +185,7 @@ export const uploadResume = async (req: Request, res: Response) => {
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "We couldn’t read this resume properly, Upload Another Resume.",
       error: "We couldn’t read this resume properly, Upload Another Resume.",
     });
   }

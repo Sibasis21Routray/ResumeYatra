@@ -164,7 +164,7 @@ export default function PreviewPage() {
     top: 0,
     behavior: "smooth",
   });
-}, []);
+}, [selectedTemplate]);
 
   // Animation for AI enhancement steps
   useEffect(() => {
