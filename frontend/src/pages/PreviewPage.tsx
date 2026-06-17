@@ -1195,7 +1195,7 @@ export default function PreviewPage() {
             />
           )}
 
-          <div className="flex w-full px-2 sm:px-3">
+          <div className="flex w-full px-2 sm:px-3 h-screen1">
             {/* Left Sidebar */}
             <div
               className={`
@@ -1442,27 +1442,32 @@ export default function PreviewPage() {
               )}
 
               {/* Loading overlay - Solid white to hide all transitional blinking */}
+            
               {(rendering || iframeLoading || exporting) && !enhancing && (
-                <div className="absolute inset-0 z-[60] bg-white flex items-center justify-center rounded-xl">
-                  <div className="text-center">
-                    <div className="relative inline-block scale-110 mb-5">
-                      <div className="w-14 h-14 border-4 border-gray-100 rounded-full"></div>
-                      <div className="w-14 h-14 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
-                     
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                       <h3 className="text-lg font-bold text-gray-900">
-                         {exporting ? "Finalizing File..." : "Updating Design"}
-                       </h3>
-                       <p className="text-sm text-gray-500 font-medium animate-pulse">
-                         {exporting 
-                           ? `Your ${exporting.toUpperCase()} is almost ready` 
-                           : "Applying your changes..."}
-                       </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+             <div className="absolute inset-0 z-[60] bg-white rounded-xl">
+              <div className="flex flex-col items-center pt-56 ">
+      
+             {/* Loading Spinner */}
+           <div className="relative inline-block scale-110">
+           <div className="w-14 h-14 border-4 border-gray-100 rounded-full"></div>
+           <div className="w-14 h-14 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+          </div>
+
+            {/* Text */}
+           <div className="flex flex-col items-center gap-1.5 mt-5">
+           <h3 className="text-lg font-bold text-gray-900">
+           {exporting ? "Finalizing File..." : "Updating Design"}
+            </h3>
+            <p className="text-sm text-gray-400 font-medium animate-pulse">
+             {exporting
+              ? `Your ${exporting.toUpperCase()} is almost ready`
+             : "Applying your changes..."}
+           </p>
+          </div>
+
+        </div>
+     </div>
+      )}
 
               {/* Iframe */}
               {previewUrl && (

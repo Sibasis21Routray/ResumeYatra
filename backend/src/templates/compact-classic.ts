@@ -271,6 +271,7 @@ export function buildCompactClassicTemplate(
       letter-spacing: 0.5px;
       line-height: 1.1;
       margin-bottom: 6px;
+      
     }
 
     .role-title {
@@ -324,9 +325,11 @@ export function buildCompactClassicTemplate(
       display: flex;
       align-items: center;
       gap: 12px;
-      border-bottom: 2px solid ${currentTheme.primary};
+      border-top: 2px solid ${currentTheme.primary};
       padding-bottom: 6px;
       margin-bottom: 15px;
+      padding-top: 10px;
+      margin-top: 15px;
       width: 100%;
     }
 
@@ -359,7 +362,7 @@ export function buildCompactClassicTemplate(
 
     .entry-block {
       margin-bottom: 20px;
-      page-break-inside: avoid;
+      
     }
 
     .entry-meta-row {
@@ -393,10 +396,12 @@ export function buildCompactClassicTemplate(
       white-space: nowrap;
     }
 
+    /* Custom bullet list - using CSS pseudo-element for reliable bullets */
     .bullet-list {
-      margin-left: 16px;
+      margin-left: 0;
       margin-top: 5px;
-      list-style-type: disc;
+      padding-left: 0;
+      list-style: none;
     }
 
     .bullet-list li {
@@ -405,6 +410,18 @@ export function buildCompactClassicTemplate(
       margin-bottom: 5px;
       line-height: 1.4;
       text-align: justify;
+      padding-left: 18px;
+      position: relative;
+    }
+
+    .bullet-list li::before {
+      content: "•";
+      position: absolute;
+      left: 2px;
+      top: 0;
+      color: ${currentTheme.primary};
+      font-size: 1.2em;
+      font-weight: bold;
     }
 
     .skills-list {
@@ -426,6 +443,7 @@ export function buildCompactClassicTemplate(
       body { padding: 0; }
       .section-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       .icon-bubble, .section-icon { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .bullet-list li::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
@@ -573,7 +591,12 @@ export function buildCompactClassicTemplate(
           ${dateRange ? `<div class="entry-date">${dateRange}</div>` : ""}
         </div>
         ${exp.description ? renderDescription(exp.description) : ""}
-        ${exp.achievements ? `<div class="entry-content" style="font-size: ${smallFontSize}; margin-left: 16px; margin-top: 5px; text-align: justify; color: #222222; line-height: 1.4;"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
+        ${exp.achievements ? `
+  <div style="margin-top: 5px;">
+    <strong>Achievements:</strong>
+    ${renderDescription(exp.achievements)}
+  </div>
+` : ""}
       </div>
     `}).join("")}
   </div>` : ""}

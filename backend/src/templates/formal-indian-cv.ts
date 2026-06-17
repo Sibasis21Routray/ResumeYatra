@@ -506,14 +506,26 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
               <div class="company-title">${exp.title || ""}</div>
               <div class="company-sub">${exp.company || ""}${exp.location ? `, ${exp.location}` : ""}</div>
              </td>
-            <td class="col-main">
-              ${points.length > 0 ? `
-                <ul class="bullet-list">
-                  ${points.map((pt: string, bidx: number) => `<li>${pt.replace(/^[•\-\*]\s*/, '')}</li>`).join("")}
-                </ul>
-              ` : `<p>${exp.description || ""}</p>`}
-              ${exp.achievements ? `<p style="margin-top: 8px; text-align: justify; padding-left: 12px; color: #333333; line-height: 1.4;"><strong>Achievements:</strong> ${exp.achievements}</p>` : ""}
-             </td>
+           <td class="col-main">
+  ${points.length > 0 ? `
+    <ul class="bullet-list">
+      ${points.map((pt: string) => `<li>${pt.replace(/^[•\-\*]\s*/, '')}</li>`).join("")}
+    </ul>
+  ` : `<p>${exp.description || ""}</p>`}
+
+  ${exp.achievements ? `
+    <div style="margin-top: 8px;">
+      <strong>Achievements:</strong>
+      <ul class="bullet-list">
+        ${exp.achievements
+          .split('\n')
+          .filter((a: string) => a.trim())
+          .map((a: string) => `<li>${a.replace(/^[•\-\*]\s*/, '').trim()}</li>`)
+          .join("")}
+      </ul>
+    </div>
+  ` : ""}
+</td>
             <td class="col-time">
               <span class="tenure-text">${range}</span>
              </td>
