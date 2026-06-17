@@ -319,6 +319,7 @@ export function buildCompactClassicTemplate(
     .section {
       margin-top: 25px;
       margin-bottom: 15px;
+      
     }
 
     .section-header {
@@ -362,7 +363,6 @@ export function buildCompactClassicTemplate(
 
     .entry-block {
       margin-bottom: 20px;
-      
     }
 
     .entry-meta-row {
@@ -469,7 +469,7 @@ export function buildCompactClassicTemplate(
           String(p.url).toLowerCase().includes("linkedin")
         );
         const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
-        const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+        const cleanLinkedinLabel = linkedinUrl ? linkedinUrl: "";
         
         const items = [];
         if (personal.phone) {
@@ -532,19 +532,7 @@ export function buildCompactClassicTemplate(
     </div>
   </div>
 
-  <!-- AVAILABILITY & WORK AUTH SECTION -->
-  ${availabilityWorkAuth && hasObjectValues(availabilityWorkAuth) ? `
-  <div class="section" id="section-availability" data-section="availability">
-    <div class="section-header">
-      <span class="section-icon">${icons.clock}</span>
-      <span class="section-title">Availability</span>
-    </div>
-    <div class="skills-list">
-      ${availabilityWorkAuth.availabilityNoticePeriod ? `<span class="skill-tag">Notice: ${availabilityWorkAuth.availabilityNoticePeriod}</span>` : ''}
-      ${availabilityWorkAuth.workAuthorizationStatus ? `<span class="skill-tag">Work Auth: ${availabilityWorkAuth.workAuthorizationStatus}</span>` : ''}
-      ${availabilityWorkAuth.preferredLocation ? `<span class="skill-tag">Preferred: ${availabilityWorkAuth.preferredLocation}</span>` : ''}
-    </div>
-  </div>` : ""}
+ 
 
 
   <!-- PROFESSIONAL SUMMARY SECTION -->
@@ -815,7 +803,7 @@ export function buildCompactClassicTemplate(
 
 
 
-  <!-- CERTIFICATIONS SECTION -->
+   <!-- CERTIFICATIONS SECTION -->
   ${nonEmptyCertifications.length > 0 ? `
   <div class="section" id="section-certifications" data-section="certifications">
     <div class="section-header">
@@ -824,7 +812,16 @@ export function buildCompactClassicTemplate(
     </div>
     <ul class="bullet-list">
       ${nonEmptyCertifications.map((cert, idx) => `
-        <li data-index="${idx}"><strong>${cert.name || cert.title || ''}</strong>${cert.issuer ? ` – ${cert.issuer}` : ""}${cert.date ? ` (${cert.date})` : ""}</li>
+        <li data-index="${idx}">
+          ${cert.url || cert.credentialUrl || cert.link
+            ? `<a href="${cert.url || cert.credentialUrl || cert.link}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: none;">
+                <strong>${cert.name || cert.title || ''}</strong>
+               </a>`
+            : `<strong>${cert.name || cert.title || ''}</strong>`
+          }
+          ${cert.issuer ? ` – ${cert.issuer}` : ""}
+          ${cert.date ? ` (${cert.date})` : ""}
+        </li>
       `).join("")}
     </ul>
   </div>` : ""}
@@ -1099,6 +1096,21 @@ export function buildCompactClassicTemplate(
         <div style="font-size: 10pt; color: #333333;">Score: ${item.score || ''}${item.percentileRank ? ` (${item.percentileRank} percentile)` : ''}</div>
       </div>
     `).join("")}
+  </div>` : ""}
+
+
+   <!-- AVAILABILITY & WORK AUTH SECTION -->
+  ${availabilityWorkAuth && hasObjectValues(availabilityWorkAuth) ? `
+  <div class="section" id="section-availability" data-section="availability">
+    <div class="section-header">
+      <span class="section-icon">${icons.clock}</span>
+      <span class="section-title">Availability</span>
+    </div>
+    <div class="skills-list">
+      ${availabilityWorkAuth.availabilityNoticePeriod ? `<span class="skill-tag">Notice: ${availabilityWorkAuth.availabilityNoticePeriod}</span>` : ''}
+      ${availabilityWorkAuth.workAuthorizationStatus ? `<span class="skill-tag">Work Auth: ${availabilityWorkAuth.workAuthorizationStatus}</span>` : ''}
+      ${availabilityWorkAuth.preferredLocation ? `<span class="skill-tag">Preferred: ${availabilityWorkAuth.preferredLocation}</span>` : ''}
+    </div>
   </div>` : ""}
 
   <!-- PUBLICATIONS SECTION -->
