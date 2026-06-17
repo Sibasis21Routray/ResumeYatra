@@ -3,45 +3,22 @@ import ResumeVersion from "../models/ResumeVersion";
 import * as pdfService from "./pdf.service";
 import * as storageService from "./storage.service";
 import * as cloudinaryService from "./cloudinary.service";
-import { TEMPLATE_COLORS } from "../config/template-colors";
+import { TEMPLATE_COLORS, getTemplateMetadata } from "../config/template-colors";
 import { buildModernTemplate } from "../templates/modern";
 import { buildPhotographicTemplate } from "../templates/photographic";
-import { buildCreativeTemplate } from "../templates/creative";
-import { buildProfessionalTemplate } from "../templates/professional";
 import { buildAzurillTemplate } from "../templates/azurill";
-import { buildGengarTemplate } from "../templates/gengar";
-import { buildMinimalTemplate } from "../templates/minimal";
 import { buildModernSidebarTemplate } from "../templates/modern-sidebar";
 import { buildFormalIndianCvTemplate } from "../templates/formal-indian-cv";
 import { buildPhotoMinimalTemplate } from "../templates/photo-minimal";
 import { buildPhotoModernProTemplate } from "../templates/photo-modern-pro";
-import { buildDragoniteTemplate } from "../templates/dragonite";
-import { buildVenusaurTemplate } from "../templates/venusaur";
-import { buildAlakazamTemplate } from "../templates/alakazam";
-import { buildMewtwoTemplate } from "../templates/mewtwo";
-import { buildSquirtleTemplate } from "../templates/squirtle";
-import { buildBulbasaurTemplate } from "../templates/bulbasaur";
-import { buildEeveeTemplate } from "../templates/eevee";
 import { buildMachampTemplate } from "../templates/machamp";
-import { buildClassicProfessionalTemplate } from "../templates/classic-professional";
-import { buildSkillsFirstTemplate } from "../templates/skills-first";
-import { buildMetricsDrivenTemplate } from "../templates/metrics-driven";
 import { buildLeadershipManagerialTemplate } from "../templates/leadership-managerial";
-import { buildTechItTemplate } from "../templates/tech-it";
-import { buildFresherEntryLevelTemplate } from "../templates/fresher-entry-level";
 import { buildConsultantFreelancerTemplate } from "../templates/consultant-freelancer";
-import { buildOperationsSupportTemplate } from "../templates/operations-support";
 import { buildCompactClassicTemplate } from "../templates/compact-classic";
-import { buildMinimalAtsTemplate } from "../templates/minimal-ats";
-import { buildCosmosTemplate } from "../templates/cosmos";
-import { buildNovaTemplate } from "../templates/nova";
 import { buildStellarTemplate } from "../templates/stellar";
 import { buildOrionTemplate } from "../templates/orion";
-import { buildNebulaTemplate } from "../templates/nebula";
 import { buildAtsClassicTemplate } from "../templates/ats-classic";
-import { buildModernExecutiveTemplate } from "../templates/modern-executive";
 import { buildImpactResumeTemplate } from "../templates/impactResume";
-import { buildStartupAndTechTemplate } from "../templates/startup&Tech";
 import { buildModernCorporateTemplate } from "../templates/modernCorporate";
 import { buildSeniorLeadershipTemplate } from "../templates/seniorLeadership";
 import { buildCorporateStandardTemplate } from "../templates/corporateStandard";
@@ -55,7 +32,7 @@ const imageCache: Record<string, { base64: string; expiresAt: number }> = {};
 const IMAGE_CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
 
 export function getAllTemplatesMetadata() {
-  return TEMPLATE_COLORS;
+  return getTemplateMetadata();
 }
 
 export async function renderResume(
@@ -96,26 +73,14 @@ export async function renderResumeHtml(
   currentData?: any
 ) {
   const template = templateId || "modern";
-  // console.log("[renderResumeHtml] Called with:", {
-  //   resumeId,
-  //   template,
-  //   hasTheme: !!theme,
-  //   hasCurrentData: !!currentData,
-  //   currentDataKeys: currentData ? Object.keys(currentData) : null,
-  // });
 
   let data: any = {};
 
   if (currentData) {
     // Use currentData if provided (for live preview from frontend)
     data = currentData;
-    console.log("[renderResumeHtml] Using provided currentData");
   } else {
     // Only fetch latest version from database when no currentData provided
-    console.log(
-      "[renderResumeHtml] Fetching from database for resumeId:",
-      resumeId
-    );
     const latestVersion = await ResumeVersion.findOne({ resumeId })
       .sort({ createdAt: -1 })
       .select("data")
@@ -123,22 +88,10 @@ export async function renderResumeHtml(
 
     if (latestVersion?.data) {
       data = latestVersion.data;
-      console.log(
-        "[renderResumeHtml] Loaded from database, data keys:",
-        Object.keys(data)
-      );
-    } else {
-      console.warn(
-        "[renderResumeHtml] No version found for resumeId:",
-        resumeId
-      );
     }
   }
 
-  // ── Normalize formatting ──────────────────────────────────────────
-  // Some templates read from data.formatting.fontFamily / bodyFontSize,
-  // while older ones read from data.fontFamily / data.fontSize.
-  // Mirror the formatting values to top-level so every template works.
+  // Normalize formatting
   if (data.formatting) {
     if (data.formatting.fontFamily) {
       data.fontFamily = data.formatting.fontFamily;
@@ -148,10 +101,8 @@ export async function renderResumeHtml(
     }
     if (data.formatting.fontSize) {
       data.fontSize = data.formatting.fontSize;
-      // Also set bodyFontSize so templates that read it specifically work
       data.formatting.bodyFontSize = data.formatting.bodyFontSize || data.formatting.fontSize;
     }
-    // If no explicit theme argument was provided, use the one from formatting
     if (!theme && data.formatting.theme) {
       theme = data.formatting.theme;
     }
@@ -159,14 +110,11 @@ export async function renderResumeHtml(
 
   const processedData =
     template === "photographic" ? await processImageForTemplate(data) : data;
-  console.log("[renderResumeHtml] Building HTML for template:", template);
   let html = buildHtml(processedData, template, theme);
   
   // Inject Google Fonts if needed to ensure font changes work
   html = injectGoogleFonts(html, data.fontFamily || data.formatting?.fontFamily);
   
-  console.log("[renderResumeHtml] Generated HTML length:", html.length);
-
   return html;
 }
 
@@ -203,16 +151,15 @@ function injectGoogleFonts(html: string, fontFamily?: string): string {
   if (matchedFont) {
     const fontQuery = fontMap[matchedFont];
     const googleFontLink = `<link href="https://fonts.googleapis.com/css2?family=${fontQuery}&display=swap" rel="stylesheet">`;
-    const debugComment = `<!-- Font Injected: ${matchedFont} -->`;
     
     // Check if it's already there
     if (html.includes(`family=${fontQuery}`)) return html;
 
     const headRegex = /<\/head>/i;
     if (headRegex.test(html)) {
-      return html.replace(headRegex, `${debugComment}\n${googleFontLink}\n</head>`);
+      return html.replace(headRegex, `${googleFontLink}\n</head>`);
     } else {
-      return `${debugComment}\n${googleFontLink}\n${html}`;
+      return `${googleFontLink}\n${html}`;
     }
   }
   
@@ -222,17 +169,12 @@ function injectGoogleFonts(html: string, fontFamily?: string): string {
 // Render a sample resume for a given template (public, used for thumbnails/previews)
 export async function renderTemplateSample(templateId?: string, theme?: any) {
   const template = templateId || "modern";
-  console.log(
-    "[TemplateService] renderTemplateSample called for template:",
-    template
-  );
   // Use cache key based on template and theme
   const defaultColor = TEMPLATE_COLORS[template] || "default";
   const cacheKey = `${template}:${theme ? JSON.stringify(theme) : `default-${defaultColor}`}`;
   const now = Date.now();
   const cached = previewCache[cacheKey];
   if (cached && cached.expiresAt > now) {
-    console.log("[TemplateService] returning cached preview for", cacheKey);
     return cached.url;
   }
 
@@ -439,13 +381,11 @@ async function processImageForTemplate(data: any): Promise<any> {
     const cached = imageCache[imageUrl];
 
     if (cached && cached.expiresAt > now) {
-      console.log("Using cached image for:", imageUrl);
       data.personal.image = cached.base64;
       return data;
     }
 
     try {
-      console.log("Processing image for template:", imageUrl);
       // Try to fetch the image and convert to base64
       const https = require("https");
       const url = new URL(imageUrl);
@@ -492,10 +432,8 @@ async function processImageForTemplate(data: any): Promise<any> {
         expiresAt: Date.now() + IMAGE_CACHE_TTL_MS,
       };
 
-      console.log("Successfully processed and cached image");
     } catch (error) {
       console.error("Failed to process image:", error);
-      // Keep the original URL if conversion fails
     }
   }
   return data;
@@ -509,28 +447,14 @@ function buildHtml(data: any, template: string, theme?: any): string {
   };
 
   switch (template) {
-    case "operations-support":
-      return buildOperationsSupportTemplate(data, finalTheme);
     case "compact-classic":
       return buildCompactClassicTemplate(data, finalTheme);
-    case "minimal-ats":
-      return buildMinimalAtsTemplate(data, finalTheme);
-    case "cosmos":
-      return buildCosmosTemplate(data, finalTheme);
-    case "modern-executive":
-      return buildModernExecutiveTemplate(data, finalTheme);
-    case "nova":
-      return buildNovaTemplate(data, finalTheme);
     case "stellar":
       return buildStellarTemplate(data, finalTheme);
     case "orion":
       return buildOrionTemplate(data, finalTheme);
-    case "nebula":
-      return buildNebulaTemplate(data, finalTheme);
     case "impact-resume":
       return buildImpactResumeTemplate(data, finalTheme);
-    case "startup-tech":
-      return buildStartupAndTechTemplate(data, finalTheme);
     case "modern-corporate":
       return buildModernCorporateTemplate(data, finalTheme);
     case "senior-leadership":
@@ -543,16 +467,8 @@ function buildHtml(data: any, template: string, theme?: any): string {
       return buildModernTemplate(data, finalTheme);
     case "photographic":
       return buildPhotographicTemplate(data, finalTheme);
-    case "creative":
-      return buildCreativeTemplate(data, finalTheme);
-    case "professional":
-      return buildProfessionalTemplate(data, finalTheme);
     case "azurill":
       return buildAzurillTemplate(data, finalTheme);
-    case "gengar":
-      return buildGengarTemplate(data, finalTheme);
-    case "minimal":
-      return buildMinimalTemplate(data, finalTheme);
     case "modern-sidebar":
       return buildModernSidebarTemplate(data, finalTheme);
     case "formal-indian-cv":
@@ -561,34 +477,10 @@ function buildHtml(data: any, template: string, theme?: any): string {
       return buildPhotoMinimalTemplate(data, finalTheme);
     case "photo-modern-pro":
       return buildPhotoModernProTemplate(data, finalTheme);
-    case "dragonite":
-      return buildDragoniteTemplate(data, finalTheme);
-    case "venusaur":
-      return buildVenusaurTemplate(data, finalTheme);
-    case "alakazam":
-      return buildAlakazamTemplate(data, finalTheme);
-    case "mewtwo":
-      return buildMewtwoTemplate(data, finalTheme);
-    case "squirtle":
-      return buildSquirtleTemplate(data, finalTheme);
-    case "bulbasaur":
-      return buildBulbasaurTemplate(data, finalTheme);
-    case "eevee":
-      return buildEeveeTemplate(data, finalTheme);
     case "machamp":
       return buildMachampTemplate(data, finalTheme);
-    case "classic-professional":
-      return buildClassicProfessionalTemplate(data, finalTheme);
-    case "skills-first":
-      return buildSkillsFirstTemplate(data, finalTheme);
-    case "metrics-driven":
-      return buildMetricsDrivenTemplate(data, finalTheme);
     case "leadership-managerial":
       return buildLeadershipManagerialTemplate(data, finalTheme);
-    case "tech-it":
-      return buildTechItTemplate(data, finalTheme);
-    case "fresher-entry-level":
-      return buildFresherEntryLevelTemplate(data, finalTheme);
     case "consultant-freelancer":
       return buildConsultantFreelancerTemplate(data, finalTheme);
     default:

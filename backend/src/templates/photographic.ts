@@ -144,8 +144,8 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
     return `
       <div class="custom-list-container" style="margin-top: 5px;">
         ${lines.map(line => `
-          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${normalTextFontSize}px; line-height: 1.4; color: ${currentTheme.textLight};">
-            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16px; text-align: center;">${bulletChar}</div>
+          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${normalTextFontSize}pt; line-height: 1.4; color: ${currentTheme.textLight};">
+            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16pt; text-align: center;">${bulletChar}</div>
             <div style="display: table-cell; vertical-align: top; padding-left: 2px;">${line.trim()}</div>
           </div>
         `).join('')}
@@ -236,7 +236,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
           line-height: 1.3;
           padding: 40px 50px;
           background: #ffffff;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           font-weight: ${currentFontWeight};
           text-align: ${currentAlignment};
         }
@@ -249,7 +249,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
           border-bottom: 4px solid ${currentTheme.borderColor};
         }
         .header h1 {
-          font-size: ${headerNameFontSize}px;
+          font-size: ${headerNameFontSize}pt;
           text-transform: uppercase;
           letter-spacing: 1px;
           margin-bottom: 5px;
@@ -257,7 +257,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
         }
         .contact-info {
           text-align: center;
-          font-size: ${smallTextFontSize}px;
+          font-size: ${smallTextFontSize}pt;
           margin-bottom: 15px;
           color: ${currentTheme.textLight};
         }
@@ -276,7 +276,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
         }
         .section-header span {
           padding: 0 15px;
-          font-size: ${sectionHeaderFontSize}px;
+          font-size: ${sectionHeaderFontSize}pt;
           font-weight: bold;
           text-transform: uppercase;
           letter-spacing: 1px;
@@ -290,13 +290,13 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
         .company-name {
           text-align: center;
           font-weight: bold;
-          font-size: ${companyNameFontSize}px;
+          font-size: ${companyNameFontSize}pt;
           text-transform: uppercase;
           color: ${currentTheme.text};
         }
         .location-line {
           text-align: center;
-          font-size: ${smallTextFontSize}px;
+          font-size: ${smallTextFontSize}pt;
           margin-bottom: 4px;
           color: ${currentTheme.textLight};
         }
@@ -304,7 +304,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
           display: flex;
           justify-content: space-between;
           font-weight: bold;
-          font-size: ${jobTitleFontSize}px;
+          font-size: ${jobTitleFontSize}pt;
           margin-bottom: 3px;
           color: ${currentTheme.text};
         }
@@ -312,7 +312,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
         .bullet-list {
           list-style-type: disc;
           margin-left: 30px;
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           color: ${currentTheme.textLight};
         }
         .bullet-list li {
@@ -331,13 +331,13 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
           display: flex;
           justify-content: space-between;
           font-weight: bold;
-          font-size: ${jobTitleFontSize}px;
+          font-size: ${jobTitleFontSize}pt;
           text-transform: uppercase;
           color: ${currentTheme.text};
         }
         .edu-sub {
           font-weight: bold;
-          font-size: ${smallTextFontSize}px;
+          font-size: ${smallTextFontSize}pt;
           color: ${currentTheme.textLight};
         }
 
@@ -351,7 +351,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
           width: 100%;
           margin-bottom: 6px;
           color: ${currentTheme.textLight};
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           line-height: 1.4;
         }
         .description-html li .bullet-wrap {
@@ -360,7 +360,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
           vertical-align: top;
           padding-top: 0;
           font-family: 'Arial', sans-serif;
-          font-size: 16px;
+          font-size: 16pt;
           text-align: center;
         }
         .description-html li .li-text {
@@ -376,7 +376,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
           margin-bottom: 10px;
         }
         .context-item {
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           color: ${currentTheme.textLight};
         }
         .context-label {
@@ -403,19 +403,50 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
         <h1>${personal.name?.toUpperCase() || ''}</h1>
       </div>
 
-      ${hasContactInfo() ? `
-      <div class="contact-info" data-section="personal">
-        ${personal.location || personal.pinCode ? `<p>${personal.location ? `${personal.location}${personal.pinCode ? ` ${personal.pinCode}` : ''}` : personal.pinCode ? personal.pinCode : ''}</p>` : ''}
-        ${personal.phone ? `<p>${personal.phone}</p>` : ''}
-        ${personal.email ? `<p>${personal.email}</p>` : ''}
-        ${personal.alternatePhone ? `<p>Alt: ${personal.alternatePhone}</p>` : ''}
-        ${personal.country ? `<p>${personal.country}</p>` : ''}
-        ${personal.fullAddress ? `<p>${personal.fullAddress}</p>` : ''}
-        ${personal.dob ? `<p>DOB: ${personal.dob}</p>` : ''}
-        ${personal.gender ? `<p>Gender: ${personal.gender}</p>` : ''}
-        ${personal.maritalStatus ? `<p>Marital: ${personal.maritalStatus}</p>` : ''}
-      </div>
-      ` : ''}
+      ${(() => {
+        const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+        const linkedinProfile = socialProfiles?.find((p: any) => 
+          String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+          String(p.url).toLowerCase().includes("linkedin")
+        );
+        const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+        const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+        
+        const githubProfile = socialProfiles?.find((p: any) => 
+          String(p.network || p.platform).toLowerCase().includes("github") || 
+          String(p.url).toLowerCase().includes("github")
+        );
+        const githubUrl = githubProfile?.url || githubProfile?.username || "";
+        const cleanGithubLabel = githubUrl ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+
+        const items = [];
+        if (personal.phone) {
+          items.push(`<p>${personal.phone}</p>`);
+        }
+        if (personal.email) {
+          items.push(`<p><a href="mailto:${personal.email}">${personal.email}</a></p>`);
+        }
+        if (personal.dob) {
+          items.push(`<p>DOB: ${personal.dob}</p>`);
+          if (linkedinUrl) {
+            items.push(`<p><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></p>`);
+          } else if (addressString) {
+            items.push(`<p>${addressString}</p>`);
+          }
+        } else {
+          if (linkedinUrl) {
+            items.push(`<p><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></p>`);
+          } else if (addressString) {
+            items.push(`<p>${addressString}</p>`);
+          }
+        }
+        
+        if (githubUrl) {
+          items.push(`<p><a href="${githubUrl}" target="_blank">${cleanGithubLabel}</a></p>`);
+        }
+        
+        return items.length > 0 ? `<div class="contact-info" data-section="personal">${items.join("")}</div>` : "";
+      })()}
 
      
 
@@ -430,12 +461,12 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
 
       ${careerObjective && careerObjective.trim() && (!summary || !summary.trim()) ? `
       <div class="section-header" data-section="careerObjective"><span>Career Objective</span></div>
-      <p style="font-size: ${normalTextFontSize}px; text-align: justify; padding: 0 5px; color: ${currentTheme.textLight};">${careerObjective}</p>
+      <p style="font-size: ${normalTextFontSize}pt; text-align: justify; padding: 0 5px; color: ${currentTheme.textLight};">${careerObjective}</p>
       ` : ''}
 
       ${summary && summary.trim() ? `
       <div class="section-header" data-section="summary"><span>Summary</span></div>
-      <p style="font-size: ${normalTextFontSize}px; text-align: justify; padding: 0 5px; color: ${currentTheme.textLight};">${summary}</p>
+      <p style="font-size: ${normalTextFontSize}pt; text-align: justify; padding: 0 5px; color: ${currentTheme.textLight};">${summary}</p>
       ` : ''}
 
       ${nonEmptyExperience.length > 0 ? `
@@ -449,7 +480,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
             <span>${formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}</span>
           </div>
           ${exp.description ? renderDescription(exp.description) : ''}
-          ${exp.achievements ? `<p style="font-size: ${normalTextFontSize}px; margin-top: 5px; color: ${currentTheme.textLight};"><strong>Achievements:</strong> ${exp.achievements}</p>` : ''}
+          ${exp.achievements ? `<p style="font-size: ${normalTextFontSize}pt; margin-top: 5px; color: ${currentTheme.textLight};"><strong>Achievements:</strong> ${exp.achievements}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -464,7 +495,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
             <span>${project.duration || ''}</span>
           </div>
           ${project.description ? renderDescription(project.description) : ''}
-          ${project.technologies ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};"><strong>Technologies:</strong> ${project.technologies}</p>` : ''}
+          ${project.technologies ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};"><strong>Technologies:</strong> ${project.technologies}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -492,7 +523,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
             <span>${item.provider || item.organization || ''}</span>
             <span>${item.completionDate || ''}${item.duration ? ` (${item.duration})` : ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -508,8 +539,8 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
             <span>${item.duration || ''}</span>
           </div>
           ${item.description ? renderDescription(item.description) : ''}
-          ${item.technologies && item.technologies.length > 0 ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};"><strong>Technologies:</strong> ${Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}</p>` : ''}
-          ${item.url ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};"><strong>URL:</strong> <a href="${item.url}" target="_blank">${item.url}</a></p>` : ''}
+          ${item.technologies && item.technologies.length > 0 ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};"><strong>Technologies:</strong> ${Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}</p>` : ''}
+          ${item.url ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};"><strong>URL:</strong> <a href="${item.url}" target="_blank">${item.url}</a></p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -538,7 +569,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
             <span>${item.role ? `Role: ${item.role}` : ''}</span>
             <span>${item.year || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -552,7 +583,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
             <span>${item.role ? `Role: ${item.role}` : ''}</span>
             <span>${item.year || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -610,7 +641,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${cert.date || ''}</span>
           </div>
-          ${cert.url ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};"><a href="${cert.url}" target="_blank">${cert.url}</a></p>` : ''}
+          ${cert.url ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};"><a href="${cert.url}" target="_blank">${cert.url}</a></p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -625,7 +656,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.issueYear || item.year || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -640,7 +671,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.year || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -655,7 +686,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.date || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -670,7 +701,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.year || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -685,7 +716,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.year || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -701,8 +732,8 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span>${item.duration || ''}</span>
           </div>
           ${item.description ? renderDescription(item.description) : ''}
-          ${item.toolsTechnologies ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};"><strong>Tools:</strong> ${item.toolsTechnologies}</p>` : ''}
-          ${item.projectUrl ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};"><strong>URL:</strong> <a href="${item.projectUrl}" target="_blank">${item.projectUrl}</a></p>` : ''}
+          ${item.toolsTechnologies ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};"><strong>Tools:</strong> ${item.toolsTechnologies}</p>` : ''}
+          ${item.projectUrl ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};"><strong>URL:</strong> <a href="${item.projectUrl}" target="_blank">${item.projectUrl}</a></p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -713,8 +744,8 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
         <div class="exp-item" data-index="${idx}">
           <div class="company-name">${item.name || ''}</div>
           <div class="location-line">${item.type || ''}${item.platform ? ` on ${item.platform}` : ''}</div>
-          ${item.url ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};"><a href="${item.url}" target="_blank">${item.url}</a></p>` : ''}
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.url ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};"><a href="${item.url}" target="_blank">${item.url}</a></p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -729,7 +760,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.duration || formatDateRange(item.startDate, item.endDate) || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -744,7 +775,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.duration || formatDateRange(item.startDate, item.endDate) || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -793,7 +824,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.duration || formatDateRange(item.startDate, item.endDate) || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -808,7 +839,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.duration || formatDateRange(item.startDate, item.endDate) || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -823,7 +854,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.year || ''}</span>
           </div>
-          ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+          ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -838,7 +869,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.year || ''}</span>
           </div>
-          ${item.percentileRank ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">Percentile: ${item.percentileRank}</p>` : ''}
+          ${item.percentileRank ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">Percentile: ${item.percentileRank}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -853,7 +884,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.year || ''}</span>
           </div>
-          ${item.urlDoi ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};"><a href="${item.urlDoi}" target="_blank">${item.urlDoi}</a></p>` : ''}
+          ${item.urlDoi ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};"><a href="${item.urlDoi}" target="_blank">${item.urlDoi}</a></p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -868,7 +899,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span></span>
             <span>${item.year || ''}</span>
           </div>
-          ${item.status ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">Status: ${item.status}</p>` : ''}
+          ${item.status ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">Status: ${item.status}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -879,7 +910,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
         <div class="exp-item" data-index="${idx}">
           <div class="company-name">${item.name || ''}</div>
           <div class="location-line">${item.designationRelationship || ''}${item.organization ? ` at ${item.organization}` : ''}</div>
-          ${item.contactInformation ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.contactInformation}</p>` : ''}
+          ${item.contactInformation ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.contactInformation}</p>` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -921,8 +952,8 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
             <span>${dateRange || edu.graduationDate || edu.endDate || ''}</span>
           </div>
           ${schoolLine ? `<div class="edu-sub">${schoolLine}</div>` : ''}
-          ${edu.grade ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};"><strong>${edu.grade}</strong></p>` : ''}
-          ${edu.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${edu.description}</p>` : ''}
+          ${edu.grade ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};"><strong>${edu.grade}</strong></p>` : ''}
+          ${edu.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${edu.description}</p>` : ''}
         </div>
       `}).join('')}
       ` : ''}

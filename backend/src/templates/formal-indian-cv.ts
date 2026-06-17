@@ -43,15 +43,23 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
   const defaultTheme = {
     primary: '#0c4354',
     secondary: '#164653',
-    background: '#ffffff',
-    headingFont: "'Cinzel', 'Times New Roman', serif",
-    bodyFont: "'Inter', Arial, sans-serif"
+    background: '#ffffff'
   };
+
+  const userFontFamily =
+    data.formatting?.fontFamily ||
+    data.fontFamily ||
+    "'Inter', Arial, sans-serif";
+
+
   const currentTheme = { ...defaultTheme, ...(theme || {}) };
 
   const userFontSize = data.formatting?.bodyFontSize || data.fontSize || 11;
-  const userFontFamily = data.formatting?.fontFamily || data.fontFamily || "'Inter', Arial, sans-serif";
   const baseFontSize = userFontSize;
+  const nameFontSize = Math.round(userFontSize * 2.3);
+  const headingFontSize = Math.round(userFontSize * 1.3);
+  const subHeadingFontSize = Math.round(userFontSize * 1.05);
+  const smallFontSize = Math.round(userFontSize * 0.9);
 
   const getNonEmptyArray = (arr: any): any[] => {
     if (!arr || !Array.isArray(arr)) return [];
@@ -203,6 +211,38 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     share: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${currentTheme.primary}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`
   };
 
+  // --- Contact Priority Logic ---
+  const addressString = personal.location || personal.fullAddress || "";
+  const linkedinProfile = socialProfiles?.find((p: any) => 
+    String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+    String(p.url).toLowerCase().includes("linkedin")
+  );
+  const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+  const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+
+  const headerContactItems = [];
+  if (personal?.phone) {
+    headerContactItems.push(`<div class="contact-item">${svgIcons.phone} <span>${personal.phone}</span></div>`);
+  }
+  if (personal?.email) {
+    headerContactItems.push(`<div class="contact-item">${svgIcons.email} <span>${personal.email}</span></div>`);
+  }
+  if (personal?.dob) {
+    headerContactItems.push(`<div class="contact-item">${svgIcons.calendar} <span>DOB: ${personal.dob}</span></div>`);
+    if (linkedinUrl) {
+      headerContactItems.push(`<div class="contact-item">${svgIcons.linkedin} <span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span></div>`);
+    } else if (addressString) {
+      headerContactItems.push(`<div class="contact-item">${svgIcons.location} <span>${addressString}</span></div>`);
+    }
+  } else {
+    if (linkedinUrl) {
+      headerContactItems.push(`<div class="contact-item">${svgIcons.linkedin} <span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span></div>`);
+    } else if (addressString) {
+      headerContactItems.push(`<div class="contact-item">${svgIcons.location} <span>${addressString}</span></div>`);
+    }
+  }
+  // ------------------------------
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,11 +250,12 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resume</title>
   <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter...&family=Roboto...&family=Open+Sans...&family=Montserrat...&family=Poppins...&family=Lato...');
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: ${userFontFamily};
-      font-size: ${baseFontSize}px;
+      font-size: ${baseFontSize}pt;
       color: #222222;
       background: #f4f6f8;
       line-height: 1.5;
@@ -236,8 +277,8 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     }
 
     .name {
-      font-family: ${currentTheme.headingFont};
-      font-size: 26px;
+      font-family: ${userFontFamily};
+      font-size: ${nameFontSize}pt;
       font-weight: 700;
       color: ${currentTheme.primary};
       text-transform: uppercase;
@@ -246,7 +287,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     }
 
     .role {
-      font-size: 13px;
+      font-size: ${subHeadingFontSize}pt;
       font-weight: 700;
       color: #333333;
       text-transform: uppercase;
@@ -272,7 +313,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     }
 
     .contact-item {
-      font-size: 11px;
+      font-size: ${smallFontSize}pt;
       color: #333333;
       display: flex;
       align-items: center;
@@ -302,8 +343,8 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
 
     .section-title {
       padding: 0 15px;
-      font-family: ${currentTheme.headingFont};
-      font-size: 14px;
+      font-family: ${userFontFamily};
+      font-size: ${headingFontSize}pt;
       font-weight: 700;
       color: ${currentTheme.primary};
       text-transform: uppercase;
@@ -312,7 +353,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
 
     /* ===== CONTENT STYLING ===== */
     .summary-text {
-      font-size: 11.5px;
+      font-size: ${baseFontSize}pt;
       color: #444444;
       text-align: center;
       line-height: 1.6;
@@ -332,7 +373,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       background-color: #f2f6f7;
       color: ${currentTheme.primary};
       font-family: ${userFontFamily};
-      font-size: 11px;
+      font-size: ${smallFontSize}pt;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -345,7 +386,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       border: 1px solid #7a9299;
       padding: 12px 14px;
       vertical-align: top;
-      font-size: 11px;
+      font-size: ${smallFontSize}pt;
     }
 
     .col-meta { width: 30%; }
@@ -355,13 +396,13 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     .company-title {
       font-weight: 700;
       color: #111111;
-      font-size: 11.5px;
+      font-size: ${baseFontSize}pt;
       margin-bottom: 2px;
     }
 
     .company-sub {
       color: #555555;
-      font-size: 11px;
+      font-size: ${smallFontSize}pt;
     }
 
     .bullet-list {
@@ -404,62 +445,15 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     <!-- HEADER AREA -->
     <div class="header-section" id="section-header" data-section="header">
       <div class="name">${personal?.name || "Your Name "}</div>
-      ${
-  personal?.role &&
-  !["undefined", "null"].includes(String(personal.role).toLowerCase())
-    ? `<div class="role">${personal.role}</div>`
-    : ""
-}
+      ${personal?.role &&
+      !["undefined", "null"].includes(String(personal.role).toLowerCase())
+      ? `<div class="role">${personal.role}</div>`
+      : ""
+    }
       
       <div class="contact-container" >
         <div class="contact-flex">
-          ${personal?.phone ? `
-          <div class="contact-item">
-            ${svgIcons.phone}
-            <span>${personal.phone}</span>
-          </div>` : ""}
-
-          ${personal?.alternatePhone ? `
-          <div class="contact-item">
-            ${svgIcons.phone}
-            <span>${personal.alternatePhone} (Alt)</span>
-          </div>` : ""}
-
-          ${personal?.email ? `
-          <div class="contact-item">
-            ${svgIcons.email}
-            <span>${personal.email}</span>
-          </div>` : ""}
-
-          ${personal?.location || personal?.fullAddress ? `
-          <div class="contact-item">
-            ${svgIcons.location}
-            <span>${personal.location || personal.fullAddress}</span>
-          </div>` : ""}
-
-          ${personal?.linkedinUrl ? `
-          <div class="contact-item">
-            ${svgIcons.linkedin}
-            <span><a href="${personal.linkedinUrl}" target="_blank">${personal.linkedinUrl.replace(/https?:\/\/(www\.)?/, "")}</a></span>
-          </div>` : ""}
-          
-          ${personal?.dob ? `
-          <div class="contact-item">
-            ${svgIcons.calendar}
-            <span>DOB: ${personal.dob}</span>
-          </div>` : ""}
-          
-          ${personal?.gender ? `
-          <div class="contact-item">
-            ${svgIcons.user}
-            <span>${personal.gender}</span>
-          </div>` : ""}
-          
-          ${personal?.maritalStatus ? `
-          <div class="contact-item">
-            ${svgIcons.heart}
-            <span>${personal.maritalStatus}</span>
-          </div>` : ""}
+          ${headerContactItems.join('')}
         </div>
       </div>
     </div>
@@ -503,10 +497,10 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       </thead>
       <tbody>
         ${sortedExperience.map((exp: any, idx: number) => {
-          const range = formatDateRange(exp.startDate, exp.endDate, exp.isCurrent);
-          const points = exp.description ? exp.description.split('\n').filter((p: string) => p.trim()) : [];
-          
-          return `
+      const range = formatDateRange(exp.startDate, exp.endDate, exp.isCurrent);
+      const points = exp.description ? exp.description.split('\n').filter((p: string) => p.trim()) : [];
+
+      return `
           <tr>
             <td class="col-meta">
               <div class="company-title">${exp.title || ""}</div>
@@ -518,14 +512,14 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
                   ${points.map((pt: string, bidx: number) => `<li>${pt.replace(/^[•\-\*]\s*/, '')}</li>`).join("")}
                 </ul>
               ` : `<p>${exp.description || ""}</p>`}
-              ${exp.achievements ? `<p><strong>Achievements:</strong> ${exp.achievements}</p>` : ""}
+              ${exp.achievements ? `<p style="margin-top: 8px; text-align: justify; padding-left: 12px; color: #333333; line-height: 1.4;"><strong>Achievements:</strong> ${exp.achievements}</p>` : ""}
              </td>
             <td class="col-time">
               <span class="tenure-text">${range}</span>
              </td>
           </tr>
           `;
-        }).join("")}
+    }).join("")}
       </tbody>
     </table>
     ` : ""}
@@ -727,7 +721,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       <span class="section-title">Skills</span>
     </div>
     <div class="summary-text" id="section-skills" data-section="skills">
-      ${skillsList.map((skill, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10px;">${skill}</span>`).join("")}
+      ${skillsList.map((skill, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: ${smallFontSize}pt;">${skill}</span>`).join("")}
     </div>
     ` : ""}
 
@@ -737,7 +731,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       <span class="section-title">Core Competencies</span>
     </div>
     <div class="summary-text" id="section-coreCompetencies" data-section="coreCompetencies">
-      ${coreCompetenciesList.map((comp, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10px;">${comp}</span>`).join("")}
+      ${coreCompetenciesList.map((comp, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10pt;">${comp}</span>`).join("")}
     </div>
     ` : ""}
 
@@ -747,7 +741,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       <span class="section-title">Tools & Technologies</span>
     </div>
     <div class="summary-text" id="section-toolsTechnologies" data-section="toolsTechnologies">
-      ${nonEmptyToolsTechnologies.map((item, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10px;">${typeof item === "string" ? item : item.name}${item.proficiency ? ` (${item.proficiency})` : ''}</span>`).join("")}
+      ${nonEmptyToolsTechnologies.map((item, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10pt;">${typeof item === "string" ? item : item.name}${item.proficiency ? ` (${item.proficiency})` : ''}</span>`).join("")}
     </div>
     ` : ""}
 
@@ -757,7 +751,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       <span class="section-title">Languages</span>
     </div>
     <div class="summary-text" id="section-languages" data-section="languages">
-      ${nonEmptyLanguages.map((lang, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10px;">${lang.language || lang}${lang.proficiency ? ` (${lang.proficiency})` : ''}</span>`).join("")}
+      ${nonEmptyLanguages.map((lang, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10pt;">${lang.language || lang}${lang.proficiency ? ` (${lang.proficiency})` : ''}</span>`).join("")}
     </div>
     ` : ""}
 
@@ -1007,7 +1001,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       <span class="section-title">Methodologies</span>
     </div>
     <div class="summary-text" id="section-methodologies" data-section="methodologies">
-      ${nonEmptyMethodologies.map((item, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10px;">${item.name || ''}${item.certification ? ` (${item.certification})` : ''}</span>`).join("")}
+      ${nonEmptyMethodologies.map((item, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10pt;">${item.name || ''}${item.certification ? ` (${item.certification})` : ''}</span>`).join("")}
     </div>
     ` : ""}
 
@@ -1017,7 +1011,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       <span class="section-title">Industry Expertise</span>
     </div>
     <div class="summary-text" id="section-industryExpertise" data-section="industryExpertise">
-      ${nonEmptyIndustryExpertise.map((item, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10px;">${item.industry || ''}${item.domainArea ? ` - ${item.domainArea}` : ''}</span>`).join("")}
+      ${nonEmptyIndustryExpertise.map((item, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10pt;">${item.industry || ''}${item.domainArea ? ` - ${item.domainArea}` : ''}</span>`).join("")}
     </div>
     ` : ""}
 
@@ -1171,7 +1165,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
           </td>
           <td class="col-time">
             ${item.year ? `<span class="tenure-text">${item.year}</span>` : ''}
-            ${item.status ? `<br><span style="font-size: 10px;">${item.status}</span>` : ''}
+            ${item.status ? `<br><span style="font-size: 10pt;">${item.status}</span>` : ''}
           </td>
         </tr>
         `).join("")}
@@ -1210,7 +1204,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       <span class="section-title">Certifications</span>
     </div>
     <div class="summary-text" id="section-certifications" data-section="certifications">
-      ${nonEmptyCertifications.map((cert, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10px;">${cert.name || cert.title || ''}${cert.issuer ? ` – ${cert.issuer}` : ''}${cert.date ? ` (${cert.date})` : ''}</span>`).join("")}
+      ${nonEmptyCertifications.map((cert, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10pt;">${cert.name || cert.title || ''}${cert.issuer ? ` – ${cert.issuer}` : ''}${cert.date ? ` (${cert.date})` : ''}</span>`).join("")}
     </div>
     ` : ""}
 
@@ -1253,7 +1247,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       <span class="section-title">Hobbies & Interests</span>
     </div>
     <div class="summary-text" id="section-hobbies" data-section="hobbies">
-      ${nonEmptyHobbies.map((hobby, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10px;">${typeof hobby === "string" ? hobby.trim() : hobby}</span>`).join("")}
+      ${nonEmptyHobbies.map((hobby, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10pt;">${typeof hobby === "string" ? hobby.trim() : hobby}</span>`).join("")}
     </div>
     ` : ""}
 
@@ -1263,7 +1257,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
       <span class="section-title">Social Profiles</span>
     </div>
     <div class="summary-text" id="section-socialProfiles" data-section="socialProfiles">
-      ${nonEmptySocialProfiles.map((profile, idx) => `<a href="${profile.url}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: none; margin: 3px; display: inline-block;"><span style="background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10px;">${profile.platform || profile.network || 'Profile'}</span></a>`).join("")}
+      ${nonEmptySocialProfiles.map((profile, idx) => `<a href="${profile.url}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: none; margin: 3px; display: inline-block;"><span style="background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: ${smallFontSize}pt;">${profile.platform || profile.network || 'Profile'}</span></a>`).join("")}
     </div>
     ` : ""}
 

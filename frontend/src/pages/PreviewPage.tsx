@@ -46,11 +46,10 @@ const colorPalettes = [
 // Font families
 const fontFamilies = [  
   { name: 'Arial', value: 'Arial, sans-serif', category: 'sans' },
-  { name: 'Times New Roman', value: '"Times New Roman", serif', category: 'serif' },
+  { name: 'Times New Roman', value: 'Times New Roman, serif', category: 'serif' },
   { name: 'Georgia', value: 'Georgia, serif', category: 'serif' },
   { name: 'Verdana', value: 'Verdana, sans-serif', category: 'sans' },
   { name: 'Helvetica', value: 'Helvetica, sans-serif', category: 'sans' },
-  { name: 'Tahoma', value: 'Tahoma, sans-serif', category: 'sans' },
   { name: 'Trebuchet MS', value: '"Trebuchet MS", sans-serif', category: 'sans' },
   { name: 'Impact', value: 'Impact, sans-serif', category: 'display' },
   { name: 'Garamond', value: 'Garamond, serif', category: 'serif' },
@@ -1119,7 +1118,7 @@ export default function PreviewPage() {
                   -
                 </button>
                 <span className="px-2 text-xs font-bold text-slate-700">
-                  {bodyFontSize}px
+                  {bodyFontSize}pt
                 </span>
                 <button
                   onClick={async () => {
@@ -1449,9 +1448,7 @@ export default function PreviewPage() {
                     <div className="relative inline-block scale-110 mb-5">
                       <div className="w-14 h-14 border-4 border-gray-100 rounded-full"></div>
                       <div className="w-14 h-14 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Loader2 className="w-5 h-5 text-[#04477E]/30" />
-                      </div>
+                     
                     </div>
                     <div className="flex flex-col items-center gap-2">
                        <h3 className="text-lg font-bold text-gray-900">
@@ -1586,8 +1583,8 @@ export default function PreviewPage() {
                                   
                                   try {
                                     // 1. Prepare defaults
-                                    const defaultFont = "Arial, sans-serif";
-                                    const defaultSize = 14;
+                                    const defaultFont = templateOption.defaultFontFamily || "Arial, sans-serif";
+                                    const defaultSize = templateOption.defaultFontSize || 14;
                                     const defaultTheme = (templateOption as any).defaultColor 
                                       ? { 
                                           name: 'Default', 

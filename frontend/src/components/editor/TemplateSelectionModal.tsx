@@ -214,11 +214,19 @@ export function TemplateSelectionModal({
                 const selectedTemplate = templates.find((t) => t.id === selectedTemplateId);
                 const newColor = selectedTemplate?.defaultColor || "#000000";
                 const newTheme = { primary: newColor, secondary: newColor };
+                const newFont = selectedTemplate?.defaultFontFamily || "Arial, sans-serif";
+                const newSize = selectedTemplate?.defaultFontSize || 14;
 
-                // Save template + new theme color to backend together
+                // Save template + new theme color + fonts to backend together
                 await resumeAPI.update(resumeId, {
                   template: selectedTemplateId,
-                  formatting: { theme: newTheme, primary: newColor },
+                  formatting: { 
+                    theme: newTheme, 
+                    primary: newColor,
+                    fontFamily: newFont,
+                    fontSize: newSize,
+                    bodyFontSize: newSize
+                  },
                 });
 
                 // Update UIStore so PreviewPage re-renders with correct color immediately

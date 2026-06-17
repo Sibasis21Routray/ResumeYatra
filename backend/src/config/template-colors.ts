@@ -14,41 +14,76 @@ export const TEMPLATE_COLORS: Record<string, string> = {
   "formal-indian-cv": "#0c4354",
   "senior-leadership": "#0B1F3A",
   "azurill": "#004B87",
-  "nova": "#80303d",
   "stellar": "#004B87",
-  "venusaur": "#0f172a",
-  "cosmos": "#000000",
-  "modern-executive": "#7aa333",
   "orion": "#0f172a",
-  "operations-support": "#1a1a2e",
-  "minimal-ats": "#1a1a1a",
-  "nebula": "#abc9eb",
   "modern": "#4b5563",
   "photographic": "#000000",
-  "minimal": "#000000",
-  "professional": "#5B9BD5",
-  "creative": "#2c3e50",
-  "gengar": "#7c3aed",
-  "dragonite": "#d97706",
-  "alakazam": "#004369",
-  "mewtwo": "#000000",
-  "squirtle": "#373737",
-  "bulbasaur": "#15803d",
-  "eevee": "#000000",
   "machamp": "#000000",
-  "classic-professional": "#000000",
-  "skills-first": "#000000",
-  "metrics-driven": "#000000",
   "leadership-managerial": "#1e1b4b",
-  "tech-it": "#1a1a1a",
-  "fresher-entry-level": "#334155",
   "consultant-freelancer": "#2563eb",
   "impact-resume": "#3b82f6",
-  "startup-tech": "#2d3e50",
   "modern-corporate": "#000000",
   "corporate-standard": "#000000",
 };
 
+export const TEMPLATE_FONTS: Record<string, string> = {
+  "ats-classic": "Arial, sans-serif",
+  "photo-minimal": "Helvetica, sans-serif",
+  "modern-sidebar": "Roboto, sans-serif",
+  "compact-classic": "Verdana, sans-serif",
+  "photo-modern-pro": "Georgia, serif",
+  "formal-indian-cv": "Times New Roman, serif",
+  "senior-leadership": "Garamond, sans-serif",
+  "azurill": "Montserrat, sans-serif",
+  "stellar": "Lato, sans-serif",
+  "orion": "Trebuchet MS, sans-serif",
+  "modern": "Inter, system-ui, sans-serif",
+  "photographic": "Roboto, sans-serif",
+  "machamp": "Impact, sans-serif",
+  "leadership-managerial": "Garamond, serif",
+  "consultant-freelancer": "Lato, sans-serif",
+  "impact-resume": "Montserrat, sans-serif",
+  "modern-corporate": "Inter, system-ui, sans-serif",
+  "corporate-standard": "Arial, sans-serif",
+};
+
+export const TEMPLATE_FONT_SIZES: Record<string, number> = {
+  "ats-classic": 11,
+  "photo-minimal": 11,
+  "modern-sidebar": 11,
+  "compact-classic": 10,
+  "photo-modern-pro": 11,
+  "formal-indian-cv": 11,
+  "senior-leadership": 12,
+  "azurill": 10,
+  "stellar": 11,
+  "orion": 12,
+  "modern": 12,
+  "photographic": 12,
+  "machamp": 11,
+  "leadership-managerial": 12,
+  "consultant-freelancer": 11,
+  "impact-resume": 11,
+  "modern-corporate": 11,
+  "corporate-standard": 12,
+};
+
 export const getDefaultColor = (templateId: string): string => {
   return TEMPLATE_COLORS[templateId] || "#000000";
+};
+
+export const getDefaultFont = (templateId: string): string => {
+  return TEMPLATE_FONTS[templateId] || "Arial, sans-serif";
+};
+
+export const getDefaultFontSize = (templateId: string): number => {
+  return TEMPLATE_FONT_SIZES[templateId] || 14;
+};
+
+export const getTemplateMetadata = () => {
+  return {
+    colors: TEMPLATE_COLORS,
+    fonts: TEMPLATE_FONTS,
+    fontSizes: TEMPLATE_FONT_SIZES,
+  };
 };

@@ -169,12 +169,12 @@ const coreCompArray = typeof coreCompetencies === "string"
           line-height: 1.4;
           padding: 40px 50px;
           background: #ffffff;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
         }
 
         header { text-align: center; margin-bottom: 10px; }
         .name {
-          font-size: ${Math.round(baseFontSize * 2.9)}px;
+          font-size: ${Math.round(baseFontSize * 2.9)}pt;
           font-weight: 800;
           text-transform: uppercase;
           margin-bottom: 12px;
@@ -205,7 +205,7 @@ const coreCompArray = typeof coreCompetencies === "string"
         }
 
         .section-title {
-          font-size: ${Math.round(baseFontSize * 1.27)}px;
+          font-size: ${Math.round(baseFontSize * 1.27)}pt;
           font-weight: 800;
           text-transform: uppercase;
           border-bottom: 2px solid ${currentTheme.text};
@@ -218,9 +218,9 @@ const coreCompArray = typeof coreCompetencies === "string"
         .text-muted { color: ${currentTheme.textLight}; text-align: justify; line-height: 1.6; }
 
         .exp-item { margin-bottom: 20px; position: relative; }
-        .job-title { font-weight: 800; font-size: ${Math.round(baseFontSize * 1.1)}px; display: block; }
+        .job-title { font-weight: 800; font-size: ${Math.round(baseFontSize * 1.1)}pt; display: block; }
         .company { color: ${currentTheme.primary}; font-weight: 700; display: block; }
-        .date { color: #9ca3af; font-size: ${Math.round(baseFontSize * 0.9)}px; font-weight: 600; margin-bottom: 8px; display: block; }
+        .date { color: #9ca3af; font-size: ${Math.round(baseFontSize * 0.9)}pt; font-weight: 600; margin-bottom: 8px; display: block; }
 
         .bullets { list-style: none; }
         .bullets li {
@@ -241,7 +241,7 @@ const coreCompArray = typeof coreCompetencies === "string"
         .edu-item { margin-bottom: 15px; }
         .edu-course { font-weight: 800; display: block; }
         .edu-school { color: ${currentTheme.primary}; font-weight: 600; display: block; }
-        .edu-meta { color: #9ca3af; font-size: ${Math.round(baseFontSize * 0.9)}px; }
+        .edu-meta { color: #9ca3af; font-size: ${Math.round(baseFontSize * 0.9)}pt; }
 
         .lang-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
         .pill-container { display: flex; gap: 3px; }
@@ -264,7 +264,7 @@ const coreCompArray = typeof coreCompetencies === "string"
 
         .cert-item { margin-bottom: 12px; }
         .cert-name { font-weight: 700; display: block; }
-        .cert-issuer { color: ${currentTheme.textLight}; font-size: ${Math.round(baseFontSize * 0.9)}px; }
+        .cert-issuer { color: ${currentTheme.textLight}; font-size: ${Math.round(baseFontSize * 0.9)}pt; }
 
         @media print {
           body { padding: 0; }
@@ -276,15 +276,50 @@ const coreCompArray = typeof coreCompetencies === "string"
       <header data-section="personal">
         <h1 class="name">${personal.name || 'YOUR NAME'}</h1>
         <div class="contact-bar">
-          ${personal.phone ? `<span>${personal.phone}</span>` : ''}
-          ${personal.alternatePhone ? `<span>${personal.alternatePhone}</span>` : ''}
-          ${personal.email ? `<span>${personal.email}</span>` : ''}
-          ${personal.location ? `<span>${personal.location}</span>` : ''}
-        </div>
-        <div class="contact-bar" style="margin-top: 5px; font-size: ${Math.round(baseFontSize * 0.9)}px;">
-          ${linkedIn ? `<a href="${linkedIn}">LinkedIn</a>` : ''}
-          ${github ? `<a href="${github}">GitHub</a>` : ''}
-          ${personal.dob ? `<span>DOB: ${personal.dob}</span>` : ''}
+          ${(() => {
+            const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+            const linkedinProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+              String(p.url).toLowerCase().includes("linkedin")
+            );
+            const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+            const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+            
+            const githubProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("github") || 
+              String(p.url).toLowerCase().includes("github")
+            );
+            const githubUrl = githubProfile?.url || githubProfile?.username || "";
+            const cleanGithubLabel = githubUrl ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+
+            const items = [];
+            if (personal.phone) {
+              items.push(`<span>${personal.phone}</span>`);
+            }
+            if (personal.email) {
+              items.push(`<span><a href="mailto:${personal.email}">${personal.email}</a></span>`);
+            }
+            if (personal.dob) {
+              items.push(`<span>DOB: ${personal.dob}</span>`);
+              if (linkedinUrl) {
+                items.push(`<a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a>`);
+              } else if (addressString) {
+                items.push(`<span>${addressString}</span>`);
+              }
+            } else {
+              if (linkedinUrl) {
+                items.push(`<a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a>`);
+              } else if (addressString) {
+                items.push(`<span>${addressString}</span>`);
+              }
+            }
+            
+            if (githubUrl) {
+              items.push(`<a href="${githubUrl}" target="_blank">${cleanGithubLabel}</a>`);
+            }
+            
+            return items.join("");
+          })()}
         </div>
       </header>
 

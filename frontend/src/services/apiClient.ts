@@ -27,7 +27,7 @@ function formatMongooseError(raw: string): string {
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // ✅ CRITICAL for cookies
+  withCredentials: true, //  CRITICAL for cookies
   headers: {
     "Content-Type": "application/json",
   },

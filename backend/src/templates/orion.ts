@@ -52,30 +52,30 @@ export function buildOrionTemplate(data: any, theme?: any): string {
     accent: "#ffffff"
   };
 
-const currentTheme = {
-  ...defaultTheme,
-  ...(theme || {}),
-  sidebarBg: theme?.sidebarBg || theme?.primary || defaultTheme.sidebarBg,
-  sidebarText: theme?.sidebarText || "#ffffff"
-};
-  
+  const currentTheme = {
+    ...defaultTheme,
+    ...(theme || {}),
+    sidebarBg: theme?.sidebarBg || theme?.primary || defaultTheme.sidebarBg,
+    sidebarText: theme?.sidebarText || "#ffffff"
+  };
+
   // ✅ Dynamic font size from user settings
   const baseFontSize = data?.formatting?.bodyFontSize || data?.fontSize || 14;
   const userFontFamily = data?.formatting?.fontFamily || data?.fontFamily || "'Georgia', serif";
-  
+
   // Typography settings
   const typography = theme?.typography || {
     fontSize: "medium",
     alignment: "left",
     fontWeight: "normal",
   };
-  
+
   const alignmentMap = { left: "left", center: "center", justify: "justify" };
   const fontWeightMap = { normal: "400", bold: "700" };
-  
+
   const currentAlignment = alignmentMap[typography.alignment as keyof typeof alignmentMap] || "left";
   const currentFontWeight = fontWeightMap[typography.fontWeight as keyof typeof fontWeightMap] || "400";
-  
+
   // Responsive font sizes based on baseFontSize
   const bannerNameFontSize = Math.round(baseFontSize * 3);
   const sidebarTitleFontSize = Math.round(baseFontSize * 1.3);
@@ -91,7 +91,7 @@ const currentTheme = {
     return arr.some(item => {
       if (typeof item === "string") return item.trim().length > 0;
       if (typeof item === "object" && item !== null) {
-        return Object.values(item).some(val => 
+        return Object.values(item).some(val =>
           typeof val === "string" && val.trim().length > 0
         );
       }
@@ -104,17 +104,17 @@ const currentTheme = {
     return arr.filter(item => {
       if (typeof item === "string") return item.trim().length > 0;
       if (typeof item === "object" && item !== null) {
-        return Object.values(item).some(val => 
+        return Object.values(item).some(val =>
           typeof val === "string" && val.trim().length > 0
         );
       }
       return false;
     });
   };
-// console.log("THEME:????????????????>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", currentTheme);
+  // console.log("THEME:????????????????>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", currentTheme);
   const hasObjectValues = (obj: any): boolean => {
     if (!obj || typeof obj !== "object") return false;
-    return Object.values(obj).some(val => 
+    return Object.values(obj).some(val =>
       val !== null && val !== undefined && val !== ""
     );
   };
@@ -129,9 +129,9 @@ const currentTheme = {
 
   const renderDescription = (description: string): string => {
     if (!description) return '';
-    
+
     // Use a very robust bullet character that Adobe identifies correctly
-    const bulletChar = '&#8226;'; 
+    const bulletChar = '&#8226;';
 
     if (description.includes('<ul>') || description.includes('<li>')) {
       let cleaned = description;
@@ -143,13 +143,13 @@ const currentTheme = {
     const lines = description.split('\n')
       .map(line => line.trim())
       .filter(line => line.length > 0);
-      
+
     if (lines.length === 0) return '';
     return `
       <div class="custom-list-container" style="margin-top: 5px; margin-left: 5px;">
         ${lines.map(line => `
-          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${smallTextFontSize2}px; line-height: 1.4; color: ${currentTheme.textLight};">
-            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16px; text-align: center;">${bulletChar}</div>
+          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${smallTextFontSize2}pt; line-height: 1.4; color: ${currentTheme.textLight};">
+            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16pt; text-align: center;">${bulletChar}</div>
             <div style="display: table-cell; vertical-align: top; padding-left: 2px;">${line.trim()}</div>
           </div>
         `).join('')}
@@ -234,7 +234,7 @@ const currentTheme = {
           display: flex;
           flex-direction: column;
           min-height: 100vh;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           font-weight: ${currentFontWeight};
           text-align: ${currentAlignment};
         }
@@ -246,7 +246,7 @@ const currentTheme = {
           text-align: center;
         }
         .name-banner h1 {
-          font-size: ${bannerNameFontSize}px;
+          font-size: ${bannerNameFontSize}pt;
           text-transform: uppercase;
           letter-spacing: 5px;
           font-weight: bold;
@@ -267,7 +267,7 @@ const currentTheme = {
           margin-bottom: 35px;
         }
         .sidebar-title {
-          font-size: ${sidebarTitleFontSize}px;
+          font-size: ${sidebarTitleFontSize}pt;
           font-weight: bold;
           text-transform: uppercase;
           border-bottom: 1.5px solid ${currentTheme.sidebarTextLight};
@@ -284,7 +284,7 @@ const currentTheme = {
           display: flex;
           align-items: center;
           margin-bottom: 12px;
-          font-size: ${smallTextFontSize}px;
+          font-size: ${smallTextFontSize}pt;
           font-family: 'Arial', sans-serif;
           color: ${currentTheme.sidebarText};
         }
@@ -305,14 +305,14 @@ const currentTheme = {
         }
         .sidebar-list li {
           margin-bottom: 8px;
-          font-size: ${smallTextFontSize2}px;
+          font-size: ${smallTextFontSize2}pt;
           padding-left: 12px;
           position: relative;
           color: ${currentTheme.sidebarText};
         }
         .sidebar-list li::before {
           content: '●';
-          font-size: 8px;
+          font-size: 8pt;
           position: absolute;
           left: 0;
           top: 4px;
@@ -324,7 +324,7 @@ const currentTheme = {
           padding: 40px 50px;
         }
         .section-title {
-          font-size: ${sectionTitleFontSize}px;
+          font-size: ${sectionTitleFontSize}pt;
           font-weight: bold;
           text-transform: uppercase;
           border-bottom: 2px solid ${currentTheme.borderColor};
@@ -336,12 +336,12 @@ const currentTheme = {
 
         .entry { margin-bottom: 20px; }
         .date-line { 
-          font-size: ${smallTextFontSize}px; 
+          font-size: ${smallTextFontSize}pt; 
           color: ${currentTheme.textLight}; 
           margin-bottom: 4px; 
         }
         .title-line { 
-          font-size: ${entryTitleFontSize}px; 
+          font-size: ${entryTitleFontSize}pt; 
           font-weight: bold; 
           margin-bottom: 5px; 
           color: ${currentTheme.text};
@@ -350,7 +350,7 @@ const currentTheme = {
         .bullet-list {
           list-style-type: disc;
           margin-left: 20px;
-          font-size: ${smallTextFontSize2}px;
+          font-size: ${smallTextFontSize2}pt;
           line-height: 1.5;
           color: ${currentTheme.textLight};
         }
@@ -365,7 +365,7 @@ const currentTheme = {
           width: 100%;
           margin-bottom: 6px;
           color: ${currentTheme.textLight};
-          font-size: ${smallTextFontSize2}px;
+          font-size: ${smallTextFontSize2}pt;
           line-height: 1.4;
         }
         .description-html li::before {
@@ -377,7 +377,7 @@ const currentTheme = {
           vertical-align: top;
           padding-top: 0;
           font-family: 'Arial', sans-serif;
-          font-size: 16px;
+          font-size: 16pt;
           text-align: center;
         }
         .description-html li .bullet-circle {
@@ -399,7 +399,7 @@ const currentTheme = {
           gap: 10px;
         }
         .context-item {
-          font-size: ${smallTextFontSize}px;
+          font-size: ${smallTextFontSize}pt;
           color: ${currentTheme.textLight};
         }
         .context-label {
@@ -424,636 +424,960 @@ const currentTheme = {
     </head>
     <body>
       <div class="name-banner" data-section="personal">
-        <h1>${personal.name?.toUpperCase() || ''}</h1>
+        <h1>${personal.name?.toUpperCase() || ""}</h1>
       </div>
 
       <div class="main-container">
         <aside class="sidebar">
-          ${(personal.location || personal.pinCode || personal.phone || personal.email || personal.alternatePhone || personal.fullAddress || personal.country || personal.dob || personal.gender || personal.maritalStatus) ? `
-          <div class="sidebar-section" data-section="personal">
-            <h2 class="sidebar-title">Contact</h2>
-            ${personal.location || personal.pinCode ? `
-            <div class="contact-item">
-              <span class="icon-wrapper">${icons.location}</span>
-              <span>${personal.location ? `${personal.location}${personal.pinCode ? ` ${personal.pinCode}` : ''}` : personal.pinCode ? personal.pinCode : ''}</span>
-            </div>
-            ` : ''}
-            ${personal.phone ? `
-            <div class="contact-item">
-              <span class="icon-wrapper">${icons.phone}</span>
-              <span>${personal.phone}</span>
-            </div>
-            ` : ''}
-            ${personal.email ? `
-            <div class="contact-item">
-              <span class="icon-wrapper">${icons.mail}</span>
-              <span>${personal.email}</span>
-            </div>
-            ` : ''}
-            ${personal.alternatePhone ? `
-            <div class="contact-item">
-              <span class="icon-wrapper">${icons.phone}</span>
-              <span>${personal.alternatePhone} (Alt)</span>
-            </div>
-            ` : ''}
-            ${personal.fullAddress ? `
-            <div class="contact-item">
-              <span class="icon-wrapper">${icons.location}</span>
-              <span>${personal.fullAddress}</span>
-            </div>
-            ` : ''}
-            ${personal.country ? `
-            <div class="contact-item">
-              <span class="icon-wrapper">${icons.location}</span>
-              <span>${personal.country}</span>
-            </div>
-            ` : ''}
-            ${personal.dob ? `
-            <div class="contact-item">
-              <span class="icon-wrapper">${icons.calendar}</span>
-              <span>DOB: ${personal.dob}</span>
-            </div>
-            ` : ''}
-            ${personal.gender ? `
-            <div class="contact-item">
-              <span class="icon-wrapper">${icons.user}</span>
-              <span>Gender: ${personal.gender}</span>
-            </div>
-            ` : ''}
-            ${personal.maritalStatus ? `
-            <div class="contact-item">
-              <span class="icon-wrapper">${icons.heart}</span>
-              <span>Marital: ${personal.maritalStatus}</span>
-            </div>
-            ` : ''}
-          </div>
-          ` : ''}
+          ${(() => {
+            const addressString =
+              [personal.location, personal.pinCode]
+                .filter(Boolean)
+                .join(", ") ||
+              personal.fullAddress ||
+              "";
+            const linkedinProfile = socialProfiles?.find(
+              (p: any) =>
+                String(p.network || p.platform)
+                  .toLowerCase()
+                  .includes("linkedin") ||
+                String(p.url).toLowerCase().includes("linkedin"),
+            );
+            const linkedinUrl =
+              personal.linkedinUrl ||
+              linkedinProfile?.url ||
+              linkedinProfile?.username ||
+              "";
+            const cleanLinkedinLabel = linkedinUrl
+              ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "")
+              : "";
 
-          ${skillList.length > 0 ? `
+            const githubProfile = socialProfiles?.find(
+              (p: any) =>
+                String(p.network || p.platform)
+                  .toLowerCase()
+                  .includes("github") ||
+                String(p.url).toLowerCase().includes("github"),
+            );
+            const githubUrl =
+              githubProfile?.url || githubProfile?.username || "";
+            const cleanGithubLabel = githubUrl
+              ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "")
+              : "";
+
+            const items = [];
+            if (personal.phone) {
+              items.push(
+                `<div class="contact-item"><span class="icon-wrapper">${icons.phone}</span><span>${personal.phone}</span></div>`,
+              );
+            }
+            if (personal.email) {
+              items.push(
+                `<div class="contact-item"><span class="icon-wrapper">${icons.mail}</span><span>${personal.email}</span></div>`,
+              );
+            }
+            if (personal.dob) {
+              items.push(
+                `<div class="contact-item"><span class="icon-wrapper">${icons.calendar}</span><span>DOB: ${personal.dob}</span></div>`,
+              );
+              if (linkedinUrl) {
+                items.push(
+                  `<div class="contact-item"><span class="icon-wrapper">${icons.user}</span><span><a href="${linkedinUrl}" target="_blank" style="color: ${currentTheme.sidebarText};">LinkedIn</a></span></div>`,
+                );
+              } else if (addressString) {
+                items.push(
+                  `<div class="contact-item"><span class="icon-wrapper">${icons.location}</span><span>${addressString}</span></div>`,
+                );
+              }
+            } else {
+              if (linkedinUrl) {
+                items.push(
+                  `<div class="contact-item"><span class="icon-wrapper">${icons.user}</span><span><a href="${linkedinUrl}" target="_blank" style="color: ${currentTheme.sidebarText};">LinkedIn</a></span></div>`,
+                );
+              } else if (addressString) {
+                items.push(
+                  `<div class="contact-item"><span class="icon-wrapper">${icons.location}</span><span>${addressString}</span></div>`,
+                );
+              }
+            }
+
+            if (githubUrl) {
+              items.push(
+                `<div class="contact-item"><span class="icon-wrapper">${icons.user}</span><span><a href="${githubUrl}" target="_blank" style="color: ${currentTheme.sidebarText};">GitHub</a></span></div>`,
+              );
+            }
+
+            if (items.length === 0) return "";
+
+            return `
+            <div class="sidebar-section" data-section="personal">
+              <h2 class="sidebar-title">Contact</h2>
+              ${items.join("")}
+            </div>
+            `;
+          })()}
+
+          ${
+            skillList.length > 0
+              ? `
           <div class="sidebar-section" data-section="skills">
             <h2 class="sidebar-title">Skills</h2>
             <ul class="sidebar-list">
-              ${skillList.map((skill, idx) => `
+              ${skillList
+                .map(
+                  (skill, idx) => `
                 <li data-index="${idx}">
                   <div class="text">${skill}</div>
                 </li>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </ul>
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-           ${parsedCoreCompetencies.length > 0 ? `
+           ${
+             parsedCoreCompetencies.length > 0
+               ? `
           <div class="sidebar-section" data-section="skills">
             <h2 class="sidebar-title">Competencies</h2>
             <ul class="sidebar-list">
-              ${parsedCoreCompetencies.map((coreCompetency, idx) => `
+              ${parsedCoreCompetencies
+                .map(
+                  (coreCompetency, idx) => `
                 <li data-index="${idx}">
                   <div class="text">${coreCompetency}</div>
                 </li>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </ul>
           </div>
-          ` : ''}
+          `
+               : ""
+           }
 
-          ${nonEmptyLanguages.length > 0 ? `
+          ${
+            nonEmptyLanguages.length > 0
+              ? `
           <div class="sidebar-section" data-section="languages">
             <h2 class="sidebar-title">Languages</h2>
             <ul class="sidebar-list">
-              ${nonEmptyLanguages.map((lang: any, idx: number) => `
+              ${nonEmptyLanguages
+                .map(
+                  (lang: any, idx: number) => `
                 <li data-index="${idx}">
-                  <div class="text">${lang.language || lang}${lang.proficiency ? ` (${lang.proficiency})` : ''}${lang.capability ? ` - ${lang.capability}` : ''}</div>
+                  <div class="text">${lang.language || lang}${lang.proficiency ? ` (${lang.proficiency})` : ""}${lang.capability ? ` - ${lang.capability}` : ""}</div>
                 </li>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </ul>
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyCertifications.length > 0 ? `
+          ${
+            nonEmptyCertifications.length > 0
+              ? `
           <div class="sidebar-section" data-section="certifications">
             <h2 class="sidebar-title">Certifications</h2>
-            <div style="font-size: ${smallTextFontSize}px;">
-              ${nonEmptyCertifications.map((cert: any, idx: number) => `
+            <div style="font-size: ${smallTextFontSize}pt;">
+              ${nonEmptyCertifications
+                .map(
+                  (cert: any, idx: number) => `
                 <div style="margin-bottom: 12px;" data-index="${idx}">
-                  <strong>${cert.name || ''}</strong><br>
-                  ${cert.issuer ? `${cert.issuer}<br>` : ''}
-                  ${cert.date ? `${cert.date}` : ''}
+                  <strong>${cert.name || ""}</strong><br>
+                  ${cert.issuer ? `${cert.issuer}<br>` : ""}
+                  ${cert.date ? `${cert.date}` : ""}
                 </div>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </div>
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyHobbies.length > 0 ? `
+          ${
+            nonEmptyHobbies.length > 0
+              ? `
           <div class="sidebar-section" data-section="hobbies">
             <h2 class="sidebar-title">Hobbies</h2>
             <ul class="sidebar-list">
-              ${nonEmptyHobbies.map((hobby: any, idx: number) => `
+              ${nonEmptyHobbies
+                .map(
+                  (hobby: any, idx: number) => `
                 <li data-index="${idx}">
                   <div class="text">${typeof hobby === "string" ? hobby.trim() : hobby}</div>
                 </li>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </ul>
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptySocialProfiles.length > 0 ? `
+          ${
+            nonEmptySocialProfiles.length > 0
+              ? `
           <div class="sidebar-section" data-section="socialProfiles">
             <h2 class="sidebar-title">Social Profiles</h2>
-            <div style="font-size: ${smallTextFontSize}px;">
-              ${nonEmptySocialProfiles.map((item: any, idx: number) => `
+            <div style="font-size: ${smallTextFontSize}pt;">
+              ${nonEmptySocialProfiles
+                .map(
+                  (item: any, idx: number) => `
                 <div style="margin-bottom: 8px;" data-index="${idx}">
-                  <strong>${item.platform || 'Profile'}:</strong><br>
-                  <a href="${item.url || ''}" style="color: ${currentTheme.sidebarText}; word-break: break-all;">${item.url || ''}</a>
+                  <strong>${item.platform || "Profile"}:</strong><br>
+                  <a href="${item.url || ""}" style="color: ${currentTheme.sidebarText}; word-break: break-all;">${item.url || ""}</a>
                 </div>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </div>
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-         ${nonEmptyEducation.length > 0 ? `
+         ${
+           nonEmptyEducation.length > 0
+             ? `
 <div class="sidebar-section" data-section="education">
   <h2 class="sidebar-title">Education</h2>
-  <div style="font-size: ${smallTextFontSize}px;">
-    ${nonEmptyEducation.map((edu, idx: number) => {
-      const dateParts = [];
-      if (edu.startDate && edu.startDate.trim()) dateParts.push(edu.startDate.trim());
-      if (edu.graduationDate && edu.graduationDate.trim()) dateParts.push(edu.graduationDate.trim());
-      else if (edu.endDate && edu.endDate.trim()) dateParts.push(edu.endDate.trim());
-      const dateRange = dateParts.length > 0 ? dateParts.join(" - ") : "";
-      return `
+  <div style="font-size: ${smallTextFontSize}pt;">
+    ${nonEmptyEducation
+      .map((edu, idx: number) => {
+        const dateParts = [];
+        if (edu.startDate && edu.startDate.trim())
+          dateParts.push(edu.startDate.trim());
+        if (edu.graduationDate && edu.graduationDate.trim())
+          dateParts.push(edu.graduationDate.trim());
+        else if (edu.endDate && edu.endDate.trim())
+          dateParts.push(edu.endDate.trim());
+        const dateRange = dateParts.length > 0 ? dateParts.join(" - ") : "";
+        return `
       <div style="margin-bottom: 15px;" data-index="${idx}">
-        <p><strong>${edu.degree || ''}${edu.field ? ` in ${edu.field}` : ''}</strong></p>
-        <p>${edu.school || ''}</p>
-        ${edu.location ? `<p>${edu.location}</p>` : ''}
-        ${dateRange ? `<p>${dateRange}</p>` : ''}
-        ${edu.grade ? `<p>${edu.grade}</p>` : ''}
-        ${edu.description ? `<p style="">${edu.description}</p>` : ''}
+        <p><strong>${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}</strong></p>
+        <p>${edu.school || ""}</p>
+        ${edu.location ? `<p>${edu.location}</p>` : ""}
+        ${dateRange ? `<p>${dateRange}</p>` : ""}
+        ${edu.grade ? `<p>${edu.grade}</p>` : ""}
+        ${edu.description ? `<p style="">${edu.description}</p>` : ""}
       </div>
-    `}).join('')}
+    `;
+      })
+      .join("")}
   </div>
 </div>
-` : ''}
+`
+             : ""
+         }
         </aside>
 
         <main class="content">
         
 
-          ${availabilityWorkAuth && hasObjectValues(availabilityWorkAuth) ? `
+          ${
+            availabilityWorkAuth && hasObjectValues(availabilityWorkAuth)
+              ? `
           <div class="section" data-section="availabilityWorkAuth">
             <h2 class="section-title">Availability</h2>
             <div class="context-grid">
-              ${availabilityWorkAuth.availabilityNoticePeriod ? `<div class="context-item"><span class="context-label">Notice Period:</span> ${availabilityWorkAuth.availabilityNoticePeriod}</div>` : ''}
-              ${availabilityWorkAuth.workAuthorizationStatus ? `<div class="context-item"><span class="context-label">Work Auth:</span> ${availabilityWorkAuth.workAuthorizationStatus}</div>` : ''}
-              ${availabilityWorkAuth.preferredLocation ? `<div class="context-item"><span class="context-label">Preferred Location:</span> ${availabilityWorkAuth.preferredLocation}</div>` : ''}
+              ${availabilityWorkAuth.availabilityNoticePeriod ? `<div class="context-item"><span class="context-label">Notice Period:</span> ${availabilityWorkAuth.availabilityNoticePeriod}</div>` : ""}
+              ${availabilityWorkAuth.workAuthorizationStatus ? `<div class="context-item"><span class="context-label">Work Auth:</span> ${availabilityWorkAuth.workAuthorizationStatus}</div>` : ""}
+              ${availabilityWorkAuth.preferredLocation ? `<div class="context-item"><span class="context-label">Preferred Location:</span> ${availabilityWorkAuth.preferredLocation}</div>` : ""}
             </div>
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${careerObjective && careerObjective.trim() && (!summary || !summary.trim()) ? `
+          ${
+            careerObjective &&
+            careerObjective.trim() &&
+            (!summary || !summary.trim())
+              ? `
           <div class="section" data-section="careerObjective">
             <h2 class="section-title">Career Objective</h2>
             <p style="text-align: justify; margin-bottom: 15px; color: ${currentTheme.textLight};">${careerObjective}</p>
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${summary && summary.trim() ? `
+          ${
+            summary && summary.trim()
+              ? `
           <div class="section" data-section="summary">
             <p style="text-align: justify; margin-bottom: 25px; color: ${currentTheme.textLight};">${summary}</p>
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyExperience.length > 0 ? `
+          ${
+            nonEmptyExperience.length > 0
+              ? `
           <div class="section" data-section="experience">
             <h2 class="section-title">Experience</h2>
-            ${nonEmptyExperience.map((exp, idx) => `
+            ${nonEmptyExperience
+              .map(
+                (exp, idx) => `
               <div class="entry" data-index="${idx}">
                 <div class="date-line">${formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}</div>
                 <div class="title-line">
-                  ${exp.title || ''}, <i>${exp.company || ''}</i> — ${exp.location || ''}
+                  ${exp.title || ""}, <i>${exp.company || ""}</i> — ${exp.location || ""}
                 </div>
-                ${exp.description ? renderDescription(exp.description) : ''}
-                ${exp.achievements ? `<p style="margin-top: 5px; color: ${currentTheme.textLight};"><strong>Achievements:</strong> ${exp.achievements}</p>` : ''}
-              </div>
-            `).join('')}
+               ${exp.description ? renderDescription(exp.description) : ""}
+${
+  exp.achievements
+    ? `
+  <div style="margin-top: 10px;">
+    <strong>Achievements:</strong>
+    ${renderDescription(exp.achievements)}
+  </div>
+`
+    : ""
+}</div>
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyProjects.length > 0 ? `
+          ${
+            nonEmptyProjects.length > 0
+              ? `
           <div class="section" data-section="projects">
             <h2 class="section-title">Projects</h2>
-            ${nonEmptyProjects.map((project, idx) => `
+            ${nonEmptyProjects
+              .map(
+                (project, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${project.duration || ''}</div>
+                <div class="date-line">${project.duration || ""}</div>
                 <div class="title-line">
-                  ${project.name || project.title || ''}
+                  ${project.name || project.title || ""}
                 </div>
-                ${project.role ? `<p><strong>Role:</strong> ${project.role}</p>` : ''}
-                ${project.description ? renderDescription(project.description) : ''}
-                ${project.technologies ? `<p><strong>Technologies:</strong> ${project.technologies}</p>` : ''}
+                ${project.role ? `<p><strong>Role:</strong> ${project.role}</p>` : ""}
+                ${project.description ? renderDescription(project.description) : ""}
+                ${project.technologies ? `<p><strong>Technologies:</strong> ${project.technologies}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyInternships.length > 0 ? `
+          ${
+            nonEmptyInternships.length > 0
+              ? `
           <div class="section" data-section="internships">
             <h2 class="section-title">Internships</h2>
-            ${nonEmptyInternships.map((item, idx) => `
+            ${nonEmptyInternships
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.duration || formatDateRange(item.startDate, item.endDate) || ''}</div>
+                <div class="date-line">${item.duration || formatDateRange(item.startDate, item.endDate) || ""}</div>
                 <div class="title-line">
-                  ${item.title || ''}, <i>${item.company || ''}</i>
+                  ${item.title || ""}, <i>${item.company || ""}</i>
                 </div>
-                ${item.description ? renderDescription(item.description) : ''}
+                ${item.description ? renderDescription(item.description) : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyTrainingPrograms.length > 0 ? `
+          ${
+            nonEmptyTrainingPrograms.length > 0
+              ? `
           <div class="section" data-section="trainingPrograms">
             <h2 class="section-title">Training Programs</h2>
-            ${nonEmptyTrainingPrograms.map((item, idx) => `
+            ${nonEmptyTrainingPrograms
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.completionDate || ''}${item.duration ? ` (${item.duration})` : ''}</div>
+                <div class="date-line">${item.completionDate || ""}${item.duration ? ` (${item.duration})` : ""}</div>
                 <div class="title-line">
-                  ${item.name || ''}
+                  ${item.name || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.provider || item.organization || ''}</p>
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.provider || item.organization || ""}</p>
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyAcademicProjects.length > 0 ? `
+          ${
+            nonEmptyAcademicProjects.length > 0
+              ? `
           <div class="section" data-section="academicProjects">
             <h2 class="section-title">Academic Projects</h2>
-            ${nonEmptyAcademicProjects.map((item, idx) => `
+            ${nonEmptyAcademicProjects
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.duration || ''}</div>
+                <div class="date-line">${item.duration || ""}</div>
                 <div class="title-line">
-                  ${item.name || item.title || ''}
+                  ${item.name || item.title || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.institution || ''}${item.course ? ` | ${item.course}` : ''}</p>
-                ${item.description ? renderDescription(item.description) : ''}
-                ${item.technologies && item.technologies.length > 0 ? `<p><strong>Technologies:</strong> ${Array.isArray(item.technologies) ? item.technologies.join(', ') : item.technologies}</p>` : ''}
-                ${item.url ? `<p><strong>URL:</strong> <a href="${item.url}" target="_blank" style="color:#9ca3af;">${item.url}</a></p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.institution || ""}${item.course ? ` | ${item.course}` : ""}</p>
+                ${item.description ? renderDescription(item.description) : ""}
+                ${item.technologies && item.technologies.length > 0 ? `<p><strong>Technologies:</strong> ${Array.isArray(item.technologies) ? item.technologies.join(", ") : item.technologies}</p>` : ""}
+                ${item.url ? `<p><strong>URL:</strong> <a href="${item.url}" target="_blank" style="color:#9ca3af;">${item.url}</a></p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyLeadershipPositions.length > 0 ? `
+          ${
+            nonEmptyLeadershipPositions.length > 0
+              ? `
           <div class="section" data-section="leadershipPositions">
             <h2 class="section-title">Leadership Positions</h2>
-            ${nonEmptyLeadershipPositions.map((item, idx) => `
+            ${nonEmptyLeadershipPositions
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${formatDateRange(item.startDate, item.endDate) || ''}</div>
+                <div class="date-line">${formatDateRange(item.startDate, item.endDate) || ""}</div>
                 <div class="title-line">
-                  ${item.position || item.title || ''}
+                  ${item.position || item.title || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.organization || ''}</p>
-                ${item.description ? renderDescription(item.description) : ''}
+                <p style="color: ${currentTheme.textLight};">${item.organization || ""}</p>
+                ${item.description ? renderDescription(item.description) : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyCoCurricular.length > 0 ? `
+          ${
+            nonEmptyCoCurricular.length > 0
+              ? `
           <div class="section" data-section="coCurricular">
             <h2 class="section-title">Co-curricular Activities</h2>
-            ${nonEmptyCoCurricular.map((item, idx) => `
+            ${nonEmptyCoCurricular
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.year || ''}</div>
+                <div class="date-line">${item.year || ""}</div>
                 <div class="title-line">
-                  ${item.activity || ''}
+                  ${item.activity || ""}
                 </div>
-                ${item.role ? `<p>Role: ${item.role}</p>` : ''}
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                ${item.role ? `<p>Role: ${item.role}</p>` : ""}
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyExtracurricular.length > 0 ? `
+          ${
+            nonEmptyExtracurricular.length > 0
+              ? `
           <div class="section" data-section="extracurricular">
             <h2 class="section-title">Extracurricular Activities</h2>
-            ${nonEmptyExtracurricular.map((item, idx) => `
+            ${nonEmptyExtracurricular
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.year || ''}</div>
+                <div class="date-line">${item.year || ""}</div>
                 <div class="title-line">
-                  ${item.activity || ''}
+                  ${item.activity || ""}
                 </div>
-                ${item.role ? `<p>Role: ${item.role}</p>` : ''}
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                ${item.role ? `<p>Role: ${item.role}</p>` : ""}
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyScholarships.length > 0 ? `
+          ${
+            nonEmptyScholarships.length > 0
+              ? `
           <div class="section" data-section="scholarships">
             <h2 class="section-title">Scholarships</h2>
-            ${nonEmptyScholarships.map((item, idx) => `
+            ${nonEmptyScholarships
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.year || ''}</div>
+                <div class="date-line">${item.year || ""}</div>
                 <div class="title-line">
-                  ${item.name || ''}
+                  ${item.name || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.provider || item.organization || ''}</p>
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.provider || item.organization || ""}</p>
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyAwards.length > 0 ? `
+          ${
+            nonEmptyAwards.length > 0
+              ? `
           <div class="section" data-section="awards">
             <h2 class="section-title">Awards</h2>
-            ${nonEmptyAwards.map((item, idx) => `
+            ${nonEmptyAwards
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.issueYear || item.year || ''}</div>
+                <div class="date-line">${item.issueYear || item.year || ""}</div>
                 <div class="title-line">
-                  ${item.title || ''}
+                  ${item.title || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.organization || ''}</p>
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.organization || ""}</p>
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptySpeakingEngagements.length > 0 ? `
+          ${
+            nonEmptySpeakingEngagements.length > 0
+              ? `
           <div class="section" data-section="speakingEngagements">
             <h2 class="section-title">Speaking Engagements</h2>
-            ${nonEmptySpeakingEngagements.map((item, idx) => `
+            ${nonEmptySpeakingEngagements
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.date || ''}</div>
+                <div class="date-line">${item.date || ""}</div>
                 <div class="title-line">
-                  ${item.topic || ''}
+                  ${item.topic || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.eventName || ''}</p>
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.eventName || ""}</p>
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyMemberships.length > 0 ? `
+          ${
+            nonEmptyMemberships.length > 0
+              ? `
           <div class="section" data-section="memberships">
             <h2 class="section-title">Memberships</h2>
-            ${nonEmptyMemberships.map((item, idx) => `
+            ${nonEmptyMemberships
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.year || ''}</div>
+                <div class="date-line">${item.year || ""}</div>
                 <div class="title-line">
-                  ${item.membershipName || ''}
+                  ${item.membershipName || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.organizationName || item.organization || ''}</p>
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.organizationName || item.organization || ""}</p>
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyWorkshops.length > 0 ? `
+          ${
+            nonEmptyWorkshops.length > 0
+              ? `
           <div class="section" data-section="workshops">
             <h2 class="section-title">Workshops</h2>
-            ${nonEmptyWorkshops.map((item, idx) => `
+            ${nonEmptyWorkshops
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.year || ''}</div>
+                <div class="date-line">${item.year || ""}</div>
                 <div class="title-line">
-                  ${item.programTitle || item.title || ''}
+                  ${item.programTitle || item.title || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.conductedBy || ''}</p>
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.conductedBy || ""}</p>
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyClientProjects.length > 0 ? `
+          ${
+            nonEmptyClientProjects.length > 0
+              ? `
           <div class="section" data-section="clientProjects">
             <h2 class="section-title">Client Projects</h2>
-            ${nonEmptyClientProjects.map((item, idx) => `
+            ${nonEmptyClientProjects
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.duration || ''}</div>
+                <div class="date-line">${item.duration || ""}</div>
                 <div class="title-line">
-                  ${item.name || ''}
+                  ${item.name || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.clientOrganization || ''}${item.role ? ` - ${item.role}` : ''}</p>
-                ${item.description ? renderDescription(item.description) : ''}
-                ${item.toolsTechnologies ? `<p><strong>Tools:</strong> ${item.toolsTechnologies}</p>` : ''}
-                ${item.projectUrl ? `<p><strong>URL:</strong> <a href="${item.projectUrl}" target="_blank">${item.projectUrl}</a></p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.clientOrganization || ""}${item.role ? ` - ${item.role}` : ""}</p>
+                ${item.description ? renderDescription(item.description) : ""}
+                ${item.toolsTechnologies ? `<p><strong>Tools:</strong> ${item.toolsTechnologies}</p>` : ""}
+                ${item.projectUrl ? `<p><strong>URL:</strong> <a href="${item.projectUrl}" target="_blank">${item.projectUrl}</a></p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyPortfolio.length > 0 ? `
+          ${
+            nonEmptyPortfolio.length > 0
+              ? `
           <div class="section" data-section="portfolio">
             <h2 class="section-title">Portfolio</h2>
-            ${nonEmptyPortfolio.map((item, idx) => `
+            ${nonEmptyPortfolio
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
                 <div class="title-line">
-                  ${item.name || ''}
+                  ${item.name || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.type || ''}${item.platform ? ` on ${item.platform}` : ''}</p>
-                ${item.url ? `<p><a href="${item.url}" target="_blank">${item.url}</a></p>` : ''}
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.type || ""}${item.platform ? ` on ${item.platform}` : ""}</p>
+                ${item.url ? `<p><a href="${item.url}" target="_blank">${item.url}</a></p>` : ""}
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyVolunteering.length > 0 ? `
+          ${
+            nonEmptyVolunteering.length > 0
+              ? `
           <div class="section" data-section="volunteering">
             <h2 class="section-title">Volunteering</h2>
-            ${nonEmptyVolunteering.map((item, idx) => `
+            ${nonEmptyVolunteering
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.duration || formatDateRange(item.startDate, item.endDate) || ''}</div>
+                <div class="date-line">${item.duration || formatDateRange(item.startDate, item.endDate) || ""}</div>
                 <div class="title-line">
-                  ${item.role || ''}
+                  ${item.role || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.organization || ''}${item.causeArea ? ` - ${item.causeArea}` : ''}</p>
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.organization || ""}${item.causeArea ? ` - ${item.causeArea}` : ""}</p>
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyMilitaryService.length > 0 ? `
+          ${
+            nonEmptyMilitaryService.length > 0
+              ? `
           <div class="section" data-section="militaryService">
             <h2 class="section-title">Military Service</h2>
-            ${nonEmptyMilitaryService.map((item, idx) => `
+            ${nonEmptyMilitaryService
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.duration || formatDateRange(item.startDate, item.endDate) || ''}</div>
+                <div class="date-line">${item.duration || formatDateRange(item.startDate, item.endDate) || ""}</div>
                 <div class="title-line">
-                  ${item.branch ? item.branch : ''}${item.rank ? ` - ${item.rank}` : ''}
+                  ${item.branch ? item.branch : ""}${item.rank ? ` - ${item.rank}` : ""}
                 </div>
-                ${item.specialization ? `<p>Specialization: ${item.specialization}</p>` : ''}
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                ${item.specialization ? `<p>Specialization: ${item.specialization}</p>` : ""}
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyToolsTechnologies.length > 0 ? `
+          ${
+            nonEmptyToolsTechnologies.length > 0
+              ? `
           <div class="section" data-section="toolsTechnologies">
             <h2 class="section-title">Tools & Technologies</h2>
-            ${nonEmptyToolsTechnologies.map((item, idx) => `
+            ${nonEmptyToolsTechnologies
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="title-line" style="font-size: ${normalTextFontSize}px;">
-                  ${item.name || ''}
+                <div class="title-line" style="font-size: ${normalTextFontSize}pt;">
+                  ${item.name || ""}
                 </div>
-                ${item.category ? `<p><strong>Category:</strong> ${item.category}</p>` : ''}
-                ${item.proficiency ? `<p><strong>Proficiency:</strong> ${item.proficiency}</p>` : ''}
-                ${item.experienceDuration ? `<p><strong>Experience:</strong> ${item.experienceDuration}</p>` : ''}
+                ${item.category ? `<p><strong>Category:</strong> ${item.category}</p>` : ""}
+                ${item.proficiency ? `<p><strong>Proficiency:</strong> ${item.proficiency}</p>` : ""}
+                ${item.experienceDuration ? `<p><strong>Experience:</strong> ${item.experienceDuration}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyMethodologies.length > 0 ? `
+          ${
+            nonEmptyMethodologies.length > 0
+              ? `
           <div class="section" data-section="methodologies">
             <h2 class="section-title">Methodologies</h2>
-            ${nonEmptyMethodologies.map((item, idx) => `
+            ${nonEmptyMethodologies
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="title-line" style="font-size: ${normalTextFontSize}px;">
-                  ${item.name || ''}
+                <div class="title-line" style="font-size: ${normalTextFontSize}pt;">
+                  ${item.name || ""}
                 </div>
-                ${item.certification ? `<p><strong>Certification:</strong> ${item.certification}</p>` : ''}
-                ${item.experienceDuration ? `<p><strong>Experience:</strong> ${item.experienceDuration}</p>` : ''}
+                ${item.certification ? `<p><strong>Certification:</strong> ${item.certification}</p>` : ""}
+                ${item.experienceDuration ? `<p><strong>Experience:</strong> ${item.experienceDuration}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyIndustryExpertise.length > 0 ? `
+          ${
+            nonEmptyIndustryExpertise.length > 0
+              ? `
           <div class="section" data-section="industryExpertise">
             <h2 class="section-title">Industry Expertise</h2>
-            ${nonEmptyIndustryExpertise.map((item, idx) => `
+            ${nonEmptyIndustryExpertise
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="title-line" style="font-size: ${normalTextFontSize}px;">
-                  ${item.industry || ''}
+                <div class="title-line" style="font-size: ${normalTextFontSize}pt;">
+                  ${item.industry || ""}
                 </div>
-                ${item.domainArea ? `<p><strong>Domain:</strong> ${item.domainArea}</p>` : ''}
-                ${item.experienceDuration ? `<p><strong>Experience:</strong> ${item.experienceDuration}</p>` : ''}
+                ${item.domainArea ? `<p><strong>Domain:</strong> ${item.domainArea}</p>` : ""}
+                ${item.experienceDuration ? `<p><strong>Experience:</strong> ${item.experienceDuration}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyTeachingExperience.length > 0 ? `
+          ${
+            nonEmptyTeachingExperience.length > 0
+              ? `
           <div class="section" data-section="teachingExperience">
             <h2 class="section-title">Teaching Experience</h2>
-            ${nonEmptyTeachingExperience.map((item, idx) => `
+            ${nonEmptyTeachingExperience
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.duration || formatDateRange(item.startDate, item.endDate) || ''}</div>
+                <div class="date-line">${item.duration || formatDateRange(item.startDate, item.endDate) || ""}</div>
                 <div class="title-line">
-                  ${item.subjectCourseTaught || item.title || ''}
+                  ${item.subjectCourseTaught || item.title || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.institution || ''}</p>
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.institution || ""}</p>
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyMentorshipExperience.length > 0 ? `
+          ${
+            nonEmptyMentorshipExperience.length > 0
+              ? `
           <div class="section" data-section="mentorshipExperience">
             <h2 class="section-title">Mentorship Experience</h2>
-            ${nonEmptyMentorshipExperience.map((item, idx) => `
+            ${nonEmptyMentorshipExperience
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.duration || formatDateRange(item.startDate, item.endDate) || ''}</div>
+                <div class="date-line">${item.duration || formatDateRange(item.startDate, item.endDate) || ""}</div>
                 <div class="title-line">
-                  ${item.mentorshipArea || ''}
+                  ${item.mentorshipArea || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.organizationPlatform || ''}${item.menteeLevel ? ` - ${item.menteeLevel}` : ''}</p>
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.organizationPlatform || ""}${item.menteeLevel ? ` - ${item.menteeLevel}` : ""}</p>
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyResearchGrants.length > 0 ? `
+          ${
+            nonEmptyResearchGrants.length > 0
+              ? `
           <div class="section" data-section="researchGrants">
             <h2 class="section-title">Research Grants</h2>
-            ${nonEmptyResearchGrants.map((item, idx) => `
+            ${nonEmptyResearchGrants
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.year || ''}</div>
+                <div class="date-line">${item.year || ""}</div>
                 <div class="title-line">
-                  ${item.title || ''}
+                  ${item.title || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.agency || ''}${item.amount ? ` | Amount: ${item.amount}` : ''}</p>
-                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.agency || ""}${item.amount ? ` | Amount: ${item.amount}` : ""}</p>
+                ${item.description ? `<p style="color: ${currentTheme.textLight};">${item.description}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyTestScores.length > 0 ? `
+          ${
+            nonEmptyTestScores.length > 0
+              ? `
           <div class="section" data-section="testScores">
             <h2 class="section-title">Test Scores</h2>
-            ${nonEmptyTestScores.map((item, idx) => `
+            ${nonEmptyTestScores
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.year || ''}</div>
-                <div class="title-line" style="font-size: ${normalTextFontSize}px;">
-                  ${item.testName || ''}
+                <div class="date-line">${item.year || ""}</div>
+                <div class="title-line" style="font-size: ${normalTextFontSize}pt;">
+                  ${item.testName || ""}
                 </div>
-                <p><strong>Score:</strong> ${item.score || ''}</p>
-                ${item.percentileRank ? `<p><strong>Percentile:</strong> ${item.percentileRank}</p>` : ''}
+                <p><strong>Score:</strong> ${item.score || ""}</p>
+                ${item.percentileRank ? `<p><strong>Percentile:</strong> ${item.percentileRank}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyPublications.length > 0 ? `
+          ${
+            nonEmptyPublications.length > 0
+              ? `
           <div class="section" data-section="publications">
             <h2 class="section-title">Publications</h2>
-            ${nonEmptyPublications.map((item, idx) => `
+            ${nonEmptyPublications
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.year || ''}</div>
+                <div class="date-line">${item.year || ""}</div>
                 <div class="title-line">
-                  ${item.title || ''}
+                  ${item.title || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.journalPublisher || ''}${item.publicationType ? ` (${item.publicationType})` : ''}</p>
-                ${item.urlDoi ? `<p><a href="${item.urlDoi}" target="_blank">${item.urlDoi}</a></p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.journalPublisher || ""}${item.publicationType ? ` (${item.publicationType})` : ""}</p>
+                ${item.urlDoi ? `<p><a href="${item.urlDoi}" target="_blank">${item.urlDoi}</a></p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyPatents.length > 0 ? `
+          ${
+            nonEmptyPatents.length > 0
+              ? `
           <div class="section" data-section="patents">
             <h2 class="section-title">Patents</h2>
-            ${nonEmptyPatents.map((item, idx) => `
+            ${nonEmptyPatents
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
-                <div class="date-line">${item.year || ''}</div>
+                <div class="date-line">${item.year || ""}</div>
                 <div class="title-line">
-                  ${item.title || ''}
+                  ${item.title || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.patentNumber ? `Patent #: ${item.patentNumber}` : ''}${item.issuingAuthority ? ` | ${item.issuingAuthority}` : ''}</p>
-                ${item.status ? `<p><strong>Status:</strong> ${item.status}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.patentNumber ? `Patent #: ${item.patentNumber}` : ""}${item.issuingAuthority ? ` | ${item.issuingAuthority}` : ""}</p>
+                ${item.status ? `<p><strong>Status:</strong> ${item.status}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
-          ${nonEmptyReferences.length > 0 ? `
+          ${
+            nonEmptyReferences.length > 0
+              ? `
           <div class="section" data-section="references">
             <h2 class="section-title">References</h2>
-            ${nonEmptyReferences.map((item, idx) => `
+            ${nonEmptyReferences
+              .map(
+                (item, idx) => `
               <div class="entry" data-index="${idx}">
                 <div class="title-line">
-                  ${item.name || ''}
+                  ${item.name || ""}
                 </div>
-                <p style="color: ${currentTheme.textLight};">${item.designationRelationship || ''}${item.organization ? ` at ${item.organization}` : ''}</p>
-                ${item.contactInformation ? `<p style="color: ${currentTheme.textLight};">${item.contactInformation}</p>` : ''}
+                <p style="color: ${currentTheme.textLight};">${item.designationRelationship || ""}${item.organization ? ` at ${item.organization}` : ""}</p>
+                ${item.contactInformation ? `<p style="color: ${currentTheme.textLight};">${item.contactInformation}</p>` : ""}
               </div>
-            `).join('')}
+            `,
+              )
+              .join("")}
           </div>
-          ` : ''}
+          `
+              : ""
+          }
 
          
         </main>

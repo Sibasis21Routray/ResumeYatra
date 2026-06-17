@@ -51,24 +51,24 @@ export function buildModernTemplate(data: any, theme?: any): string {
   };
 
   const currentTheme = { ...defaultTheme, ...(theme || {}) };
-  
+
   // ✅ Dynamic font size from user settings
   const baseFontSize = data?.formatting?.bodyFontSize || data?.fontSize || 14;
   const userFontFamily = data?.formatting?.fontFamily || data?.fontFamily || "'Helvetica', 'Arial', sans-serif";
-  
+
   // Typography settings
   const typography = theme?.typography || {
     fontSize: "medium",
     alignment: "left",
     fontWeight: "normal",
   };
-  
+
   const alignmentMap = { left: "left", center: "center", justify: "justify" };
   const fontWeightMap = { normal: "400", bold: "700" };
-  
+
   const currentAlignment = alignmentMap[typography.alignment as keyof typeof alignmentMap] || "left";
   const currentFontWeight = fontWeightMap[typography.fontWeight as keyof typeof fontWeightMap] || "400";
-  
+
   // Responsive font sizes based on baseFontSize
   const nameFontSize = Math.round(baseFontSize * 3.7); // ~52px at 14px base
   const labelFontSize = Math.round(baseFontSize * 1.14); // ~16px at 14px base
@@ -82,7 +82,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
     return arr.some(item => {
       if (typeof item === "string") return item.trim().length > 0;
       if (typeof item === "object" && item !== null) {
-        return Object.values(item).some(val => 
+        return Object.values(item).some(val =>
           typeof val === "string" && val.trim().length > 0
         );
       }
@@ -96,7 +96,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
     return arr.filter(item => {
       if (typeof item === "string") return item.trim().length > 0;
       if (typeof item === "object" && item !== null) {
-        return Object.values(item).some(val => 
+        return Object.values(item).some(val =>
           typeof val === "string" && val.trim().length > 0
         );
       }
@@ -107,7 +107,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
   // Helper to check if an object has any non-empty values
   const hasObjectValues = (obj: any): boolean => {
     if (!obj || typeof obj !== "object") return false;
-    return Object.values(obj).some(val => 
+    return Object.values(obj).some(val =>
       val !== null && val !== undefined && val !== ""
     );
   };
@@ -124,7 +124,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
   // Helper to render description with HTML content
   const renderDescription = (description: string): string => {
     if (!description) return '';
-    
+
     const bulletChar = '•'; // Use literal bullet for maximum Word compatibility
 
     if (description.includes('<ul>') || description.includes('<li>')) {
@@ -137,13 +137,13 @@ export function buildModernTemplate(data: any, theme?: any): string {
     const lines = description.split('\n')
       .map(line => line.trim())
       .filter(line => line.length > 0);
-      
+
     if (lines.length === 0) return '';
     return `
       <div class="custom-list-container" style="margin-top: 5px;">
         ${lines.map(line => `
-          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${normalTextFontSize}px; line-height: 1.4; color: ${currentTheme.textLight};">
-            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16px; text-align: center;">${bulletChar}</div>
+          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${normalTextFontSize}pt; line-height: 1.4; color: ${currentTheme.textLight};">
+            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16pt; text-align: center;">${bulletChar}</div>
             <div style="display: table-cell; vertical-align: top; padding-left: 2px;">${line.trim()}</div>
           </div>
         `).join('')}
@@ -151,12 +151,12 @@ export function buildModernTemplate(data: any, theme?: any): string {
     `;
   };
 
-  
+
 
   // Helper to parse skills into two columns with proper bullet points
   const parseSkillsToColumns = (skills: any) => {
     let list: string[] = [];
-    
+
     if (typeof skills === "string") {
       if (skills.includes('<ul>') || skills.includes('<li>')) {
         const matches = skills.match(/<li>(.*?)<\/li>/g);
@@ -172,7 +172,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
     } else if (Array.isArray(skills)) {
       list = skills;
     }
-    
+
     const mid = Math.ceil(list.length / 2);
     return {
       col1: list.slice(0, mid),
@@ -184,7 +184,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
 
   const { col1, col2 } = parseSkillsToColumns(skills);
   const { col1: coreCompCol1, col2: coreCompCol2 } = parseSkillsToColumns(coreCompetencies);
-  
+
   // Filter arrays to only include non-empty items
   const nonEmptyExperience = getNonEmptyItems(experience);
   const nonEmptyEducation = getNonEmptyItems(education);
@@ -235,7 +235,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
           background: #ffffff;
           max-width: 850px;
           margin: 0 auto;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           font-weight: ${currentFontWeight};
           text-align: ${currentAlignment};
         }
@@ -245,7 +245,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
           margin-bottom: 30px;
         }
         .name {
-          font-size: ${nameFontSize}px;
+          font-size: ${nameFontSize}pt;
           font-weight: 900;
           color: ${currentTheme.heading};
           text-transform: uppercase;
@@ -261,7 +261,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
         }
         
         .contact-info {
-          font-size: ${smallTextFontSize}px;
+          font-size: ${smallTextFontSize}pt;
           color: ${currentTheme.textLight};
           display: flex;
           gap: 12px;
@@ -277,7 +277,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
         }
 
         .label-main {
-          font-size: ${labelFontSize}px;
+          font-size: ${labelFontSize}pt;
           font-weight: 800;
           text-transform: uppercase;
           color: ${currentTheme.heading};
@@ -290,7 +290,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
           margin-bottom: 20px;
         }
         .entry-left {
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           font-weight: 800;
           color: ${currentTheme.text};
         }
@@ -298,7 +298,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
           width: 100%;
         }
         .entry-right b {
-          font-size: ${entryTitleFontSize}px;
+          font-size: ${entryTitleFontSize}pt;
           font-weight: 800;
           display: block;
           color: ${currentTheme.text};
@@ -313,7 +313,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
         .bullet-list {
           list-style-type: disc;
           margin-left: 18px;
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           color: ${currentTheme.textLight};
         }
         .bullet-list li {
@@ -340,7 +340,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
           width: 100%;
           margin-bottom: 6px;
           color: ${currentTheme.textLight};
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           line-height: 1.4;
         }
         .description-html li .bullet-wrap {
@@ -349,7 +349,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
           vertical-align: top;
           padding-top: 0;
           font-family: 'Arial', sans-serif;
-          font-size: 16px;
+          font-size: 16pt;
           text-align: center;
         }
         .description-html li .li-text {
@@ -366,7 +366,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
         .inline-list {
           list-style-type: disc;
           margin-left: 18px;
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
         }
         .inline-list li {
           margin-bottom: 4px;
@@ -379,7 +379,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
           width: 100%;
         }
         .context-item {
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           color: ${currentTheme.textLight};
         }
         .context-label {
@@ -417,17 +417,50 @@ export function buildModernTemplate(data: any, theme?: any): string {
         <h1 class="name">${personal.name?.toUpperCase() || ""}</h1>
         <div class="top-line"></div>
         <div class="contact-info">
-          ${personal.location ? `<span>${personal.location}${personal.pinCode ? ` ${personal.pinCode}` : ''}</span> | ` : ''}
-          ${personal.country ? `<span>${personal.country}</span> | ` : ''}
-          ${personal.phone ? `<span>${personal.phone}</span> | ` : ''}
-          ${personal.alternatePhone ? `<span>${personal.alternatePhone}</span> | ` : ''}
-          ${personal.email ? `<span>${personal.email}</span>` : ''}
-        </div>
-        <div class="contact-info" style="margin-bottom: 0;">
-          ${personal.fullAddress ? `<span>${personal.fullAddress}</span>` : ''}
-          ${personal.dob ? `<span>DOB: ${personal.dob}</span>` : ''}
-          ${personal.gender ? `<span>Gender: ${personal.gender}</span>` : ''}
-          ${personal.maritalStatus ? `<span>Marital: ${personal.maritalStatus}</span>` : ''}
+          ${(() => {
+            const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+            const linkedinProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+              String(p.url).toLowerCase().includes("linkedin")
+            );
+            const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+            const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+            
+            const githubProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("github") || 
+              String(p.url).toLowerCase().includes("github")
+            );
+            const githubUrl = githubProfile?.url || githubProfile?.username || "";
+            const cleanGithubLabel = githubUrl ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+
+            const items = [];
+            if (personal.phone) {
+              items.push(`<span>${personal.phone}</span>`);
+            }
+            if (personal.email) {
+              items.push(`<span>${personal.email}</span>`);
+            }
+            if (personal.dob) {
+              items.push(`<span>DOB: ${personal.dob}</span>`);
+              if (linkedinUrl) {
+                items.push(`<span><a href="${linkedinUrl}" target="_blank">LinkedIn</a></span>`);
+              } else if (addressString) {
+                items.push(`<span>${addressString}</span>`);
+              }
+            } else {
+              if (linkedinUrl) {
+                items.push(`<span><a href="${linkedinUrl}" target="_blank">LinkedIn</a></span>`);
+              } else if (addressString) {
+                items.push(`<span>${addressString}</span>`);
+              }
+            }
+            
+            if (githubUrl) {
+              items.push(`<span><a href="${githubUrl}" target="_blank">GitHub</a></span>`);
+            }
+            
+            return items.join(" | ");
+          })()}
         </div>
       </header>
 
@@ -447,7 +480,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
       <div class="section-row" data-section="careerObjective">
         <div class="label-main">Career Objective</div>
         <div class="section-content">
-          <p style="font-size: ${normalTextFontSize}px; text-align: justify; color: ${currentTheme.textLight};">${careerObjective}</p>
+          <p style="font-size: ${normalTextFontSize}pt; text-align: justify; color: ${currentTheme.textLight};">${careerObjective}</p>
         </div>
       </div>
       ` : ''}
@@ -456,7 +489,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
       <div class="section-row" data-section="summary">
         <div class="label-main">Summary</div>
         <div class="section-content">
-          <p style="font-size: ${normalTextFontSize}px; text-align: justify; color: ${currentTheme.textLight};">${summary}</p>
+          <p style="font-size: ${normalTextFontSize}pt; text-align: justify; color: ${currentTheme.textLight};">${summary}</p>
         </div>
       </div>
       ` : ''}
@@ -526,7 +559,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
           <div class="entry-right">
             <b>${item.name || ''}</b>
             <span class="sub-line">${item.provider || item.organization || ''}</span>
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -579,7 +612,7 @@ export function buildModernTemplate(data: any, theme?: any): string {
           <div class="entry-right">
             <b>${item.activity || ''}</b>
             ${item.role ? `<span class="sub-line">Role: ${item.role}</span>` : ''}
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -596,35 +629,13 @@ export function buildModernTemplate(data: any, theme?: any): string {
           <div class="entry-right">
             <b>${item.activity || ''}</b>
             ${item.role ? `<span class="sub-line">Role: ${item.role}</span>` : ''}
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
       ` : ''}
 
-      ${nonEmptyEducation.length > 0 ? `
-      <div class="section-row" style="margin-bottom: 0;" data-section="education">
-        <div class="label-main">Education</div>
-        <div></div>
-      </div>
-      ${nonEmptyEducation.map((edu, idx) => {
-        const dateParts = [];
-        if (edu.startDate && edu.startDate.trim()) dateParts.push(edu.startDate.trim());
-        if (edu.graduationDate && edu.graduationDate.trim()) dateParts.push(edu.graduationDate.trim());
-        else if (edu.endDate && edu.endDate.trim()) dateParts.push(edu.endDate.trim());
-        const dateRange = dateParts.length > 0 ? dateParts.join(" - ") : "";
-        return `
-        <div class="entry" data-index="${idx}">
-          <div class="entry-left">${dateRange || edu.graduationDate || edu.endDate || ''}</div>
-          <div class="entry-right">
-            <b>${edu.degree || ''}${edu.field ? ` in ${edu.field}` : ''}</b>
-            <span class="sub-line">${edu.school || ''}${edu.location ? ` - ${edu.location}` : ''}</span>
-            ${edu.grade ? `<p style="color: ${currentTheme.textLight};"><strong>${edu.grade}</strong></p>` : ''}
-            ${edu.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${edu.description}</p>` : ''}
-          </div>
-        </div>
-      `}).join('')}
-      ` : ''}
+     
 
       ${col1.length > 0 || col2.length > 0 ? `
       <div class="section-row" data-section="skills">
@@ -706,7 +717,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
           <div class="entry-right">
             <b>${item.title || ''}</b>
             <span class="sub-line">${item.organization || ''}</span>
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -723,7 +734,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
           <div class="entry-right">
             <b>${item.name || ''}</b>
             <span class="sub-line">${item.provider || item.organization || ''}</span>
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -740,7 +751,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
           <div class="entry-right">
             <b>${item.topic || ''}</b>
             <span class="sub-line">${item.eventName || ''}</span>
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -757,7 +768,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
           <div class="entry-right">
             <b>${item.membershipName || ''}</b>
             <span class="sub-line">${item.organizationName || item.organization || ''}</span>
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -774,7 +785,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
           <div class="entry-right">
             <b>${item.programTitle || item.title || ''}</b>
             <span class="sub-line">${item.conductedBy || ''}</span>
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -799,6 +810,30 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
       `).join('')}
       ` : ''}
 
+       ${nonEmptyEducation.length > 0 ? `
+      <div class="section-row" style="margin-bottom: 0;" data-section="education">
+        <div class="label-main">Education</div>
+        <div></div>
+      </div>
+      ${nonEmptyEducation.map((edu, idx) => {
+    const dateParts = [];
+    if (edu.startDate && edu.startDate.trim()) dateParts.push(edu.startDate.trim());
+    if (edu.graduationDate && edu.graduationDate.trim()) dateParts.push(edu.graduationDate.trim());
+    else if (edu.endDate && edu.endDate.trim()) dateParts.push(edu.endDate.trim());
+    const dateRange = dateParts.length > 0 ? dateParts.join(" - ") : "";
+    return `
+        <div class="entry" data-index="${idx}">
+          <div class="entry-left">${dateRange || edu.graduationDate || edu.endDate || ''}</div>
+          <div class="entry-right">
+            <b>${edu.degree || ''}${edu.field ? ` in ${edu.field}` : ''}</b>
+            <span class="sub-line">${edu.school || ''}${edu.location ? ` - ${edu.location}` : ''}</span>
+            ${edu.grade ? `<p style="color: ${currentTheme.textLight};"><strong>${edu.grade}</strong></p>` : ''}
+            ${edu.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${edu.description}</p>` : ''}
+          </div>
+        </div>
+      `}).join('')}
+      ` : ''}
+
       ${nonEmptyPortfolio.length > 0 ? `
       <div class="section-row" style="margin-bottom: 0;" data-section="portfolio">
         <div class="label-main">Portfolio</div>
@@ -811,7 +846,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
             <b>${item.name || ''}</b>
             <span class="sub-line">${item.type || ''}${item.platform ? ` on ${item.platform}` : ''}</span>
             ${item.url ? `<p><a href="${item.url}" target="_blank">${item.url}</a></p>` : ''}
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -828,7 +863,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
           <div class="entry-right">
             <b>${item.role || ''}</b>
             <span class="sub-line">${item.organization || ''}${item.causeArea ? ` - ${item.causeArea}` : ''}</span>
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -845,7 +880,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
           <div class="entry-right">
             <b>${item.branch ? item.branch : ''}${item.rank ? ` - ${item.rank}` : ''}</b>
             ${item.specialization ? `<span class="sub-line">${item.specialization}</span>` : ''}
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -914,7 +949,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
           <div class="entry-right">
             <b>${item.subjectCourseTaught || item.title || ''}</b>
             <span class="sub-line">${item.institution || ''}</span>
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -931,7 +966,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
           <div class="entry-right">
             <b>${item.mentorshipArea || ''}</b>
             <span class="sub-line">${item.organizationPlatform || ''}${item.menteeLevel ? ` - ${item.menteeLevel}` : ''}</span>
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}
@@ -948,7 +983,7 @@ ${coreCompCol1.length > 0 || coreCompCol2.length > 0 ? `
           <div class="entry-right">
             <b>${item.title || ''}</b>
             <span class="sub-line">${item.agency || ''}${item.amount ? ` | Amount: ${item.amount}` : ''}</span>
-            ${item.description ? `<p style="font-size: ${normalTextFontSize}px; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
+            ${item.description ? `<p style="font-size: ${normalTextFontSize}pt; color: ${currentTheme.textLight};">${item.description}</p>` : ''}
           </div>
         </div>
       `).join('')}

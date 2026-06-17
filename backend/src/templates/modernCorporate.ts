@@ -148,7 +148,7 @@ const coreCompArray = typeof coreCompetencies === "string"
 
         body {
           font-family: ${userFontFamily};
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           color: #111111;
           background: #ffffff;
           line-height: 1.5;
@@ -161,7 +161,7 @@ const coreCompArray = typeof coreCompetencies === "string"
           margin-bottom: 18px;
         }
         .name {
-          font-size: ${nameFontSize}px;
+          font-size: ${nameFontSize}pt;
           font-weight: 700;
           letter-spacing: 3px;
           text-transform: uppercase;
@@ -169,7 +169,7 @@ const coreCompArray = typeof coreCompetencies === "string"
           color: #000;
         }
         .contact-line {
-          font-size: ${baseFontSize * 0.95}px;
+          font-size: ${baseFontSize * 0.95}pt;
           color: #333;
           margin-bottom: 3px;
         }
@@ -193,7 +193,7 @@ const coreCompArray = typeof coreCompetencies === "string"
           border-bottom: none;
         }
         .summary-text {
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           color: #333;
           line-height: 1.6;
           max-width: 95%;
@@ -203,7 +203,7 @@ const coreCompArray = typeof coreCompetencies === "string"
 
         /* ── SECTION TITLE ── */
         .section-title {
-          font-size: ${sectionTitleSize}px;
+          font-size: ${sectionTitleSize}pt;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 1.2px;
@@ -244,19 +244,19 @@ const coreCompArray = typeof coreCompetencies === "string"
         }
         .edu-degree {
           font-weight: 700;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           color: #000;
           display: block;
           line-height: 1.3;
         }
         .edu-school {
-          font-size: ${baseFontSize * 0.92}px;
+          font-size: ${baseFontSize * 0.92}pt;
           color: #444;
           display: block;
           margin-top: 1px;
         }
         .edu-year {
-          font-size: ${baseFontSize * 0.88}px;
+          font-size: ${baseFontSize * 0.88}pt;
           color: #666;
           display: block;
           margin-top: 1px;
@@ -274,7 +274,7 @@ const coreCompArray = typeof coreCompetencies === "string"
 
         .skill-list li {
           list-style: none;
-          font-size: ${baseFontSize * 0.95}px;
+          font-size: ${baseFontSize * 0.95}pt;
           color: #333;
           padding: 2px 0 2px 12px;
           position: relative;
@@ -293,7 +293,7 @@ const coreCompArray = typeof coreCompetencies === "string"
           padding: 0;
         }
         .sidebar-list li {
-          font-size: ${baseFontSize * 0.95}px;
+          font-size: ${baseFontSize * 0.95}pt;
           color: #333;
           margin-bottom: 5px;
           line-height: 1.4;
@@ -304,7 +304,7 @@ const coreCompArray = typeof coreCompetencies === "string"
           color: #111;
         }
         .sidebar-item-sub {
-          font-size: ${baseFontSize * 0.88}px;
+          font-size: ${baseFontSize * 0.88}pt;
           color: #555;
         }
 
@@ -325,20 +325,20 @@ const coreCompArray = typeof coreCompetencies === "string"
         }
         .company-name {
           font-weight: 700;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           text-transform: uppercase;
           color: #000;
           letter-spacing: 0.5px;
         }
         .date-text {
-          font-size: ${baseFontSize * 0.9}px;
+          font-size: ${baseFontSize * 0.9}pt;
           color: #555;
           white-space: nowrap;
           font-style: italic;
         }
         .job-title {
           display: block;
-          font-size: ${baseFontSize * 0.92}px;
+          font-size: ${baseFontSize * 0.92}pt;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.4px;
@@ -357,7 +357,7 @@ const coreCompArray = typeof coreCompetencies === "string"
           position: relative;
           padding-left: 13px;
           margin-bottom: 4px;
-          font-size: ${baseFontSize * 0.95}px;
+          font-size: ${baseFontSize * 0.95}pt;
           color: #333;
           line-height: 1.5;
           text-align: justify;
@@ -379,7 +379,7 @@ const coreCompArray = typeof coreCompetencies === "string"
           position: relative;
           padding-left: 13px;
           margin-bottom: 4px;
-          font-size: ${baseFontSize * 0.95}px;
+          font-size: ${baseFontSize * 0.95}pt;
           color: #333;
           line-height: 1.5;
           text-align: justify;
@@ -392,7 +392,7 @@ const coreCompArray = typeof coreCompetencies === "string"
         }
 
         .info-text {
-          font-size: ${baseFontSize * 0.92}px;
+          font-size: ${baseFontSize * 0.92}pt;
           color: #444;
           margin-top: 3px;
         }
@@ -409,32 +409,51 @@ const coreCompArray = typeof coreCompetencies === "string"
         <h1 class="name">${personal.name || "YOUR NAME"}</h1>
 
         <div class="contact-line">
-          ${[
-            personal.phone ? `Phone: ${personal.phone}` : "",
-            personal.email ? `Email: ${personal.email}` : "",
-            personal.location ? `Address: ${personal.location}` : "",
-          ]
-            .filter(Boolean)
-            .join('<span class="contact-separator">|</span>')}
-        </div>
+          ${(() => {
+            const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+            const linkedinProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+              String(p.url).toLowerCase().includes("linkedin")
+            );
+            const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+            const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+            
+            const githubProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("github") || 
+              String(p.url).toLowerCase().includes("github")
+            );
+            const githubUrl = githubProfile?.url || githubProfile?.username || "";
+            const cleanGithubLabel = githubUrl ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
 
-        ${
-          personal.dob || personal.gender
-            ? `
-        <div class="contact-line">
-          ${[
-            personal.dob ? `DOB: ${personal.dob}` : "",
-            personal.gender ? `Gender: ${personal.gender}` : "",
-          ]
-            .filter(Boolean)
-            .join('<span class="contact-separator">|</span>')}
+            const items = [];
+            if (personal.phone) {
+              items.push(`Phone: ${personal.phone}`);
+            }
+            if (personal.email) {
+              items.push(`Email: <a href="mailto:${personal.email}">${personal.email}</a>`);
+            }
+            if (personal.dob) {
+              items.push(`DOB: ${personal.dob}`);
+              if (linkedinUrl) {
+                items.push(`LinkedIn: <a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a>`);
+              } else if (addressString) {
+                items.push(`Address: ${addressString}`);
+              }
+            } else {
+              if (linkedinUrl) {
+                items.push(`LinkedIn: <a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a>`);
+              } else if (addressString) {
+                items.push(`Address: ${addressString}`);
+              }
+            }
+            
+            if (githubUrl) {
+              items.push(`GitHub: <a href="${githubUrl}" target="_blank">${cleanGithubLabel}</a>`);
+            }
+            
+            return items.join('<span class="contact-separator">|</span>');
+          })()}
         </div>
-        `
-            : ""
-        }
-
-        ${linkedIn ? `<div class="contact-line"><strong>LinkedIn:</strong> <a href="${linkedIn}">${linkedIn}</a></div>` : ""}
-        ${github ? `<div class="contact-line"><strong>GitHub:</strong> <a href="${github}">${github}</a></div>` : ""}
       </div>
 
       <!-- SUMMARY (full width) -->
@@ -654,7 +673,7 @@ const coreCompArray = typeof coreCompetencies === "string"
                 </div>
                 <span class="job-title">${exp.title || ""}${exp.location ? ` | ${exp.location}` : ""}</span>
                 ${exp.description ? renderBullets(exp.description) : ""}
-                ${exp.achievements ? `<p class="info-text"><strong>Achievements:</strong> ${exp.achievements}</p>` : ""}
+                ${exp.achievements ? `<p class="bullet-list" style="margin-top:4px; list-style:none; padding-left:0;"><li style="list-style:none; padding-left:0;"><strong>Achievements:</strong> ${exp.achievements}</li></p>` : ""}
               </div>
             `,
               )

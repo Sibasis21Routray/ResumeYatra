@@ -50,7 +50,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
     textMuted: "#555555",
     borderColor: "#005F5F"
   };
-  
+
   const currentTheme = { ...defaultTheme, ...theme };
 
   const userFontSize = data.fontSize || 14;
@@ -234,7 +234,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
       color: var(--text-dark);
       line-height: 1.5;
       background: #f5f5f5;
-      font-size: ${baseFontSize}px;
+      font-size: ${baseFontSize}pt;
     }
 
     .container {
@@ -261,7 +261,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
     }
     
     .name {
-      font-size: ${Math.round(baseFontSize * 1.8)}px;
+      font-size: ${Math.round(baseFontSize * 1.8)}pt;
       font-weight: 700;
       line-height: 1.15;
       letter-spacing: 0.05em;
@@ -271,7 +271,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
     }
     
     .role {
-      font-size: ${Math.round(baseFontSize * 0.85)}px;
+      font-size: ${Math.round(baseFontSize * 0.85)}pt;
       color: rgba(255, 255, 255, 0.85);
       font-weight: 600;
       letter-spacing: 0.08em;
@@ -292,7 +292,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
     
     .sidebar-title {
       color: white;
-      font-size: ${Math.round(baseFontSize * 1.0)}px;
+      font-size: ${Math.round(baseFontSize * 1.0)}pt;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -300,7 +300,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
     }
     
     .sidebar-content {
-      font-size: ${Math.round(baseFontSize * 0.88)}px;
+      font-size: ${Math.round(baseFontSize * 0.88)}pt;
       line-height: 1.5;
     }
     
@@ -361,7 +361,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
     }
     
     .section-title {
-      font-size: ${Math.round(baseFontSize * 1.2)}px;
+      font-size: ${Math.round(baseFontSize * 1.2)}pt;
       font-weight: 700;
       color: var(--primary-color);
       text-transform: uppercase;
@@ -375,7 +375,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
     }
 
     .summary-text {
-      font-size: ${baseFontSize}px;
+      font-size: ${baseFontSize}pt;
       color: ${currentTheme.textDark};
       line-height: 1.6;
     }
@@ -396,12 +396,12 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
     
     .entry-title {
       font-weight: 700;
-      font-size: ${Math.round(baseFontSize * 1.02)}px;
+      font-size: ${Math.round(baseFontSize * 1.02)}pt;
       color: #000000;
     }
     
     .entry-date {
-      font-size: ${Math.round(baseFontSize * 0.88)}px;
+      font-size: ${Math.round(baseFontSize * 0.88)}pt;
       color: ${currentTheme.textDark};
       font-weight: 500;
       white-space: nowrap;
@@ -409,7 +409,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
     
     .entry-subtitle {
       color: var(--text-muted);
-      font-size: ${Math.round(baseFontSize * 0.92)}px;
+      font-size: ${Math.round(baseFontSize * 0.92)}pt;
       margin-bottom: 6px;
     }
     
@@ -421,7 +421,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
     .entry-content li {
       margin-bottom: 5px;
       color: ${currentTheme.textDark};
-      font-size: ${Math.round(baseFontSize * 0.92)}px;
+      font-size: ${Math.round(baseFontSize * 0.92)}pt;
       line-height: 1.5;
     }
     
@@ -430,7 +430,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
       color: white;
       padding: 2px 8px;
       border-radius: 20px;
-      font-size: ${Math.round(baseFontSize * 0.82)}px;
+      font-size: ${Math.round(baseFontSize * 0.82)}pt;
       font-weight: 600;
       display: inline-block;
     }
@@ -459,12 +459,11 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
     
     <div class="sidebar-header" id="section-sidebar-header" data-section="sidebar-header">
       <div class="name">${personal?.name || "Your Name "}</div>
-      ${
-  personal?.title &&
-  !["undefined", "null"].includes(String(personal.title).toLowerCase())
-    ? `<div class="role">${personal.title}</div>`
-    : ""
-}
+      ${personal?.title &&
+      !["undefined", "null"].includes(String(personal.title).toLowerCase())
+      ? `<div class="role">${personal.title}</div>`
+      : ""
+    }
     </div>
 
     <hr class="sidebar-divider" />
@@ -623,7 +622,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
             </div>
             <div class="entry-subtitle">${formatSubtitle([exp.company || exp.organization, exp.location])}</div>
             ${exp.description ? renderDescription(exp.description) : ""}
-            ${exp.achievements ? `<div class="entry-content"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
+            ${exp.achievements ? `<div class="entry-content" style="font-size: ${Math.round(baseFontSize * 0.92)}pt;"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
           </div>
         `).join("")}
       </div>
@@ -652,10 +651,10 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
       <div class="section" id="section-education" data-section="education">
         <div class="section-title">${icons.graduation} EDUCATION</div>
         ${nonEmptyEducation.map((edu, idx) => {
-          const startDate = edu.startDate || edu.startYear;
-          const endDate = edu.endDate || edu.endYear || edu.graduationDate;
-          const dateRange = startDate && endDate ? `${startDate} – ${endDate}` : (startDate || endDate || "");
-          return `
+      const startDate = edu.startDate || edu.startYear;
+      const endDate = edu.endDate || edu.endYear || edu.graduationDate;
+      const dateRange = startDate && endDate ? `${startDate} – ${endDate}` : (startDate || endDate || "");
+      return `
             <div class="entry" data-index="${idx}">
               <div class="entry-header">
                 <div class="entry-title">${edu.degree || edu.course}</div>
@@ -666,7 +665,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
               ${edu.description ? `<div class="entry-content">${edu.description}</div>` : ""}
             </div>
           `;
-        }).join("")}
+    }).join("")}
       </div>
     ` : ""}
 

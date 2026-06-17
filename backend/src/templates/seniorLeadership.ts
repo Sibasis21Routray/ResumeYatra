@@ -54,7 +54,11 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
   const currentTheme = { ...defaultTheme, ...(theme || {}) };
   const primaryColor = currentTheme.primary || currentTheme.headerBg || "#000000";
   const baseFontSize = data?.formatting?.bodyFontSize || data?.fontSize || 10;
-  const userFontFamily = data?.formatting?.fontFamily || data?.fontFamily || "'Inter', 'Helvetica', 'Arial', sans-serif";
+  const userFontFamily =
+  data.formatting?.fontFamily ||
+  data.fontFamily ||
+  "'Inter', Arial, sans-serif";
+
   const nameFontSize = Math.round(baseFontSize * 2.6);
   const sectionTitleSize = Math.round(baseFontSize * 1.1);
 
@@ -160,13 +164,14 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
     <head>
       <meta charset="UTF-8">
       <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Lato:wght@400;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
           font-family: ${userFontFamily};
           color: ${currentTheme.textMain};
           line-height: 1.4;
           background: white;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
         }
 
         /* Black Header Block */
@@ -177,7 +182,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           padding: 35px 20px;
         }
         .name { 
-          font-size: ${nameFontSize}px; 
+          font-size: ${nameFontSize}pt; 
           font-weight: 800; 
           text-transform: uppercase;
           letter-spacing: 3px;
@@ -189,7 +194,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           justify-content: center;
           gap: 20px;
           flex-wrap: wrap;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           margin-bottom: 12px;
         }
         .contact-info span { font-weight: 400; color: #ffffff; }
@@ -230,7 +235,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           margin-bottom: 15px;
         }
         .section-title {
-          font-size: ${sectionTitleSize}px;
+          font-size: ${sectionTitleSize}pt;
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -242,7 +247,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           text-align: justify; 
           color: #1f2937; 
           line-height: 1.6;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
         }
         .side-list { 
           list-style: none; 
@@ -254,7 +259,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           margin-bottom: 8px; 
           font-weight: 500;
           color: #1f2937;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
         }
         .side-list li::before {
           content: "•";
@@ -275,14 +280,14 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
         }
         .company-name { 
           font-weight: 800; 
-          font-size: ${baseFontSize + 1}px; 
+          font-size: ${baseFontSize + 1}pt; 
           color: ${primaryColor}; 
         }
         .date-pill {
           background: #f3f4f6;
           padding: 3px 12px;
           border-radius: 4px;
-          font-size: ${baseFontSize - 1}px;
+          font-size: ${baseFontSize - 1}pt;
           color: #6b7280;
           font-weight: 600;
         }
@@ -292,7 +297,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           margin-bottom: 8px; 
           display: block; 
           font-weight: 500;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
         }
         
         .bullet-list { 
@@ -307,7 +312,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           color: #4b5563; 
           text-align: justify;
           line-height: 1.5;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
         }
         .bullet-list li::before {
           content: "•";
@@ -326,7 +331,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           padding-left: 15px;
           margin-bottom: 5px;
           color: #4b5563;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           list-style: none;
         }
         .description-html li::before {
@@ -343,11 +348,11 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           display: block; 
           margin-bottom: 3px; 
           color: ${primaryColor};
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
         }
         .edu-meta { 
           color: #6b7280; 
-          font-size: ${baseFontSize - 1}px; 
+          font-size: ${baseFontSize - 1}pt; 
           padding-left: 0;
           line-height: 1.4;
         }
@@ -356,7 +361,7 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
           display: flex;
           align-items: flex-start;
           margin-bottom: 10px;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           color: #1f2937;
         }
         .contact-item {
@@ -381,33 +386,106 @@ export function buildSeniorLeadershipTemplate(data: any, theme?: any): string {
       <div class="header-container" data-section="personal">
         <h1 class="name">${personal.name || 'YOUR NAME'}</h1>
         <div class="contact-info">
-          ${personal.phone ? `<span><b>Ph.</b> ${personal.phone}</span>` : ''}
-          ${personal.alternatePhone ? `<span><b>Alt Phone</b> ${personal.alternatePhone}</span>` : ''}
-          ${personal.email ? `<span><b>Email</b> ${personal.email}</span>` : ''}
-          ${personal.location ? `<span><b>Location</b> ${personal.location}</span>` : ''}
-          ${personal.dob ? `<span><b>DOB</b> ${personal.dob}</span>` : ''}
-          ${personal.gender ? `<span><b>Gender</b> ${personal.gender}</span>` : ''}
+          ${(() => {
+            const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+            const linkedinProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+              String(p.url).toLowerCase().includes("linkedin")
+            );
+            const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+            const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+            
+            const githubProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("github") || 
+              String(p.url).toLowerCase().includes("github")
+            );
+            const githubUrl = githubProfile?.url || githubProfile?.username || "";
+            const cleanGithubLabel = githubUrl ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+
+            const items = [];
+            if (personal.phone) {
+              items.push(`<span><b>Ph.</b> ${personal.phone}</span>`);
+            }
+            if (personal.email) {
+              items.push(`<span><b>Email</b> <a href="mailto:${personal.email}" class="linkedin-link">${personal.email}</a></span>`);
+            }
+            if (personal.dob) {
+              items.push(`<span><b>DOB</b> ${personal.dob}</span>`);
+              if (linkedinUrl) {
+                items.push(`<span><a class="linkedin-link" href="${linkedinUrl}" target="_blank"><b>LinkedIn:</b> ${cleanLinkedinLabel}</a></span>`);
+              } else if (addressString) {
+                items.push(`<span><b>Location</b> ${addressString}</span>`);
+              }
+            } else {
+              if (linkedinUrl) {
+                items.push(`<span><a class="linkedin-link" href="${linkedinUrl}" target="_blank"><b>LinkedIn:</b> ${cleanLinkedinLabel}</a></span>`);
+              } else if (addressString) {
+                items.push(`<span><b>Location</b> ${addressString}</span>`);
+              }
+            }
+            
+            if (githubUrl) {
+              items.push(`<span><a class="linkedin-link" href="${githubUrl}" target="_blank"><b>GitHub:</b> ${cleanGithubLabel}</a></span>`);
+            }
+            
+            return items.join("");
+          })()}
         </div>
-        ${linkedIn ? `<div><a class="linkedin-link" href="${linkedIn}"><b>LinkedIn:</b> ${linkedIn.replace(/^https?:\/\//, '')}</a></div>` : ''}
       </div>
 
       <div class="resume-body">
         <div class="left-col">
-          ${(personal.phone || personal.email || personal.location || personal.dob || personal.gender) ? `
           <section class="section" data-section="personal">
             <div class="section-header">
               <h2 class="section-title">Contact</h2>
             </div>
             <div>
-              ${personal.phone ? `<div class="contact-item">${personal.phone}</div>` : ''}
-              ${personal.alternatePhone ? `<div class="contact-item">${personal.alternatePhone} (Alt)</div>` : ''}
-              ${personal.email ? `<div class="contact-item">${personal.email}</div>` : ''}
-              ${personal.location ? `<div class="contact-item">${personal.location}</div>` : ''}
-              ${personal.dob ? `<div class="contact-item">${personal.dob}</div>` : ''}
-              ${personal.gender ? `<div class="contact-item">${personal.gender}</div>` : ''}
+              ${(() => {
+                const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+                const linkedinProfile = socialProfiles?.find((p: any) => 
+                  String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+                  String(p.url).toLowerCase().includes("linkedin")
+                );
+                const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+                const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+                
+                const githubProfile = socialProfiles?.find((p: any) => 
+                  String(p.network || p.platform).toLowerCase().includes("github") || 
+                  String(p.url).toLowerCase().includes("github")
+                );
+                const githubUrl = githubProfile?.url || githubProfile?.username || "";
+                const cleanGithubLabel = githubUrl ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+
+                const items = [];
+                if (personal.phone) {
+                  items.push(`<div class="contact-item">${personal.phone}</div>`);
+                }
+                if (personal.email) {
+                  items.push(`<div class="contact-item"><a href="mailto:${personal.email}" style="color: inherit; text-decoration: none;">${personal.email}</a></div>`);
+                }
+                if (personal.dob) {
+                  items.push(`<div class="contact-item">DOB: ${personal.dob}</div>`);
+                  if (linkedinUrl) {
+                    items.push(`<div class="contact-item"><a href="${linkedinUrl}" target="_blank" style="color: inherit; text-decoration: none;">${cleanLinkedinLabel}</a></div>`);
+                  } else if (addressString) {
+                    items.push(`<div class="contact-item">${addressString}</div>`);
+                  }
+                } else {
+                  if (linkedinUrl) {
+                    items.push(`<div class="contact-item"><a href="${linkedinUrl}" target="_blank" style="color: inherit; text-decoration: none;">${cleanLinkedinLabel}</a></div>`);
+                  } else if (addressString) {
+                    items.push(`<div class="contact-item">${addressString}</div>`);
+                  }
+                }
+                
+                if (githubUrl) {
+                  items.push(`<div class="contact-item"><a href="${githubUrl}" target="_blank" style="color: inherit; text-decoration: none;">${cleanGithubLabel}</a></div>`);
+                }
+                
+                return items.join("");
+              })()}
             </div>
           </section>
-          ` : ''}
 
           ${summary || careerObjective ? `
           <section class="section" data-section="summary">

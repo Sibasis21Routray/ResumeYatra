@@ -175,25 +175,25 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
           line-height: 1.5;
           padding: 40px;
           background: #ffffff;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
         }
 
         /* Header Section */
         .header { text-align: center; margin-bottom: 30px; }
         .name { 
-          font-size: ${nameFontSize}px; 
+          font-size: ${nameFontSize}pt; 
           text-transform: uppercase; 
           font-weight: bold; 
           margin-bottom: 10px;
           letter-spacing: 1px;
         }
         .contact-info { 
-          font-size: ${subTextSize}px; 
+          font-size: ${subTextSize}pt; 
           margin-bottom: 5px;
           color: #000;
         }
         .contact-info span { margin: 0 8px; font-weight: 500; }
-        .linkedin-link { font-size: ${subTextSize}px; color: #000; text-decoration: none; border-bottom: 1px solid #ccc; }
+        .linkedin-link { font-size: ${subTextSize}pt; color: #000; text-decoration: none; border-bottom: 1px solid #ccc; }
 
         /* Section Headings with Full Grey Light Underline */
         .section { margin-bottom: 25px; }
@@ -207,11 +207,11 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
         }
         .section-dot {
           color: ${primaryColor};
-  font-size: 12px;
+  font-size: 12pt;
   margin-right: 10px;
         }
         .section-title {
-          font-size: ${sectionTitleSize}px;
+          font-size: ${sectionTitleSize}pt;
           font-weight: bold;
           text-transform: uppercase;
           color: ${primaryColor};
@@ -220,8 +220,8 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
 
         /* Professional Experience */
         .exp-item { margin-bottom: 18px; }
-        .company-name { font-weight: bold; color: #000; font-size: ${baseFontSize}px; }
-        .job-meta { font-style: italic; color: ${currentTheme.textLight}; margin-bottom: 4px; font-size: ${subTextSize}px; }
+        .company-name { font-weight: bold; color: #000; font-size: ${baseFontSize}pt; }
+        .job-meta { font-style: italic; color: ${currentTheme.textLight}; margin-bottom: 4px; font-size: ${subTextSize}pt; }
         
         /* NATIVE BULLETS - NO ::before, NO list-style: none */
         .bullet-list,
@@ -239,7 +239,7 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
         .description-html li {
           margin-bottom: 4px;
           color: ${currentTheme.textLight};
-          font-size: ${subTextSize}px;
+          font-size: ${subTextSize}pt;
         }
 
         /* Grid layout for skills - keeps native bullets */
@@ -253,7 +253,7 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
         .description-html p {
           margin-bottom: 8px;
           color: ${currentTheme.textLight};
-          font-size: ${subTextSize}px;
+          font-size: ${subTextSize}pt;
         }
 
         /* Summary - No bullets at all */
@@ -270,7 +270,7 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
           color: #fff; 
           text-align: left; 
           padding: 8px; 
-          font-size: ${subTextSize}px;
+          font-size: ${subTextSize}pt;
           text-transform: uppercase;
           font-weight: 600;
         }
@@ -278,12 +278,12 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
           border: 1px solid #eee; 
           padding: 8px; 
           color: ${currentTheme.textLight};
-          font-size: ${subTextSize}px;
+          font-size: ${subTextSize}pt;
         }
 
         .info-text {
           color: ${currentTheme.textLight};
-          font-size: ${subTextSize}px;
+          font-size: ${subTextSize}pt;
           line-height: 1.6;
         }
 
@@ -315,14 +315,51 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
       <header class="header" data-section="personal">
         <h1 class="name">${personal.name || 'Your Name'}</h1>
         <div class="contact-info">
-          ${personal.phone ? `<span><strong>Ph.</strong> ${personal.phone}</span>` : ''}
-          ${personal.alternatePhone ? `<span><strong>Alt Phone</strong> ${personal.alternatePhone}</span>` : ''}
-          ${personal.email ? `<span><strong>Email</strong> ${personal.email}</span>` : ''}
-          ${personal.location ? `<span><strong>Location</strong> ${personal.location}</span>` : ''}
-          ${personal.dob ? `<span><strong>DOB</strong> ${personal.dob}</span>` : ''}
-          ${personal.gender ? `<span><strong>Gender</strong> ${personal.gender}</span>` : ''}
+          ${(() => {
+            const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+            const linkedinProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+              String(p.url).toLowerCase().includes("linkedin")
+            );
+            const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+            const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+            
+            const githubProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("github") || 
+              String(p.url).toLowerCase().includes("github")
+            );
+            const githubUrl = githubProfile?.url || githubProfile?.username || "";
+            const cleanGithubLabel = githubUrl ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+
+            const items = [];
+            if (personal.phone) {
+              items.push(`<span><strong>Ph.</strong> ${personal.phone}</span>`);
+            }
+            if (personal.email) {
+              items.push(`<span><strong>Email</strong> <a href="mailto:${personal.email}" style="color: inherit; text-decoration: none;">${personal.email}</a></span>`);
+            }
+            if (personal.dob) {
+              items.push(`<span><strong>DOB</strong> ${personal.dob}</span>`);
+              if (linkedinUrl) {
+                items.push(`<span><strong>LinkedIn</strong> <a href="${linkedinUrl}" class="linkedin-link" target="_blank">${cleanLinkedinLabel}</a></span>`);
+              } else if (addressString) {
+                items.push(`<span><strong>Location</strong> ${addressString}</span>`);
+              }
+            } else {
+              if (linkedinUrl) {
+                items.push(`<span><strong>LinkedIn</strong> <a href="${linkedinUrl}" class="linkedin-link" target="_blank">${cleanLinkedinLabel}</a></span>`);
+              } else if (addressString) {
+                items.push(`<span><strong>Location</strong> ${addressString}</span>`);
+              }
+            }
+            
+            if (githubUrl) {
+              items.push(`<span><strong>GitHub</strong> <a href="${githubUrl}" class="linkedin-link" target="_blank">${cleanGithubLabel}</a></span>`);
+            }
+            
+            return items.join("");
+          })()}
         </div>
-        ${linkedIn ? `<div style="margin-top: 5px;"><strong>LinkedIn:</strong> <a class="linkedin-link" href="${linkedIn}">${linkedIn.replace(/^https?:\/\//, '')}</a></div>` : ''}
       </header>
 
       ${availabilityWorkAuth && hasObjectValues(availabilityWorkAuth) ? `
@@ -463,36 +500,7 @@ export function buildCorporateStandardTemplate(data: any, theme?: any): string {
         </ul>
       </section>` : ''}
 
-      ${nonEmptyEducation.length > 0 ? `
-      <section class="section" data-section="education">
-        <div class="section-header">
-          <span class="section-dot">●</span>
-          <h2 class="section-title">Education</h2>
-        </div>
-        <table class="edu-table">
-          <thead>
-            <tr>
-              <th>Course</th>
-              <th>University/Board</th>
-              <th>Year</th>
-              <th>%/Grade</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${nonEmptyEducation.map((edu: any, idx: number) => `
-              <tr data-index="${idx}">
-                <td>
-                  <strong>${edu.degree || edu.course || ''}${edu.field ? ` in ${edu.field}` : ''}</strong>
-                  ${edu.description ? `<br>${renderBullets(edu.description)}` : ''}
-                </td>
-                <td>${edu.school || edu.university || ''}${edu.location ? `<br><small>${edu.location}</small>` : ''}</td>
-                <td>${formatDateRange(edu.startDate, edu.graduationDate || edu.endDate, edu.isCurrent)}</td>
-                <td>${edu.grade || edu.percentage || '-'}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </section>` : ''}
+      
 
       ${skillArray.length > 0 ? `
       <section class="section" data-section="skills">
@@ -549,6 +557,37 @@ ${coreCompArray.length > 0 ? `
         <ul class="simple-list">
           ${nonEmptyIndustryExpertise.map((item: any, idx: number) => `<li data-index="${idx}"><strong>${item.industry || ''}</strong>${item.domainArea ? ` (${item.domainArea})` : ''}</li>`).join('')}
         </ul>
+      </section>` : ''}
+
+      ${nonEmptyEducation.length > 0 ? `
+      <section class="section" data-section="education">
+        <div class="section-header">
+          <span class="section-dot">●</span>
+          <h2 class="section-title">Education</h2>
+        </div>
+        <table class="edu-table">
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th>University/Board</th>
+              <th>Year</th>
+              <th>%/Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${nonEmptyEducation.map((edu: any, idx: number) => `
+              <tr data-index="${idx}">
+                <td>
+                  <strong>${edu.degree || edu.course || ''}${edu.field ? ` in ${edu.field}` : ''}</strong>
+                  ${edu.description ? `<br>${renderBullets(edu.description)}` : ''}
+                </td>
+                <td>${edu.school || edu.university || ''}${edu.location ? `<br><small>${edu.location}</small>` : ''}</td>
+                <td>${formatDateRange(edu.startDate, edu.graduationDate || edu.endDate, edu.isCurrent)}</td>
+                <td>${edu.grade || edu.percentage || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
       </section>` : ''}
 
       ${nonEmptyCertifications.length > 0 ? `

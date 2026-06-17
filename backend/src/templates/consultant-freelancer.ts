@@ -58,20 +58,20 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
   // ✅ Step 2: Fix font size source - use formatting.bodyFontSize first
   const baseFontSize = data?.formatting?.bodyFontSize || data?.fontSize || 14;
   const userFontFamily = data?.formatting?.fontFamily || data?.fontFamily || "'Open Sans', sans-serif";
-  
+
   // Typography settings
   const typography = theme?.typography || {
     fontSize: "medium",
     alignment: "left",
     fontWeight: "normal",
   };
-  
+
   const alignmentMap = { left: "left", center: "center", justify: "justify" };
   const fontWeightMap = { normal: "400", bold: "700" };
-  
+
   const currentAlignment = alignmentMap[typography.alignment as keyof typeof alignmentMap] || "left";
   const currentFontWeight = fontWeightMap[typography.fontWeight as keyof typeof fontWeightMap] || "400";
-  
+
   // Responsive font sizes based on baseFontSize
   const nameFontSize = Math.round(baseFontSize * 3); // ~42px at 14px base
   const sectionLabelFontSize = Math.round(baseFontSize * 1.14); // ~16px at 14px base
@@ -96,7 +96,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
     return arr.some(item => {
       if (typeof item === "string") return item.trim().length > 0;
       if (typeof item === "object" && item !== null) {
-        return Object.values(item).some(val => 
+        return Object.values(item).some(val =>
           typeof val === "string" && val.trim().length > 0
         );
       }
@@ -110,7 +110,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
     return arr.filter(item => {
       if (typeof item === "string") return item.trim().length > 0;
       if (typeof item === "object" && item !== null) {
-        return Object.values(item).some(val => 
+        return Object.values(item).some(val =>
           typeof val === "string" && val.trim().length > 0
         );
       }
@@ -121,16 +121,16 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
   // Helper to check if an object has any non-empty values
   const hasObjectValues = (obj: any): boolean => {
     if (!obj || typeof obj !== "object") return false;
-    return Object.values(obj).some(val => 
+    return Object.values(obj).some(val =>
       val !== null && val !== undefined && val !== ""
     );
   };
 
   // Helper to check if contact info exists
   const hasContactInfo = () => {
-    return personal.location || personal.pinCode || personal.phone || personal.email || 
-           personal.alternatePhone || personal.country || personal.fullAddress || 
-           personal.dob || personal.gender || personal.maritalStatus;
+    return personal.location || personal.pinCode || personal.phone || personal.email ||
+      personal.alternatePhone || personal.country || personal.fullAddress ||
+      personal.dob || personal.gender || personal.maritalStatus;
   };
 
   // Helper to format date range
@@ -145,7 +145,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
   // Helper to render description with HTML content
   const renderDescription = (description: string): string => {
     if (!description) return '';
-    
+
     const bulletChar = '•'; // Use literal bullet for maximum Word compatibility
 
     if (description.includes('<ul>') || description.includes('<li>')) {
@@ -158,13 +158,13 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
     const lines = description.split('\n')
       .map(line => line.trim())
       .filter(line => line.length > 0);
-      
+
     if (lines.length === 0) return '';
     return `
       <div class="custom-list-container" style="margin-top: 5px;">
         ${lines.map(line => `
-          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${normalTextFontSize}px; line-height: 1.4; color: ${currentTheme.textLight};">
-            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16px; text-align: center;">${bulletChar}</div>
+          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${normalTextFontSize}pt; line-height: 1.4; color: ${currentTheme.textLight};">
+            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16pt; text-align: center;">${bulletChar}</div>
             <div style="display: table-cell; vertical-align: top; padding-left: 2px;">${line.trim()}</div>
           </div>
         `).join('')}
@@ -175,7 +175,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
   const parseSkillsToColumns = (skills: any) => {
     if (!skills) return { col1: [], col2: [] };
     let list: string[] = [];
-    
+
     if (typeof skills === "string") {
       if (skills.includes('<ul>') || skills.includes('<li>')) {
         const matches = skills.match(/<li>(.*?)<\/li>/g);
@@ -190,7 +190,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
     } else if (Array.isArray(skills)) {
       list = skills;
     }
-    
+
     const mid = Math.ceil(list.length / 2);
     return {
       col1: list.slice(0, mid),
@@ -201,7 +201,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
   const { col1, col2 } = parseSkillsToColumns(skills);
   const { col1: coreCompCol1, col2: coreCompCol2 } = parseSkillsToColumns(coreCompetencies);
 
-  
+
   // Filter arrays to only include non-empty items
   const nonEmptyExperience = getNonEmptyItems(experience);
   const nonEmptyEducation = getNonEmptyItems(education);
@@ -251,7 +251,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
           line-height: 1.4;
           background: white;
           padding: 0;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           font-weight: ${currentFontWeight};
           text-align: ${currentAlignment};
         }
@@ -292,7 +292,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
         }
         .header-info { flex: 1; }
         .name {
-          font-size: ${nameFontSize}px;
+          font-size: ${nameFontSize}pt;
           font-weight: 700;
           color: ${currentTheme.primary};
           letter-spacing: 2px;
@@ -305,7 +305,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
           align-items: center;
           gap: 12px;
           margin-bottom: 8px;
-          font-size: ${smallTextFontSize}px;
+          font-size: ${smallTextFontSize}pt;
           color: ${currentTheme.textLight};
         }
         .icon-box {
@@ -339,7 +339,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
         .section-label {
           width: 215px;
           font-weight: 800;
-          font-size: ${sectionLabelFontSize}px;
+          font-size: ${sectionLabelFontSize}pt;
           text-transform: uppercase;
           color: ${currentTheme.text};
         }
@@ -347,7 +347,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
 
         /* Typography */
         .summary-text { 
-          font-size: ${normalTextFontSize}px; 
+          font-size: ${normalTextFontSize}pt; 
           color: ${currentTheme.textLight}; 
           line-height: 1.5; 
         }
@@ -373,7 +373,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
         .bullet-list li {
           position: relative;
           margin-bottom: 5px;
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           color: ${currentTheme.textLight};
         }
 
@@ -387,7 +387,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
         /* Education */
         .edu-line { 
           font-style: italic; 
-          font-size: ${normalTextFontSize}px; 
+          font-size: ${normalTextFontSize}pt; 
           margin-bottom: 8px; 
           color: ${currentTheme.textLight};
         }
@@ -406,7 +406,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
           width: 100%;
           margin-bottom: 6px;
           color: ${currentTheme.textLight};
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           line-height: 1.4;
         }
         .description-html li .bullet-wrap {
@@ -415,7 +415,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
           vertical-align: top;
           padding-top: 0;
           font-family: 'Arial', sans-serif;
-          font-size: 16px;
+          font-size: 16pt;
           text-align: center;
         }
         .description-html li .li-text {
@@ -432,7 +432,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 8px;
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
         }
         .context-item {
           color: ${currentTheme.textLight};
@@ -462,56 +462,59 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
       
       <div class="container">
         <header class="header" data-section="personal">
-          ${personal.image || personal.photo || personal.avatar ? `<img src="${personal.image || personal.photo || personal.avatar}" class="profile-img">` : '<div class="profile-img"></div>'}
+          ${(() => {
+            const profileImg = personal.image || personal.photo || personal.avatar;
+            return profileImg ? `<img src="${profileImg}" class="profile-img">` : '<div class="profile-img"></div>';
+          })()}
           <div class="header-info">
             <h1 class="name">${personal.name ? personal.name.toUpperCase() : ''}</h1>
-            ${hasContactInfo() ? `
-            ${personal.location || personal.pinCode ? `
-            <div class="contact-row">
-              <span class="icon-box">${icons.location}</span>
-              <span>${personal.location ? `${personal.location}${personal.pinCode ? ` ${personal.pinCode}` : ''}` : personal.pinCode ? personal.pinCode : ''}</span>
-            </div>` : ''}
-            ${personal.fullAddress ? `
-            <div class="contact-row">
-              <span class="icon-box">${icons.home}</span>
-              <span>${personal.fullAddress}</span>
-            </div>` : ''}
-            ${personal.country ? `
-            <div class="contact-row">
-              <span class="icon-box">${icons.globe}</span>
-              <span>${personal.country}</span>
-            </div>` : ''}
-            ${personal.phone ? `
-            <div class="contact-row">
-              <span class="icon-box">${icons.phone}</span>
-              <span>${personal.phone}</span>
-            </div>` : ''}
-            ${personal.alternatePhone ? `
-            <div class="contact-row">
-              <span class="icon-box">${icons.phone}</span>
-              <span>Alt: ${personal.alternatePhone}</span>
-            </div>` : ''}
-            ${personal.email ? `
-            <div class="contact-row">
-              <span class="icon-box">${icons.mail}</span>
-              <span>${personal.email}</span>
-            </div>` : ''}
-            ${personal.dob ? `
-            <div class="contact-row">
-              <span class="icon-box">${icons.calendar}</span>
-              <span>DOB: ${personal.dob}</span>
-            </div>` : ''}
-            ${personal.gender ? `
-            <div class="contact-row">
-              <span class="icon-box">${icons.user}</span>
-              <span>Gender: ${personal.gender}</span>
-            </div>` : ''}
-            ${personal.maritalStatus ? `
-            <div class="contact-row">
-              <span class="icon-box">${icons.heart}</span>
-              <span>Marital: ${personal.maritalStatus}</span>
-            </div>` : ''}
-            ` : ''}
+            ${(() => {
+              const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+              const linkedinProfile = socialProfiles?.find((p: any) => 
+                String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+                String(p.url).toLowerCase().includes("linkedin")
+              );
+              const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+              const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+              
+              const githubProfile = socialProfiles?.find((p: any) => 
+                String(p.network || p.platform).toLowerCase().includes("github") || 
+                String(p.url).toLowerCase().includes("github")
+              );
+              const githubUrl = githubProfile?.url || githubProfile?.username || "";
+              const cleanGithubLabel = githubUrl ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+
+              const linkedinIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>`;
+              const githubIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
+
+              const items = [];
+              if (personal.phone) {
+                items.push(`<div class="contact-row"><span class="icon-box">${icons.phone}</span><span>${personal.phone}</span></div>`);
+              }
+              if (personal.email) {
+                items.push(`<div class="contact-row"><span class="icon-box">${icons.mail}</span><span>${personal.email}</span></div>`);
+              }
+              if (personal.dob) {
+                items.push(`<div class="contact-row"><span class="icon-box">${icons.calendar}</span><span>DOB: ${personal.dob}</span></div>`);
+                if (linkedinUrl) {
+                  items.push(`<div class="contact-row"><span class="icon-box">${linkedinIcon}</span><span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span></div>`);
+                } else if (addressString) {
+                  items.push(`<div class="contact-row"><span class="icon-box">${icons.location}</span><span>${addressString}</span></div>`);
+                }
+              } else {
+                if (linkedinUrl) {
+                  items.push(`<div class="contact-row"><span class="icon-box">${linkedinIcon}</span><span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span></div>`);
+                } else if (addressString) {
+                  items.push(`<div class="contact-row"><span class="icon-box">${icons.location}</span><span>${addressString}</span></div>`);
+                }
+              }
+              
+              if (githubUrl) {
+                items.push(`<div class="contact-row"><span class="icon-box">${githubIcon}</span><span><a href="${githubUrl}" target="_blank">${cleanGithubLabel}</a></span></div>`);
+              }
+              
+              return items.join("");
+            })()}
           </div>
         </header>
 
@@ -548,36 +551,7 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
         </div>` : ''}
 
 
-         ${nonEmptyEducation.length > 0 ? `
-        <div class="section" data-section="education">
-          <div class="section-label">Education</div>
-          <div class="section-content">
-            ${nonEmptyEducation.map((edu, idx) => {
-              const dateParts = [];
-              if (edu.startDate && edu.startDate.trim()) dateParts.push(edu.startDate.trim());
-              if (edu.graduationDate && edu.graduationDate.trim()) dateParts.push(edu.graduationDate.trim());
-              else if (edu.endDate && edu.endDate.trim()) dateParts.push(edu.endDate.trim());
-              const dateRange = dateParts.length > 0 ? dateParts.join(" - ") : "";
-              
-              const schoolParts = [];
-              if (edu.school && edu.school.trim()) schoolParts.push(edu.school.trim());
-              if (edu.location && edu.location.trim()) schoolParts.push(edu.location.trim());
-              const schoolLine = schoolParts.length > 0 ? schoolParts.join(", ") : "";
-              
-              const firstLine = [];
-              if (schoolLine) firstLine.push(`<b>${schoolLine}</b>`);
-              if (dateRange) firstLine.push(dateRange);
-              
-              return `
-              <p class="edu-line" data-index="${idx}">
-                ${firstLine.length > 0 ? firstLine.join(", ") + "<br/>" : ""}
-                ${edu.degree || ''}${edu.field ? ' in ' + edu.field : ''}
-                ${edu.grade ? `<br/><span style="font-size: ${smallTextFontSize}px;">${edu.grade}</span>` : ''}
-                ${edu.description ? `<br/><span style="font-size: ${smallTextFontSize}px;">${edu.description}</span>` : ''}
-              </p>
-            `}).join('')}
-          </div>
-        </div>` : ''}
+       
 
         ${nonEmptyExperience.length > 0 ? `
         <div class="section" data-section="experience">
@@ -665,6 +639,37 @@ export function buildConsultantFreelancerTemplate(data: any, theme?: any): strin
                 ${item.url ? `<p style="color: ${currentTheme.textLight};"><strong>URL:</strong> <a href="${item.url}" target="_blank">${item.url}</a></p>` : ''}
               </div>
             `).join('')}
+          </div>
+        </div>` : ''}
+
+          ${nonEmptyEducation.length > 0 ? `
+        <div class="section" data-section="education">
+          <div class="section-label">Education</div>
+          <div class="section-content">
+            ${nonEmptyEducation.map((edu, idx) => {
+    const dateParts = [];
+    if (edu.startDate && edu.startDate.trim()) dateParts.push(edu.startDate.trim());
+    if (edu.graduationDate && edu.graduationDate.trim()) dateParts.push(edu.graduationDate.trim());
+    else if (edu.endDate && edu.endDate.trim()) dateParts.push(edu.endDate.trim());
+    const dateRange = dateParts.length > 0 ? dateParts.join(" - ") : "";
+
+    const schoolParts = [];
+    if (edu.school && edu.school.trim()) schoolParts.push(edu.school.trim());
+    if (edu.location && edu.location.trim()) schoolParts.push(edu.location.trim());
+    const schoolLine = schoolParts.length > 0 ? schoolParts.join(", ") : "";
+
+    const firstLine = [];
+    if (schoolLine) firstLine.push(`<b>${schoolLine}</b>`);
+    if (dateRange) firstLine.push(dateRange);
+
+    return `
+              <p class="edu-line" data-index="${idx}">
+                ${firstLine.length > 0 ? firstLine.join(", ") + "<br/>" : ""}
+                ${edu.degree || ''}${edu.field ? ' in ' + edu.field : ''}
+                ${edu.grade ? `<br/><span style="font-size: ${smallTextFontSize}pt;">${edu.grade}</span>` : ''}
+                ${edu.description ? `<br/><span style="font-size: ${smallTextFontSize}pt;">${edu.description}</span>` : ''}
+              </p>
+            `}).join('')}
           </div>
         </div>` : ''}
 

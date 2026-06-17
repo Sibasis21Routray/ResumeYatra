@@ -52,16 +52,19 @@ export function buildCompactClassicTemplate(
   };
   const currentTheme = { ...defaultTheme, ...(theme || {}) };
 
-  const bodyFontSize = "10.5pt";
-  const headingFontSize = "13pt";
-  const nameFontSize = "26pt";
+  const userFontSize = data.formatting?.bodyFontSize || data.formatting?.fontSize || 10.5;
+  const bodyFontSize = `${userFontSize}pt`;
+  const smallFontSize = `${Math.max(userFontSize * 0.95, 9)}pt`;
+  const smallerFontSize = `${Math.max(userFontSize * 0.9, 8.5)}pt`;
+  const headingFontSize = `${userFontSize * 1.25}pt`;
+  const nameFontSize = `${userFontSize * 2.5}pt`;
 
   const sortedExperience = data.experience
     ? [...data.experience].sort(
-        (a: any, b: any) =>
-          new Date(b.startDate || "1900-01-01").getTime() -
-          new Date(a.startDate || "1900-01-01").getTime()
-      )
+      (a: any, b: any) =>
+        new Date(b.startDate || "1900-01-01").getTime() -
+        new Date(a.startDate || "1900-01-01").getTime()
+    )
     : [];
 
   const formatLocation = (): string => {
@@ -225,6 +228,7 @@ export function buildCompactClassicTemplate(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resume</title>
   <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     * {
       margin: 0;
       padding: 0;
@@ -232,7 +236,7 @@ export function buildCompactClassicTemplate(
     }
 
     body {
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: ${data.formatting?.fontFamily || 'Arial, sans-serif'};
       color: #222222;
       line-height: 1.5;
       background: #ffffff;
@@ -270,7 +274,7 @@ export function buildCompactClassicTemplate(
     }
 
     .role-title {
-      font-size: 13pt;
+      font-size: ${headingFontSize};
       font-weight: 700;
       color: #111111;
       text-transform: uppercase;
@@ -288,7 +292,7 @@ export function buildCompactClassicTemplate(
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      font-size: 9.5pt;
+      font-size: ${smallerFontSize};
       color: #222222;
       text-align: right;
     }
@@ -383,7 +387,7 @@ export function buildCompactClassicTemplate(
     }
 
     .entry-date {
-      font-size: 10pt;
+      font-size: ${smallFontSize};
       color: #111111;
       font-weight: 500;
       white-space: nowrap;
@@ -396,7 +400,7 @@ export function buildCompactClassicTemplate(
     }
 
     .bullet-list li {
-      font-size: 10pt;
+      font-size: ${smallFontSize};
       color: #222222;
       margin-bottom: 5px;
       line-height: 1.4;
@@ -414,7 +418,7 @@ export function buildCompactClassicTemplate(
       background: #f0f0f0;
       padding: 4px 12px;
       border-radius: 4px;
-      font-size: 9pt;
+      font-size: ${smallerFontSize};
       color: #555555;
     }
 
@@ -432,57 +436,81 @@ export function buildCompactClassicTemplate(
   <div class="header-container" id="section-header" data-section="header">
     <div class="meta-identity">
       <div class="name">${personal.name || "Your Name "}</div>
-      ${
-  personal?.role &&
-  !["undefined", "null"].includes(String(personal.role).toLowerCase())
-    ? `<div class="role-title">${personal.role}</div>`
-    : ""
-}
+      ${personal?.role &&
+      !["undefined", "null"].includes(String(personal.role).toLowerCase())
+      ? `<div class="role-title">${personal.role}</div>`
+      : ""
+    }
     </div>
     
     <div class="contact-pane">
-      ${personal.phone ? `
-        <div class="contact-row">
-          <span>${personal.phone}</span>
-          <span class="icon-bubble">${icons.phone}</span>
-        </div>
-      ` : ""}
-      ${personal.alternatePhone ? `
-        <div class="contact-row">
-          <span>${personal.alternatePhone} (Alt)</span>
-          <span class="icon-bubble">${icons.phone}</span>
-        </div>
-      ` : ""}
-      ${personal.email ? `
-        <div class="contact-row">
-          <span><a href="mailto:${personal.email}">${personal.email}</a></span>
-          <span class="icon-bubble">${icons.email}</span>
-        </div>
-      ` : ""}
-      ${formatLocation() ? `
-        <div class="contact-row">
-          <span>${formatLocation()}</span>
-          <span class="icon-bubble">${icons.location}</span>
-        </div>
-      ` : ""}
-      ${personal.dob ? `
-        <div class="contact-row">
-          <span>DOB: ${personal.dob}</span>
-          <span class="icon-bubble">${icons.calendar}</span>
-        </div>
-      ` : ""}
-      ${personal.gender ? `
-        <div class="contact-row">
-          <span>${personal.gender}</span>
-          <span class="icon-bubble">${icons.user}</span>
-        </div>
-      ` : ""}
-      ${personal.linkedinUrl ? `
-        <div class="contact-row">
-          <span><a href="${personal.linkedinUrl}" target="_blank">${personal.linkedinUrl.replace(/https?:\/\/(www\.)?/, "")}</a></span>
-          <span class="icon-bubble">${icons.linkedin}</span>
-        </div>
-      ` : ""}
+      ${(() => {
+        const addressString = personal.location || personal.fullAddress || "";
+        const linkedinProfile = socialProfiles?.find((p: any) => 
+          String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+          String(p.url).toLowerCase().includes("linkedin")
+        );
+        const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+        const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+        
+        const items = [];
+        if (personal.phone) {
+          items.push(`
+            <div class="contact-row">
+              <span>${personal.phone}</span>
+              <span class="icon-bubble">${icons.phone}</span>
+            </div>
+          `);
+        }
+        if (personal.email) {
+          items.push(`
+            <div class="contact-row">
+              <span><a href="mailto:${personal.email}">${personal.email}</a></span>
+              <span class="icon-bubble">${icons.email}</span>
+            </div>
+          `);
+        }
+        if (personal.dob) {
+          items.push(`
+            <div class="contact-row">
+              <span>DOB: ${personal.dob}</span>
+              <span class="icon-bubble">${icons.calendar}</span>
+            </div>
+          `);
+          if (linkedinUrl) {
+            items.push(`
+              <div class="contact-row">
+                <span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span>
+                <span class="icon-bubble">${icons.linkedin}</span>
+              </div>
+            `);
+          } else if (addressString) {
+            items.push(`
+              <div class="contact-row">
+                <span>${addressString}</span>
+                <span class="icon-bubble">${icons.location}</span>
+              </div>
+            `);
+          }
+        } else {
+          if (linkedinUrl) {
+            items.push(`
+              <div class="contact-row">
+                <span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span>
+                <span class="icon-bubble">${icons.linkedin}</span>
+              </div>
+            `);
+          } else if (addressString) {
+            items.push(`
+              <div class="contact-row">
+                <span>${addressString}</span>
+                <span class="icon-bubble">${icons.location}</span>
+              </div>
+            `);
+          }
+        }
+        return items.join("");
+      })()}
     </div>
   </div>
 
@@ -522,28 +550,7 @@ export function buildCompactClassicTemplate(
   </div>` : ""}
 
 
-    <!-- EDUCATION SECTION -->
-  ${nonEmptyEducation.length > 0 ? `
-  <div class="section" id="section-education" data-section="education">
-    <div class="section-header">
-      <span class="section-icon">${icons.graduation}</span>
-      <span class="section-title">Education</span>
-    </div>
-    ${nonEmptyEducation.map((edu, idx) => {
-      const eduDate = edu.graduationDate || formatDateRange(edu.startDate || edu.startYear, edu.endDate || edu.endYear);
-      const schoolContext = formatSubtitle([edu.school, edu.location]);
-      return `
-      <div class="entry-block" data-index="${idx}">
-        <div class="entry-meta-row">
-          <div class="entry-primary-line">${edu.degree || ""}${edu.field ? ` – ${edu.field}` : ""}</div>
-          ${eduDate ? `<div class="entry-date">${eduDate}</div>` : ""}
-        </div>
-        ${schoolContext ? `<div style="font-size: 10pt; color: #333333;">${schoolContext}</div>` : ""}
-        ${edu.grade ? `<div style="font-size: 9.5pt; color: #444444; font-weight: 500; margin-top: 2px;">${edu.grade}</div>` : ""}
-        ${edu.description ? `<div class="summary-text" style="margin-top: 5px;">${edu.description}</div>` : ""}
-      </div>
-    `}).join("")}
-  </div>` : ""}
+    
 
 
   <!-- EXPERIENCE SECTION -->
@@ -554,9 +561,9 @@ export function buildCompactClassicTemplate(
       <span class="section-title">Experience</span>
     </div>
     ${nonEmptyExperience.map((exp, idx) => {
-      const dateRange = formatDateRange(exp.startDate, exp.endDate, exp.isCurrent);
-      const compositeSub = [exp.company, exp.location].filter(Boolean).join(", ");
-      return `
+        const dateRange = formatDateRange(exp.startDate, exp.endDate, exp.isCurrent);
+        const compositeSub = [exp.company, exp.location].filter(Boolean).join(", ");
+        return `
       <div class="entry-block" data-index="${idx}">
         <div class="entry-meta-row">
           <div class="entry-primary-line">
@@ -566,7 +573,7 @@ export function buildCompactClassicTemplate(
           ${dateRange ? `<div class="entry-date">${dateRange}</div>` : ""}
         </div>
         ${exp.description ? renderDescription(exp.description) : ""}
-        ${exp.achievements ? `<div class="entry-content"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
+        ${exp.achievements ? `<div class="entry-content" style="font-size: ${smallFontSize}; margin-left: 16px; margin-top: 5px; text-align: justify; color: #222222; line-height: 1.4;"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
       </div>
     `}).join("")}
   </div>` : ""}
@@ -656,7 +663,7 @@ export function buildCompactClassicTemplate(
           <div class="entry-primary-line">${item.title || item.role || ''}</div>
           <div class="entry-date">${item.duration || formatDateRange(item.startDate, item.endDate)}</div>
         </div>
-        <div style="font-size: 10pt; color: #333333;">${formatSubtitle([item.company, item.location])}</div>
+        <div style="font-size: ${smallFontSize}; color: #333333;">${formatSubtitle([item.company, item.location])}</div>
         ${item.description ? renderDescription(item.description) : ''}
       </div>
     `).join("")}
@@ -675,7 +682,7 @@ export function buildCompactClassicTemplate(
           <div class="entry-primary-line">${item.name || item.title || ''}</div>
           ${item.completionDate ? `<div class="entry-date">${item.completionDate}</div>` : ''}
         </div>
-        <div style="font-size: 10pt; color: #333333;">${item.provider || item.organization || ''}</div>
+        <div style="font-size: ${smallFontSize}; color: #333333;">${item.provider || item.organization || ''}</div>
         ${item.description ? `<div class="summary-text">${item.description}</div>` : ''}
       </div>
     `).join("")}
@@ -700,6 +707,30 @@ export function buildCompactClassicTemplate(
         ${item.url ? `<div style="margin-top: 5px;"><a href="${item.url}" target="_blank">${item.url}</a></div>` : ''}
       </div>
     `).join("")}
+  </div>` : ""}
+
+
+  <!-- EDUCATION SECTION -->
+  ${nonEmptyEducation.length > 0 ? `
+  <div class="section" id="section-education" data-section="education">
+    <div class="section-header">
+      <span class="section-icon">${icons.graduation}</span>
+      <span class="section-title">Education</span>
+    </div>
+    ${nonEmptyEducation.map((edu, idx) => {
+      const eduDate = edu.graduationDate || formatDateRange(edu.startDate || edu.startYear, edu.endDate || edu.endYear);
+      const schoolContext = formatSubtitle([edu.school, edu.location]);
+      return `
+      <div class="entry-block" data-index="${idx}">
+        <div class="entry-meta-row">
+          <div class="entry-primary-line">${edu.degree || ""}${edu.field ? ` – ${edu.field}` : ""}</div>
+          ${eduDate ? `<div class="entry-date">${eduDate}</div>` : ""}
+        </div>
+        ${schoolContext ? `<div style="font-size: ${smallFontSize}; color: #333333;">${schoolContext}</div>` : ""}
+        ${edu.grade ? `<div style="font-size: ${smallerFontSize}; color: #444444; font-weight: 500; margin-top: 2px;">${edu.grade}</div>` : ""}
+        ${edu.description ? `<div class="summary-text" style="margin-top: 5px;">${edu.description}</div>` : ""}
+      </div>
+    `}).join("")}
   </div>` : ""}
 
   <!-- LEADERSHIP POSITIONS SECTION -->

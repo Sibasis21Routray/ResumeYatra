@@ -155,8 +155,8 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
     return `
       <div class="custom-list-container" style="margin-top: 5px;">
         ${lines.map(line => `
-          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${smallTextFontSize}px; line-height: 1.4; color: ${currentTheme.textLight};">
-            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16px; text-align: center;">${bulletChar}</div>
+          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${smallTextFontSize}pt; line-height: 1.4; color: ${currentTheme.textLight};">
+            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16pt; text-align: center;">${bulletChar}</div>
             <div style="display: table-cell; vertical-align: top; padding-left: 2px;">${line.trim()}</div>
           </div>
         `).join('')}
@@ -241,7 +241,7 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
           line-height: 1.4;
           padding: 40px 60px;
           background: white;
-          font-size: ${baseFontSize}px;
+          font-size: ${baseFontSize}pt;
           font-weight: ${currentFontWeight};
           text-align: ${currentAlignment};
         }
@@ -254,13 +254,13 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
           margin-bottom: 25px;
         }
         .header-left h1 {
-          font-size: ${nameFontSize}px;
+          font-size: ${nameFontSize}pt;
           font-weight: bold;
           margin-bottom: 5px;
           color: ${currentTheme.text};
         }
         .header-left p, .header-right p {
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           color: ${currentTheme.textLight};
         }
         .header-right {
@@ -272,7 +272,7 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
           margin-bottom: 20px;
         }
         .section-title {
-          font-size: ${sectionTitleFontSize}px;
+          font-size: ${sectionTitleFontSize}pt;
           font-weight: bold;
           margin-bottom: 8px;
           text-transform: none;
@@ -291,12 +291,12 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
           display: flex;
           justify-content: space-between;
           font-weight: bold;
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           color: ${currentTheme.text};
         }
         .company-row {
           font-weight: bold;
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           margin-bottom: 4px;
           color: ${currentTheme.textLight};
         }
@@ -304,7 +304,7 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
         .bullet-list {
           list-style-type: disc;
           margin-left: 20px;
-          font-size: ${smallTextFontSize}px;
+          font-size: ${smallTextFontSize}pt;
           color: ${currentTheme.textLight};
         }
         .bullet-list li {
@@ -320,7 +320,7 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
 
         /* Education */
         .edu-item {
-          font-size: ${normalTextFontSize}px;
+          font-size: ${normalTextFontSize}pt;
           margin-bottom: 8px;
           color: ${currentTheme.textLight};
         }
@@ -342,7 +342,7 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
           width: 100%;
           margin-bottom: 6px;
           color: ${currentTheme.textLight};
-          font-size: ${smallTextFontSize}px;
+          font-size: ${smallTextFontSize}pt;
           line-height: 1.4;
         }
         .description-html li .bullet-wrap {
@@ -351,7 +351,7 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
           vertical-align: top;
           padding-top: 0;
           font-family: 'Arial', sans-serif;
-          font-size: 16px;
+          font-size: 16pt;
           text-align: center;
         }
         .description-html li .li-text {
@@ -364,7 +364,7 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 8px;
-          font-size: ${smallTextFontSize}px;
+          font-size: ${smallTextFontSize}pt;
         }
         .context-item {
           color: ${currentTheme.textLight};
@@ -392,17 +392,52 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
       <header class="header" data-section="personal">
         <div class="header-left">
           <h1>${personal.name || ''}</h1>
-          <p>${personal.location ? `${personal.location}${personal.pinCode ? ` ${personal.pinCode}` : ''}` : ''}</p>
-          ${personal.fullAddress ? `<p>${personal.fullAddress}</p>` : ''}
-          ${personal.country ? `<p>${personal.country}</p>` : ''}
-          ${personal.dob ? `<p>DOB: ${personal.dob}</p>` : ''}
-          ${personal.gender ? `<p>Gender: ${personal.gender}</p>` : ''}
-          ${personal.maritalStatus ? `<p>Marital: ${personal.maritalStatus}</p>` : ''}
         </div>
         <div class="header-right">
-          <p>${personal.phone || ''}</p>
-          ${personal.alternatePhone ? `<p>Alt: ${personal.alternatePhone}</p>` : ''}
-          <p>${personal.email || ''}</p>
+          ${(() => {
+            const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+            const linkedinProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+              String(p.url).toLowerCase().includes("linkedin")
+            );
+            const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+            const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+            
+            const githubProfile = socialProfiles?.find((p: any) => 
+              String(p.network || p.platform).toLowerCase().includes("github") || 
+              String(p.url).toLowerCase().includes("github")
+            );
+            const githubUrl = githubProfile?.url || githubProfile?.username || "";
+            const cleanGithubLabel = githubUrl ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+
+            const items = [];
+            if (personal.phone) {
+              items.push(`<p>${personal.phone}</p>`);
+            }
+            if (personal.email) {
+              items.push(`<p><a href="mailto:${personal.email}">${personal.email}</a></p>`);
+            }
+            if (personal.dob) {
+              items.push(`<p>DOB: ${personal.dob}</p>`);
+              if (linkedinUrl) {
+                items.push(`<p><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></p>`);
+              } else if (addressString) {
+                items.push(`<p>${addressString}</p>`);
+              }
+            } else {
+              if (linkedinUrl) {
+                items.push(`<p><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></p>`);
+              } else if (addressString) {
+                items.push(`<p>${addressString}</p>`);
+              }
+            }
+            
+            if (githubUrl) {
+              items.push(`<p><a href="${githubUrl}" target="_blank">${cleanGithubLabel}</a></p>`);
+            }
+            
+            return items.join("");
+          })()}
         </div>
       </header>
 
@@ -433,23 +468,7 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
       </div>
       ` : ''}
 
-        ${nonEmptyEducation.length > 0 ? `
-      <div class="section" data-section="education">
-        <h2 class="section-title">Education</h2>
-        ${nonEmptyEducation.map((edu, idx) => {
-          const dateRange = formatEducationDate(edu.startDate, edu.endDate, edu.graduationDate);
-          return `
-          <div class="edu-item" data-index="${idx}">
-            <p>
-              <b>${dateRange ? `${dateRange} ` : ''}${edu.school || ''}</b>${edu.location ? ` - ${edu.location}` : ''}
-            </p>
-            <p><b>${edu.degree || ''}${edu.field ? ' in ' + edu.field : ''}</b></p>
-            ${edu.grade ? `<p>${edu.grade}</p>` : ''}
-            ${edu.description ? `<p style="color: ${currentTheme.textLight};">${edu.description}</p>` : ''}
-          </div>
-        `}).join('')}
-      </div>
-      ` : ''}
+      
 
       ${nonEmptyExperience.length > 0 ? `
       <div class="section" data-section="experience">
@@ -461,8 +480,8 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
               <span>${formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}</span>
             </div>
             <div class="company-row">${exp.company || ''} - ${exp.location || ''}</div>
-            ${exp.description ? renderDescription(exp.description) : ''}
-            ${exp.achievements ? `<p style="margin-top: 4px; color: ${currentTheme.textLight};"><strong>Achievements:</strong> ${exp.achievements}</p>` : ''}
+            ${exp.description ? renderDescription(exp.description) : ""}
+            ${exp.achievements ? `<p style="margin-top: 4px; font-size: ${smallTextFontSize}pt; color: ${currentTheme.textLight};"><strong style="color: ${currentTheme.text};">Achievements:</strong> ${exp.achievements}</p>` : ""}
           </div>
         `).join('')}
       </div>
@@ -548,6 +567,24 @@ export function buildLeadershipManagerialTemplate(data: any, theme?: any): strin
             ${item.description ? renderDescription(item.description) : ''}
           </div>
         `).join('')}
+      </div>
+      ` : ''}
+
+        ${nonEmptyEducation.length > 0 ? `
+      <div class="section" data-section="education">
+        <h2 class="section-title">Education</h2>
+        ${nonEmptyEducation.map((edu, idx) => {
+          const dateRange = formatEducationDate(edu.startDate, edu.endDate, edu.graduationDate);
+          return `
+          <div class="edu-item" data-index="${idx}">
+            <p>
+              <b>${dateRange ? `${dateRange} ` : ''}${edu.school || ''}</b>${edu.location ? ` - ${edu.location}` : ''}
+            </p>
+            <p><b>${edu.degree || ''}${edu.field ? ' in ' + edu.field : ''}</b></p>
+            ${edu.grade ? `<p>${edu.grade}</p>` : ''}
+            ${edu.description ? `<p style="color: ${currentTheme.textLight};">${edu.description}</p>` : ''}
+          </div>
+        `}).join('')}
       </div>
       ` : ''}
 

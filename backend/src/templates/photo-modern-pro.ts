@@ -52,16 +52,19 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
   const sidebarBg = currentTheme.sidebarBg || defaultTheme.primary;
   const primaryAccent = currentTheme.secondary || defaultTheme.secondary;
 
-  const userFontSize = data.formatting?.bodyFontSize || data.fontSize || 10.5;
+  const userFontSize = data.formatting?.bodyFontSize || data.fontSize || 10;
   const baseFontSize = userFontSize;
-  const nameFontSize = Math.round(userFontSize * 2.2);
+  const nameFontSize = Math.round(userFontSize * 2.4);
+  const headingFontSize = Math.round(userFontSize * 1.2);
+  const sidebarHeadingFontSize = Math.round(userFontSize * 1.1);
+  const contactFontSize = Math.round(userFontSize * 0.85);
 
   const hasNonEmptyItems = (arr: any[]): boolean => {
     if (!arr || !Array.isArray(arr)) return false;
     return arr.some(item => {
       if (typeof item === "string") return item.trim().length > 0;
       if (typeof item === "object" && item !== null) {
-        return Object.values(item).some(val => 
+        return Object.values(item).some(val =>
           typeof val === "string" && val.trim().length > 0
         );
       }
@@ -144,7 +147,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
 
   const skillsList = parseSkills();
   const coreCompetenciesList = parseCoreCompetencies();
-  
+
   const sortedExperience = [...experience].sort(
     (a: any, b: any) =>
       new Date(b.startDate || "1900-01-01").getTime() -
@@ -237,10 +240,11 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resume</title>
   <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
+      font-family: ${data.formatting?.fontFamily || 'Arial, sans-serif'};
       color: #333333;
       line-height: 1.5;
       background: #f5f5f5;
@@ -300,7 +304,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     }
 
     .sidebar-heading {
-      font-size: 11pt;
+      font-size: ${sidebarHeadingFontSize}pt;
       font-weight: 700;
       color: #ffffff;
       text-transform: uppercase;
@@ -309,11 +313,11 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
       padding-bottom: 5px;
       margin-bottom: 12px;
     }
-
+    
     .contact-item {
       display: flex;
       align-items: center;
-      font-size: 8.5pt;
+      font-size: ${contactFontSize}pt;
       margin-bottom: 12px;
       color: rgba(255, 255, 255, 0.9);
       word-break: break-all;
@@ -399,7 +403,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     }
 
     .role {
-      font-size: 12pt;
+      font-size: ${headingFontSize}pt;
       color: #444444;
       font-weight: 700;
       text-transform: uppercase;
@@ -434,7 +438,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     }
 
     .section-title {
-      font-size: 11pt;
+      font-size: ${headingFontSize}pt;
       font-weight: 700;
       color: ${primaryAccent};
       text-transform: uppercase;
@@ -442,7 +446,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     }
 
     .summary-text {
-      font-size: 9.5pt;
+      font-size: ${baseFontSize}pt;
       line-height: 1.5;
       color: #444444;
       text-align: justify;
@@ -493,19 +497,19 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
 
     .exp-title {
       font-weight: 700;
-      font-size: 10pt;
+      font-size: ${headingFontSize}pt;
       color: #111111;
     }
 
     .exp-company {
-      font-size: 9.5pt;
+      font-size: ${baseFontSize}pt;
       color: #444444;
       font-weight: 500;
       margin-bottom: 6px;
     }
 
     .exp-date {
-      font-size: 9pt;
+      font-size: ${contactFontSize}pt;
       color: #111111;
       font-weight: 500;
       white-space: nowrap;
@@ -521,7 +525,7 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
       position: relative;
       padding-left: 12px;
       margin-bottom: 4px;
-      font-size: 9pt;
+      font-size: ${baseFontSize}pt;
       line-height: 1.4;
       color: #444444;
       text-align: justify;
@@ -548,67 +552,60 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     <div class="left-column"  ">
       <div class="profile-section" id="section-profile" data-section="profile">
         <div class="profile-photo" id="section-profile-photo" data-section="profile-photo">
-          ${personal?.image || personal?.photo ? 
-            `<img src="${personal.image || personal.photo}" alt="Profile">` : 
-            defaultAvatarSvg
-          }
+          ${personal?.image || personal?.photo ?
+      `<img src="${personal.image || personal.photo}" alt="Profile">` :
+      defaultAvatarSvg
+    }
         </div>
       </div>
 
       <!-- CONTACT INFO -->
       <div class="sidebar-section" id="section-contact" data-section="contact">
         <div class="sidebar-heading">Contact</div>
-        
-        ${personal?.phone ? `
-        <div class="contact-item">
-          ${svgIcons.phone}
-          <span>${personal.phone}</span>
-        </div>` : ""}
-
-        ${personal?.alternatePhone ? `
-        <div class="contact-item">
-          ${svgIcons.phone}
-          <span>${personal.alternatePhone} (Alt)</span>
-        </div>` : ""}
-
-        ${personal?.email ? `
-        <div class="contact-item">
-          ${svgIcons.email}
-          <span><a href="mailto:${personal.email}">${personal.email}</a></span>
-        </div>` : ""}
-
         ${(() => {
-          const addressParts = [personal.fullAddress, personal.location, personal.country, personal.pinCode].filter(Boolean);
-          return addressParts.length > 0 ? `
-          <div class="contact-item">
-            ${svgIcons.location}
-            <span>${addressParts.join(", ")}</span>
-          </div>` : "";
-        })()}
+          const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+          const linkedinProfile = socialProfiles?.find((p: any) => 
+            String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+            String(p.url).toLowerCase().includes("linkedin")
+          );
+          const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+          const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+          
+          const githubProfile = socialProfiles?.find((p: any) => 
+            String(p.network || p.platform).toLowerCase().includes("github") || 
+            String(p.url).toLowerCase().includes("github")
+          );
+          const githubUrl = githubProfile?.url || githubProfile?.username || "";
+          const cleanGithubLabel = githubUrl ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
 
-        ${personal?.linkedinUrl ? `
-        <div class="contact-item">
-          ${svgIcons.linkedin}
-          <span><a href="${personal.linkedinUrl}" target="_blank">${personal.linkedinUrl.replace(/https?:\/\/(www\.)?/, "")}</a></span>
-        </div>` : ""}
-        
-        ${personal?.dob ? `
-        <div class="contact-item">
-          ${svgIcons.calendar}
-          <span>DOB: ${personal.dob}</span>
-        </div>` : ""}
-        
-        ${personal?.gender ? `
-        <div class="contact-item">
-          ${svgIcons.user}
-          <span>${personal.gender}</span>
-        </div>` : ""}
-        
-        ${personal?.maritalStatus ? `
-        <div class="contact-item">
-          ${svgIcons.heart}
-          <span>${personal.maritalStatus}</span>
-        </div>` : ""}
+          const items = [];
+          if (personal.phone) {
+            items.push(`<div class="contact-item">${svgIcons.phone}<span>${personal.phone}</span></div>`);
+          }
+          if (personal.email) {
+            items.push(`<div class="contact-item">${svgIcons.email}<span><a href="mailto:${personal.email}">${personal.email}</a></span></div>`);
+          }
+          if (personal.dob) {
+            items.push(`<div class="contact-item">${svgIcons.calendar}<span>DOB: ${personal.dob}</span></div>`);
+            if (linkedinUrl) {
+              items.push(`<div class="contact-item">${svgIcons.linkedin}<span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span></div>`);
+            } else if (addressString) {
+              items.push(`<div class="contact-item">${svgIcons.location}<span>${addressString}</span></div>`);
+            }
+          } else {
+            if (linkedinUrl) {
+              items.push(`<div class="contact-item">${svgIcons.linkedin}<span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span></div>`);
+            } else if (addressString) {
+              items.push(`<div class="contact-item">${svgIcons.location}<span>${addressString}</span></div>`);
+            }
+          }
+          
+          if (githubUrl) {
+            items.push(`<div class="contact-item">${svgIcons.globe}<span><a href="${githubUrl}" target="_blank">${cleanGithubLabel}</a></span></div>`);
+          }
+          
+          return items.join("");
+        })()}
       </div>
 
       <!-- AVAILABILITY & WORK AUTH -->
@@ -712,14 +709,13 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
     <div class="right-column" >
       <div class="header-identity" id="section-header" data-section="header">
         <div class="name">${personal?.name || "Your Name "}</div>
-        ${
-  (personal?.role || personal?.title) &&
-  !["undefined", "null"].includes(
-    String(personal?.role || personal?.title).toLowerCase()
-  )
-    ? `<div class="role">${personal.role || personal.title}</div>`
-    : ""
-}
+        ${(personal?.role || personal?.title) &&
+      !["undefined", "null"].includes(
+        String(personal?.role || personal?.title).toLowerCase()
+      )
+      ? `<div class="role">${personal.role || personal.title}</div>`
+      : ""
+    }
       </div>
 
       <!-- PROFESSIONAL SUMMARY -->
@@ -754,10 +750,10 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
           <div class="timeline-track"></div>
           
           ${sortedExperience.map((e: any, idx: number) => {
-            const dateRange = formatDateRange(e.startDate, e.endDate, e.isCurrent);
-            const bullets = e.description ? e.description.split('\n').filter((b: string) => b.trim()) : [];
-            
-            return `
+      const dateRange = formatDateRange(e.startDate, e.endDate, e.isCurrent);
+      const bullets = e.description ? e.description.split('\n').filter((b: string) => b.trim()) : [];
+
+      return `
             <div class="exp-item" data-index="${idx}">
               <div class="timeline-marker"></div>
               <div class="exp-header">
@@ -769,8 +765,8 @@ export function buildPhotoModernProTemplate(data: any, theme?: any): string {
                 <ul class="exp-achievements">
                   ${bullets.map((bullet: string, bidx: number) => `<li data-index="${idx}-${bidx}">${bullet.replace(/^[•\-\*]\s*/, '')}</li>`).join("")}
                 </ul>
-              ` : e.description ? `<p class="summary-text" style="font-size: 9pt;">${e.description}</p>` : ""}
-              ${e.achievements ? `<p class="summary-text" style="font-size: 9pt; margin-top: 5px;"><strong>Achievements:</strong> ${e.achievements}</p>` : ""}
+              ` : e.description ? `<p class="summary-text" style="font-size: ${baseFontSize}pt;">${e.description}</p>` : ""}
+              ${e.achievements ? `<p class="summary-text" style="font-size: ${baseFontSize}pt; margin-top: 5px;"><strong>Achievements:</strong> ${e.achievements}</p>` : ""}
             </div>
           `}).join("")}
         </div>

@@ -51,21 +51,21 @@ export function buildStellarTemplate(data: any, theme?: any): string {
   };
 
   const currentTheme = { ...defaultTheme, ...(theme || {}) };
-  
+
   // Dynamic font size from user settings
   const userFontSize = data.fontSize || 13;
   const userFontFamily = data.fontFamily || "Arial, sans-serif";
-  
+
   // Typography settings
   const typography = theme?.typography || {
     fontSize: "medium",
     alignment: "left",
     fontWeight: "normal",
   };
-  
+
   const alignmentMap = { left: "left", center: "center", justify: "justify" };
   const fontWeightMap = { normal: "400", bold: "700" };
-  
+
   const currentAlignment = alignmentMap[typography.alignment as keyof typeof alignmentMap] || "left";
   const currentFontWeight = fontWeightMap[typography.fontWeight as keyof typeof fontWeightMap] || "400";
 
@@ -82,7 +82,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     return arr.some(item => {
       if (typeof item === "string") return item.trim().length > 0;
       if (typeof item === "object" && item !== null) {
-        return Object.values(item).some(val => 
+        return Object.values(item).some(val =>
           typeof val === "string" && val.trim().length > 0
         );
       }
@@ -95,7 +95,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     return arr.filter(item => {
       if (typeof item === "string") return item.trim().length > 0;
       if (typeof item === "object" && item !== null) {
-        return Object.values(item).some(val => 
+        return Object.values(item).some(val =>
           typeof val === "string" && val.trim().length > 0
         );
       }
@@ -105,7 +105,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
 
   const hasObjectValues = (obj: any): boolean => {
     if (!obj || typeof obj !== "object") return false;
-    return Object.values(obj).some(val => 
+    return Object.values(obj).some(val =>
       val !== null && val !== undefined && val !== ""
     );
   };
@@ -120,7 +120,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
 
   const renderDescription = (description: string): string => {
     if (!description) return '';
-    
+
     const bulletChar = '&#8226;';
 
     if (description.includes('<ul>') || description.includes('<li>')) {
@@ -133,13 +133,13 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     const lines = description.split('\n')
       .map(line => line.trim())
       .filter(line => line.length > 0);
-      
+
     if (lines.length === 0) return '';
     return `
       <div class="custom-list-container" style="margin-top: 5px; margin-left: 5px;">
         ${lines.map(line => `
-          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${smallTextFontSize2}px; line-height: 1.4; color: ${currentTheme.textLight};">
-            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16px; text-align: center;">${bulletChar}</div>
+          <div class="custom-list-item" style="display: table; width: 100%; margin-bottom: 6px; font-size: ${smallTextFontSize2}pt; line-height: 1.4; color: ${currentTheme.textLight};">
+            <div style="display: table-cell; width: 22px; vertical-align: top; padding-top: 0; font-family: 'Arial', sans-serif; font-size: 16pt; text-align: center;">${bulletChar}</div>
             <div style="display: table-cell; vertical-align: top; padding-left: 2px;">${line.trim()}</div>
           </div>
         `).join('')}
@@ -203,7 +203,8 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     email: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>`,
     location: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
     calendar: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
-    user: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`
+    user: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+    linkedin: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>`
   };
 
   return `<!DOCTYPE html>
@@ -219,7 +220,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       font-family: ${userFontFamily};
       color: ${currentTheme.text};
       padding: 40px 0;
-      font-size: ${baseFontSize}px;
+      font-size: ${baseFontSize}pt;
       font-weight: ${currentFontWeight};
       text-align: ${currentAlignment};
       -webkit-font-smoothing: antialiased;
@@ -256,7 +257,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     }
 
     .name-heading {
-      font-size: ${headingFontSize}px;
+      font-size: ${headingFontSize}pt;
       font-weight: 700;
       color: ${currentTheme.primary};
       margin-bottom: 15px;
@@ -271,7 +272,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       justify-content: center;
       align-items: center;
       gap: 12px;
-      font-size: ${baseFontSize - 1}px;
+      font-size: ${baseFontSize - 1}pt;
       color: #222222;
       border-radius: 6px;
     }
@@ -300,7 +301,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     }
 
     .cv-section-title {
-      font-size: ${sectionTitleFontSize}px;
+      font-size: ${sectionTitleFontSize}pt;
       font-weight: 700;
       color: ${currentTheme.primary};
       padding-bottom: 3px;
@@ -311,7 +312,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     .summary-paragraph {
       color: ${currentTheme.textLight};
       text-align: justify;
-      font-size: ${baseFontSize}px;
+      font-size: ${baseFontSize}pt;
       line-height: 1.45;
     }
 
@@ -328,7 +329,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       color: ${currentTheme.text};
       padding: 4px 12px;
       border-radius: 8px;
-      font-size: ${baseFontSize - 1}px;
+      font-size: ${baseFontSize - 1}pt;
       font-weight: 500;
       background: #ffffff;
     }
@@ -344,14 +345,14 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       align-items: baseline;
       font-weight: 700;
       color: #111111;
-      font-size: ${baseFontSize + 1}px;
+      font-size: ${baseFontSize + 1}pt;
     }
 
     .entry-row-subhead {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      font-size: ${baseFontSize}px;
+      font-size: ${baseFontSize}pt;
       color: ${currentTheme.textLight};
       margin-top: 2px;
       margin-bottom: 4px;
@@ -364,7 +365,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     .location-span {
       font-style: italic;
       color: #666666;
-      font-size: ${baseFontSize - 1}px;
+      font-size: ${baseFontSize - 1}pt;
     }
 
     .date-badge {
@@ -372,7 +373,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       color: #ffffff;
       padding: 2px 8px;
       border-radius: 20px;
-      font-size: ${baseFontSize - 2}px;
+      font-size: ${baseFontSize - 2}pt;
       font-weight: 600;
       white-space: nowrap;
     }
@@ -385,7 +386,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     .bullets-container li {
       margin-bottom: 3px;
       color: ${currentTheme.textLight};
-      font-size: ${baseFontSize}px;
+      font-size: ${baseFontSize}pt;
     }
 
     .context-grid {
@@ -396,7 +397,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
     }
     
     .context-item {
-      font-size: ${smallTextFontSize}px;
+      font-size: ${smallTextFontSize}pt;
       color: ${currentTheme.textLight};
     }
     
@@ -424,7 +425,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       width: 100%;
       margin-bottom: 4px;
       color: ${currentTheme.textLight};
-      font-size: ${smallTextFontSize2}px;
+      font-size: ${smallTextFontSize2}pt;
       line-height: 1.4;
     }
     
@@ -458,14 +459,50 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       <h1 class="name-heading">${personal?.name || "Robert Williams"}</h1>
       
       <div class="contact-strip">
-        ${personal?.phone ? `<div class="contact-item">${icons.phone}<span>${personal.phone}</span></div>` : ""}
-        ${personal?.email ? `<div class="contact-item">${icons.email}<a href="mailto:${personal.email}">${personal.email}</a></div>` : ""}
         ${(() => {
-          const loc = [personal?.location, personal?.country].filter(Boolean).join(", ");
-          return loc ? `<div class="contact-item">${icons.location}<span>${loc}</span></div>` : "";
+          const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+          const linkedinProfile = socialProfiles?.find((p: any) => 
+            String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+            String(p.url).toLowerCase().includes("linkedin")
+          );
+          const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+          const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+          
+          const githubProfile = socialProfiles?.find((p: any) => 
+            String(p.network || p.platform).toLowerCase().includes("github") || 
+            String(p.url).toLowerCase().includes("github")
+          );
+          const githubUrl = githubProfile?.url || githubProfile?.username || "";
+          const cleanGithubLabel = githubUrl ? githubUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+
+          const items = [];
+          if (personal.phone) {
+            items.push(`<div class="contact-item">${icons.phone}<span>${personal.phone}</span></div>`);
+          }
+          if (personal.email) {
+            items.push(`<div class="contact-item">${icons.email}<a href="mailto:${personal.email}">${personal.email}</a></div>`);
+          }
+          if (personal.dob) {
+            items.push(`<div class="contact-item">${icons.calendar}<span>${personal.dob}</span></div>`);
+            if (linkedinUrl) {
+              items.push(`<div class="contact-item">${icons.linkedin}<span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span></div>`);
+            } else if (addressString) {
+              items.push(`<div class="contact-item">${icons.location}<span>${addressString}</span></div>`);
+            }
+          } else {
+            if (linkedinUrl) {
+              items.push(`<div class="contact-item">${icons.linkedin}<span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span></div>`);
+            } else if (addressString) {
+              items.push(`<div class="contact-item">${icons.location}<span>${addressString}</span></div>`);
+            }
+          }
+          
+          if (githubUrl) {
+            items.push(`<div class="contact-item">${icons.user}<span><a href="${githubUrl}" target="_blank">${cleanGithubLabel}</a></span></div>`);
+          }
+          
+          return items.join("");
         })()}
-        ${personal?.dob ? `<div class="contact-item">${icons.calendar}<span>${personal.dob}</span></div>` : ""}
-        ${personal?.gender ? `<div class="contact-item">${icons.user}<span>${personal.gender}</span></div>` : ""}
       </div>
     </div>
 
@@ -501,30 +538,7 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       </div>
     ` : ""}
 
-    <!-- Education Section -->
-    ${nonEmptyEducation.length > 0 ? `
-      <div class="cv-section">
-        <h2 class="cv-section-title">Education</h2>
-        <div class="divider"></div>
-        ${nonEmptyEducation.map((edu: any, idx: number) => {
-          const dateParts = [edu.startDate, edu.graduationDate || edu.endDate].filter(Boolean);
-          const dateRange = dateParts.join(" - ");
-          return `
-            <div class="timeline-entry" data-section="education" data-index="${idx}">
-              <div class="entry-row-header">
-                <span class="institution-name">${edu.school || ""}</span>
-                ${dateRange ? `<span class="date-badge">${dateRange}</span>` : ""}
-              </div>
-              <div class="entry-row-subhead">
-                <span>${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}${edu.grade ? `, ${edu.grade}` : ""}</span>
-                
-              </div>
-              ${edu.description ? `<div class="bullets-container"><p>${edu.description}</p></div>` : ""}
-            </div>
-          `;
-        }).join('')}
-      </div>
-    ` : ""}
+   
 
     <!-- Experience Section -->
     ${nonEmptyExperience.length > 0 ? `
@@ -532,8 +546,8 @@ export function buildStellarTemplate(data: any, theme?: any): string {
         <h2 class="cv-section-title">Experience</h2>
         <div class="divider"></div>
         ${nonEmptyExperience.map((exp: any, idx: number) => {
-          const dateParts = [exp.startDate, exp.isCurrent ? "Present" : exp.endDate].filter(Boolean);
-          return `
+      const dateParts = [exp.startDate, exp.isCurrent ? "Present" : exp.endDate].filter(Boolean);
+      return `
             <div class="timeline-entry" data-section="experience" data-index="${idx}">
               <div class="entry-row-header">
                 <span>${exp.company || ""}</span>
@@ -543,10 +557,10 @@ export function buildStellarTemplate(data: any, theme?: any): string {
                 <span style="font-weight: 600;">${exp.title || ""}</span>
               </div>
               ${exp.description ? renderDescription(exp.description) : ""}
-              ${exp.achievements ? `<div class="bullets-container"><p><strong>Achievements:</strong> ${exp.achievements}</p></div>` : ""}
+              ${exp.achievements ? `<div style="font-size: ${smallTextFontSize2}pt; color: ${currentTheme.textLight}; margin-top: 4px; margin-left: 20px; text-align: justify; line-height: 1.4;"><strong style="color: ${currentTheme.text};">Achievements:</strong> ${exp.achievements}</div>` : ""}
             </div>
           `;
-        }).join('')}
+    }).join('')}
       </div>
     ` : ""}
 
@@ -693,6 +707,31 @@ export function buildStellarTemplate(data: any, theme?: any): string {
       </div>
     ` : ""}
 
+     <!-- Education Section -->
+    ${nonEmptyEducation.length > 0 ? `
+      <div class="cv-section">
+        <h2 class="cv-section-title">Education</h2>
+        <div class="divider"></div>
+        ${nonEmptyEducation.map((edu: any, idx: number) => {
+      const dateParts = [edu.startDate, edu.graduationDate || edu.endDate].filter(Boolean);
+      const dateRange = dateParts.join(" - ");
+      return `
+            <div class="timeline-entry" data-section="education" data-index="${idx}">
+              <div class="entry-row-header">
+                <span class="institution-name">${edu.school || ""}</span>
+                ${dateRange ? `<span class="date-badge">${dateRange}</span>` : ""}
+              </div>
+              <div class="entry-row-subhead">
+                <span>${edu.degree || ""}${edu.field ? ` in ${edu.field}` : ""}${edu.grade ? `, ${edu.grade}` : ""}</span>
+                
+              </div>
+              ${edu.description ? `<div class="bullets-container"><p>${edu.description}</p></div>` : ""}
+            </div>
+          `;
+    }).join('')}
+      </div>
+    ` : ""}
+
     <!-- Leadership Positions Section -->
     ${nonEmptyLeadershipPositions.length > 0 ? `
       <div class="cv-section">
@@ -710,6 +749,9 @@ export function buildStellarTemplate(data: any, theme?: any): string {
         `).join('')}
       </div>
     ` : ""}
+
+
+
 
     <!-- Co-curricular Section -->
     ${nonEmptyCoCurricular.length > 0 ? `

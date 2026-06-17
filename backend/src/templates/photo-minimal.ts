@@ -207,7 +207,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
      color: #333333;
      line-height: 1.5;
      background: #ffffff;
-     font-size: ${baseFontSize}px;
+     font-size: ${baseFontSize}pt;
      padding: 50px 45px;
    }
    
@@ -253,7 +253,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
    }
 
    .name {
-     font-size: ${headingFontSize}px;
+     font-size: ${headingFontSize}pt;
      font-weight: 700;
      color: ${currentTheme.primary};
      letter-spacing: 0.5px;
@@ -263,7 +263,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
    }
 
    .role {
-     font-size: ${Math.round(baseFontSize * 1.25)}px;
+     font-size: ${Math.round(baseFontSize * 1.25)}pt;
      font-weight: 600;
      color: ${currentTheme.primary};
      text-transform: uppercase;
@@ -289,7 +289,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
    .contact-item {
      display: flex;
      align-items: center;
-     font-size: ${Math.round(baseFontSize * 0.95)}px;
+     font-size: ${Math.round(baseFontSize * 0.95)}pt;
      color: #222222;
    }
 
@@ -320,7 +320,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
    }
 
    .section-title {
-     font-size: ${Math.round(subheadingFontSize * 1.15)}px;
+     font-size: ${Math.round(subheadingFontSize * 1.15)}pt;
      font-weight: 700;
      color: ${currentTheme.primary};
      text-transform: uppercase;
@@ -342,7 +342,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
    }
 
    .summary-text {
-     font-size: ${Math.round(baseFontSize * 1.0)}px;
+     font-size: ${Math.round(baseFontSize * 1.0)}pt;
      color: #222222;
      line-height: 1.5;
      text-align: justify;
@@ -362,12 +362,12 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
 
    .entry-title {
      font-weight: 700;
-     font-size: ${Math.round(baseFontSize * 1.15)}px;
+     font-size: ${Math.round(baseFontSize * 1.15)}pt;
      color: ${currentTheme.primary};
    }
 
    .entry-date {
-     font-size: ${Math.round(baseFontSize * 0.95)}px;
+     font-size: ${Math.round(baseFontSize * 0.95)}pt;
      color: #222222;
      font-weight: 500;
      white-space: nowrap;
@@ -375,7 +375,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
 
    .entry-subtitle {
      color: #222222;
-     font-size: ${Math.round(baseFontSize * 1.0)}px;
+     font-size: ${Math.round(baseFontSize * 1.0)}pt;
      margin-bottom: 10px;
      font-weight: 400;
    }
@@ -388,7 +388,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
    .entry-content li, .bullet-list li {
      margin-bottom: 6px;
      color: #222222;
-     font-size: ${Math.round(baseFontSize * 0.98)}px;
+     font-size: ${Math.round(baseFontSize * 0.98)}pt;
      line-height: 1.5;
    }
 
@@ -403,7 +403,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
      background: #f0f0f0;
      padding: 4px 12px;
      border-radius: 4px;
-     font-size: ${Math.round(baseFontSize * 0.9)}px;
+     font-size: ${Math.round(baseFontSize * 0.9)}pt;
      color: #555555;
    }
 
@@ -424,28 +424,48 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
     
     <div class="header-info">
       <div class="name">${personal.name || "Your Name "}</div>
-     ${
-  personal.role &&
-  personal.role !== "undefined" &&
-  personal.role !== "null"
-    ? `<div class="role">${personal.role}</div>`
-    : ""
-}
+     ${personal.role &&
+      personal.role !== "undefined" &&
+      personal.role !== "null"
+      ? `<div class="role">${personal.role}</div>`
+      : ""
+    }
       
       <hr class="header-line" />
 
       <div class="contact-grid">
-        ${personal.phone ? `<div class="contact-item"><span class="contact-icon">${svgIcons.phone}</span><span>${personal.phone}</span></div>` : ""}
-        ${personal.alternatePhone ? `<div class="contact-item"><span class="contact-icon">${svgIcons.phone}</span><span>${personal.alternatePhone} (Alt)</span></div>` : ""}
-        ${personal.email ? `<div class="contact-item"><span class="contact-icon">${svgIcons.email}</span><span><a href="mailto:${personal.email}">${personal.email}</a></span></div>` : ""}
         ${(() => {
-          const addressParts = [personal.fullAddress, personal.location, personal.country, personal.pinCode].filter(Boolean);
-          return addressParts.length > 0 ? `<div class="contact-item"><span class="contact-icon">${svgIcons.location}</span><span>${addressParts.join(", ")}</span></div>` : "";
+          const addressString = [personal.location, personal.pinCode].filter(Boolean).join(", ") || personal.fullAddress || "";
+          const linkedinProfile = socialProfiles?.find((p: any) => 
+            String(p.network || p.platform).toLowerCase().includes("linkedin") || 
+            String(p.url).toLowerCase().includes("linkedin")
+          );
+          const linkedinUrl = personal.linkedinUrl || linkedinProfile?.url || linkedinProfile?.username || "";
+          const cleanLinkedinLabel = linkedinUrl ? linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "") : "";
+          
+          const items = [];
+          if (personal.phone) {
+            items.push(`<div class="contact-item"><span class="contact-icon">${svgIcons.phone}</span><span>${personal.phone}</span></div>`);
+          }
+          if (personal.email) {
+            items.push(`<div class="contact-item"><span class="contact-icon">${svgIcons.email}</span><span><a href="mailto:${personal.email}">${personal.email}</a></span></div>`);
+          }
+          if (personal.dob) {
+            items.push(`<div class="contact-item"><span class="contact-icon">${svgIcons.calendar}</span><span>DOB: ${personal.dob}</span></div>`);
+            if (linkedinUrl) {
+              items.push(`<div class="contact-item"><span class="contact-icon">${svgIcons.linkedin}</span><span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span></div>`);
+            } else if (addressString) {
+              items.push(`<div class="contact-item"><span class="contact-icon">${svgIcons.location}</span><span>${addressString}</span></div>`);
+            }
+          } else {
+            if (linkedinUrl) {
+              items.push(`<div class="contact-item"><span class="contact-icon">${svgIcons.linkedin}</span><span><a href="${linkedinUrl}" target="_blank">${cleanLinkedinLabel}</a></span></div>`);
+            } else if (addressString) {
+              items.push(`<div class="contact-item"><span class="contact-icon">${svgIcons.location}</span><span>${addressString}</span></div>`);
+            }
+          }
+          return items.join("");
         })()}
-        ${personal.linkedinUrl ? `<div class="contact-item"><span class="contact-icon">${svgIcons.linkedin}</span><span><a href="${personal.linkedinUrl}" target="_blank">${personal.linkedinUrl.replace(/https?:\/\/(www\.)?/, "")}</a></span></div>` : ""}
-        ${personal.dob ? `<div class="contact-item"><span class="contact-icon">${svgIcons.calendar}</span><span>DOB: ${personal.dob}</span></div>` : ""}
-        ${personal.gender ? `<div class="contact-item"><span class="contact-icon">${svgIcons.user}</span><span>${personal.gender}</span></div>` : ""}
-        ${personal.maritalStatus ? `<div class="contact-item"><span class="contact-icon">${svgIcons.heart}</span><span>${personal.maritalStatus}</span></div>` : ""}
       </div>
     </div>
   </div>
@@ -484,28 +504,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
   </div>` : ""}
 
 
-   <!-- EDUCATION SECTION -->
-  ${nonEmptyEducation.length > 0 ? `
-  <div class="section" id="section-education" data-section="education">
-    <div class="section-title-container">
-      <div class="section-title">Education</div>
-    </div>
-    ${nonEmptyEducation.map((edu) => {
-      const startDate = edu.startDate || edu.startYear;
-      const endDate = edu.endDate || edu.endYear || edu.graduationDate;
-      const dateDisplay = startDate && endDate ? `${startDate} – ${endDate}` : (startDate || endDate || "");
-      return `
-      <div class="entry">
-        <div class="entry-header">
-          <div class="entry-title">${edu.degree || edu.course || ""}${edu.field ? ` in ${edu.field}` : ""}</div>
-          <div class="entry-date">${dateDisplay}</div>
-        </div>
-        <div class="entry-subtitle">${formatSubtitle([edu.school || edu.institution || edu.university, edu.location])}</div>
-        ${edu.grade ? `<div class="entry-content">${edu.grade}</div>` : ""}
-        ${edu.description ? `<div class="entry-content">${edu.description}</div>` : ""}
-      </div>
-    `}).join("")}
-  </div>` : ""}
+
 
    <!-- EXPERIENCE SECTION -->
   ${nonEmptyExperience.length > 0 ? `
@@ -514,9 +513,9 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
       <div class="section-title">Experience</div>
     </div>
     ${nonEmptyExperience.map((exp) => {
-      const dateRange = formatDateRange(exp.startDate, exp.endDate, exp.isCurrent);
-      const subtitle = formatSubtitle([exp.company, exp.location]);
-      return `
+        const dateRange = formatDateRange(exp.startDate, exp.endDate, exp.isCurrent);
+        const subtitle = formatSubtitle([exp.company, exp.location]);
+        return `
       <div class="entry">
         <div class="entry-header">
           <div class="entry-title">${exp.title || exp.designation || exp.role || ""}</div>
@@ -524,7 +523,7 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
         </div>
         ${subtitle ? `<div class="entry-subtitle">${subtitle}</div>` : ""}
         ${exp.description ? renderDescription(exp.description) : ""}
-        ${exp.achievements ? `<div class="entry-content"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
+        ${exp.achievements ? `<div class="entry-content" style="font-size: ${Math.round(baseFontSize * 0.98)}pt; margin-top: 4px;"><strong>Achievements:</strong> ${exp.achievements}</div>` : ""}
       </div>
     `}).join("")}
   </div>` : ""}
@@ -666,6 +665,30 @@ export function buildPhotoMinimalTemplate(data: any, theme?: any): string {
         ${item.description ? renderDescription(item.description) : ''}
       </div>
     `).join("")}
+  </div>` : ""}
+
+
+     <!-- EDUCATION SECTION -->
+  ${nonEmptyEducation.length > 0 ? `
+  <div class="section" id="section-education" data-section="education">
+    <div class="section-title-container">
+      <div class="section-title">Education</div>
+    </div>
+    ${nonEmptyEducation.map((edu) => {
+      const startDate = edu.startDate || edu.startYear;
+      const endDate = edu.endDate || edu.endYear || edu.graduationDate;
+      const dateDisplay = startDate && endDate ? `${startDate} – ${endDate}` : (startDate || endDate || "");
+      return `
+      <div class="entry">
+        <div class="entry-header">
+          <div class="entry-title">${edu.degree || edu.course || ""}${edu.field ? ` in ${edu.field}` : ""}</div>
+          <div class="entry-date">${dateDisplay}</div>
+        </div>
+        <div class="entry-subtitle">${formatSubtitle([edu.school || edu.institution || edu.university, edu.location])}</div>
+        ${edu.grade ? `<div class="entry-content">${edu.grade}</div>` : ""}
+        ${edu.description ? `<div class="entry-content">${edu.description}</div>` : ""}
+      </div>
+    `}).join("")}
   </div>` : ""}
 
   <!-- CO-CURRICULAR SECTION -->
