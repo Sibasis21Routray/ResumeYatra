@@ -51,7 +51,13 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
     background: "#ffffff",
   };
 
-  const currentTheme = { ...defaultTheme, ...(theme || {}) };
+  // ✅ Fix: Map primary to heading and borderColor if they're not provided
+  const currentTheme = {
+    ...defaultTheme,
+    ...(theme || {}),
+    heading: theme?.heading || theme?.primary || defaultTheme.heading,
+    borderColor: theme?.borderColor || theme?.primary || defaultTheme.borderColor,
+  };
   
   // ✅ Dynamic font size from user settings
   const baseFontSize = data?.formatting?.bodyFontSize || data?.fontSize || 13;
@@ -259,7 +265,14 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
           text-align: center;
           font-size: ${smallTextFontSize}pt;
           margin-bottom: 15px;
-          color: ${currentTheme.textLight};
+          color: ${currentTheme.text};
+        }
+        .contact-info a {
+          color: ${currentTheme.primary};
+          text-decoration: none;
+        }
+        .contact-info a:hover {
+          text-decoration: underline;
         }
 
         /* Section Title with Lines on either side */
@@ -292,7 +305,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
           font-weight: bold;
           font-size: ${companyNameFontSize}pt;
           text-transform: uppercase;
-          color: ${currentTheme.text};
+          color: ${currentTheme.heading};
         }
         .location-line {
           text-align: center;
@@ -340,6 +353,9 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
           font-size: ${smallTextFontSize}pt;
           color: ${currentTheme.textLight};
         }
+        .edu-item {
+          margin-bottom: 10px;
+        }
 
         /* Style for HTML content with bullet points */
         .description-html ul {
@@ -384,6 +400,7 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
           color: ${currentTheme.text};
         }
 
+        /* All links use primary color */
         a {
           color: ${currentTheme.primary};
           text-decoration: none;
@@ -480,7 +497,12 @@ export function buildPhotographicTemplate(data: any, theme?: any): string {
             <span>${formatDateRange(exp.startDate, exp.endDate, exp.isCurrent)}</span>
           </div>
           ${exp.description ? renderDescription(exp.description) : ''}
-          ${exp.achievements ? `<p style="font-size: ${normalTextFontSize}pt; margin-top: 5px; color: ${currentTheme.textLight};"><strong>Achievements:</strong> ${exp.achievements}</p>` : ''}
+          ${exp.achievements ? `
+  <div style="margin-top: 5px;">
+    <strong>Achievements:</strong>
+    ${renderDescription(exp.achievements)}
+  </div>
+` : ''}
         </div>
       `).join('')}
       ` : ''}
@@ -946,7 +968,7 @@ ${(coreCompCol1.length > 0 || coreCompCol2.length > 0) ? `
         const schoolLine = schoolParts.length > 0 ? schoolParts.join(", ") : "";
         
         return `
-        <div class="edu-item" style="margin-bottom: 10px;" data-index="${idx}">
+        <div class="edu-item" data-index="${idx}">
           <div class="edu-row">
             <span>${(edu.degree || '').toUpperCase()}${edu.field ? ` IN ${edu.field.toUpperCase()}` : ''}</span>
             <span>${dateRange || edu.graduationDate || edu.endDate || ''}</span>

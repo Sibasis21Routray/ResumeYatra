@@ -60,6 +60,11 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
   const bodyFontSize = data.fontSize || 14;
   const fontFamily = data.fontFamily || "'Inter', 'Helvetica Neue', Arial, sans-serif";
 
+  // Scale headings based on body font size
+  const nameFontSize = Math.round(bodyFontSize * 2.2);
+  const jobTitleFontSize = Math.round(bodyFontSize * 1.2);
+  const sectionTitleFontSize = Math.round(bodyFontSize * 1.35);
+
   const getNonEmptyItems = (arr: any[]): any[] => {
     if (!arr || !Array.isArray(arr)) return [];
     return arr.filter(item => {
@@ -220,7 +225,7 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
         }
 
         .name {
-          font-size: 32pt;
+          font-size: ${nameFontSize}pt;
           font-weight: 800;
           color: ${primaryColor};
           text-transform: uppercase;
@@ -230,7 +235,7 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
         }
 
         .job-title {
-          font-size: 15pt;
+          font-size: ${jobTitleFontSize}pt;
           font-weight: 700;
           color: ${primaryColor};
           text-transform: uppercase;
@@ -245,7 +250,7 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
           flex-wrap: wrap;
           align-items: center;
           gap: 16px;
-          font-size: 12pt;
+          font-size: ${bodyFontSize}pt;
           color: ${darkGray};
           font-weight: 500;
           margin-top: 8px;
@@ -264,12 +269,21 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
           flex-shrink: 0;
         }
 
+        .contact-item a {
+          color: ${darkGray};
+          text-decoration: none;
+        }
+
+        .contact-item a:hover {
+          text-decoration: underline;
+        }
+
         .section {
           margin-bottom: 22px;
         }
 
         .section-title {
-          font-size: 15pt;
+          font-size: ${sectionTitleFontSize}pt;
           font-weight: 700;
           color: ${primaryColor};
           text-transform: uppercase;
@@ -420,18 +434,18 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
                 items.push(`<div class="contact-item"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg><span>${personal.phone}</span></div>`);
               }
               if (personal.email) {
-                items.push(`<div class="contact-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><span>${personal.email}</span></div>`);
+                items.push(`<div class="contact-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><span><a href="mailto:${personal.email}">${personal.email}</a></span></div>`);
               }
               if (personal.dob) {
                 items.push(`<div class="contact-item"><svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg><span>DOB: ${personal.dob}</span></div>`);
                 if (linkedinUrl) {
-                  items.push(`<div class="contact-item"><svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg><span>${cleanLinkedinLabel}</span></div>`);
+                  items.push(`<div class="contact-item"  style="display:flex; align-items:center; gap:5px;><a href="${linkedinUrl}" target="_blank"><svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg><span>LinkedIn</span></a></div>`);
                 } else if (addressString) {
                   items.push(`<div class="contact-item"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span>${addressString}</span></div>`);
                 }
               } else {
                 if (linkedinUrl) {
-                  items.push(`<div class="contact-item"><svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg><span>${cleanLinkedinLabel}</span></div>`);
+                  items.push(`<div class="contact-item"  style="display:flex; align-items:center; gap:5px;><a href="${linkedinUrl}" target="_blank"><svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg><span>LinkedIn</span></a></div>`);
                 } else if (addressString) {
                   items.push(`<div class="contact-item"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span>${addressString}</span></div>`);
                 }
@@ -440,20 +454,6 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
             })()}
           </div>
         </header>
-
-        <!-- Availability Section -->
-        ${availabilityWorkAuth && hasObjectValues(availabilityWorkAuth) ? `
-          <section class="section" id="section-availability" data-section="availability">
-            <h2 class="section-title">Availability</h2>
-            <div class="context-grid">
-              ${availabilityWorkAuth.availabilityNoticePeriod ? `<div class="context-item"><span class="context-label">Notice Period:</span> ${availabilityWorkAuth.availabilityNoticePeriod}</div>` : ''}
-              ${availabilityWorkAuth.workAuthorizationStatus ? `<div class="context-item"><span class="context-label">Work Auth:</span> ${availabilityWorkAuth.workAuthorizationStatus}</div>` : ''}
-              ${availabilityWorkAuth.preferredLocation ? `<div class="context-item"><span class="context-label">Preferred Location:</span> ${availabilityWorkAuth.preferredLocation}</div>` : ''}
-            </div>
-          </section>
-        ` : ""}
-
-        
 
         <!-- Summary Section -->
         ${summary && summary.trim() ? `
@@ -626,6 +626,19 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
     }).join("")}
           </section>
         ` : ""}
+
+         <!-- Availability Section -->
+        ${availabilityWorkAuth && hasObjectValues(availabilityWorkAuth) ? `
+          <section class="section" id="section-availability" data-section="availability">
+            <h2 class="section-title">Availability</h2>
+            <div class="context-grid">
+              ${availabilityWorkAuth.availabilityNoticePeriod ? `<div class="context-item"><span class="context-label">Notice Period:</span> ${availabilityWorkAuth.availabilityNoticePeriod}</div>` : ''}
+              ${availabilityWorkAuth.workAuthorizationStatus ? `<div class="context-item"><span class="context-label">Work Auth:</span> ${availabilityWorkAuth.workAuthorizationStatus}</div>` : ''}
+              ${availabilityWorkAuth.preferredLocation ? `<div class="context-item"><span class="context-label">Preferred Location:</span> ${availabilityWorkAuth.preferredLocation}</div>` : ''}
+            </div>
+          </section>
+        ` : ""}
+
 
         
         <!-- Leadership Positions Section -->
@@ -938,8 +951,7 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
             <h2 class="section-title">Social Profiles</h2>
             ${nonEmptySocialProfiles.map((item: any, idx: number) => `
               <div class="entry" data-index="${idx}">
-                <div class="entry-header"><span class="entry-title">${item.platform || item.network || 'Profile'}</span></div>
-                <div><a href="${item.url || ''}" class="portfolio-link" target="_blank">${item.url || ''}</a></div>
+                <div><a href="${item.url || ''}" class="portfolio-link" target="_blank">${item.platform || item.network || 'Profile'}</a></div>
               </div>
             `).join('')}
           </section>

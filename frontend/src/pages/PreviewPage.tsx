@@ -90,7 +90,7 @@ export default function PreviewPage() {
   const [copied, setCopied] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedFontFamily, setSelectedFontFamily] = useState('Arial, sans-serif')
-  const [bodyFontSize, setBodyFontSize] = useState(14)
+  const [bodyFontSize, setBodyFontSize] = useState(10)
   const [templateView, setTemplateView] = useState<'grid' | 'list'>('grid')
   
 
@@ -1008,8 +1008,6 @@ export default function PreviewPage() {
 
           <div className="flex items-center gap-4 p-2 bg-white/80 backdrop-blur-xl border border-white/40 rounded-2xl shadow-sm">
             <div className="flex items-center gap-2">
-              
-
               <button
                 onClick={handleAIEnhance}
                 disabled={enhancing}
@@ -1027,8 +1025,6 @@ export default function PreviewPage() {
                   </span>
                 </div>
               </button>
-
-             
             </div>
 
             <div className="flex flex-col gap-1.5 px-2 border-r border-slate-200/60">
@@ -1037,7 +1033,7 @@ export default function PreviewPage() {
               </span>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => handleSectionClick('personal')}
+                  onClick={() => handleSectionClick("personal")}
                   className="group flex items-center gap-2 px-3 py-2 bg-white text-slate-700 border border-slate-200 rounded-xl hover:border-[#04477E] hover:shadow-sm transition-all duration-300"
                 >
                   <Pen className="w-3.5 h-3.5 text-[#04477E]" />
@@ -1063,8 +1059,8 @@ export default function PreviewPage() {
                             theme: selectedTheme,
                             fontFamily: newFont,
                             fontSize: bodyFontSize,
-                            bodyFontSize: bodyFontSize
-                          }
+                            bodyFontSize: bodyFontSize,
+                          },
                         } as any);
                       } catch (err) {
                         console.error("Failed to save font:", err);
@@ -1085,7 +1081,12 @@ export default function PreviewPage() {
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </div>
               </div>
@@ -1098,7 +1099,10 @@ export default function PreviewPage() {
               <div className="flex items-center bg-slate-100/50 rounded-lg p-0.5 border border-slate-200">
                 <button
                   onClick={async () => {
-                    const newSize = Math.max(10, bodyFontSize - 1);
+                    const newSize = Math.max(
+                      9,
+                      +(bodyFontSize - 0.5).toFixed(1),
+                    );
                     setBodyFontSize(newSize);
                     try {
                       await resumeAPI.update(id!, {
@@ -1106,8 +1110,8 @@ export default function PreviewPage() {
                           theme: selectedTheme,
                           fontFamily: selectedFontFamily,
                           fontSize: newSize,
-                          bodyFontSize: newSize
-                        }
+                          bodyFontSize: newSize,
+                        },
                       } as any);
                     } catch (e) {
                       console.error("Failed to save font size:", e);
@@ -1118,11 +1122,17 @@ export default function PreviewPage() {
                   -
                 </button>
                 <span className="px-2 text-xs font-bold text-slate-700">
-                  {bodyFontSize}pt
+                  {bodyFontSize % 1 === 0
+                    ? bodyFontSize
+                    : bodyFontSize.toFixed(1)}
+                  pt
                 </span>
                 <button
                   onClick={async () => {
-                    const newSize = Math.min(24, bodyFontSize + 1);
+                    const newSize = Math.min(
+                      12,
+                      +(bodyFontSize + 0.5).toFixed(1),
+                    );
                     setBodyFontSize(newSize);
                     try {
                       await resumeAPI.update(id!, {
@@ -1130,8 +1140,8 @@ export default function PreviewPage() {
                           theme: selectedTheme,
                           fontFamily: selectedFontFamily,
                           fontSize: newSize,
-                          bodyFontSize: newSize
-                        }
+                          bodyFontSize: newSize,
+                        },
                       } as any);
                     } catch (e) {
                       console.error("Failed to save font size:", e);
@@ -1258,15 +1268,27 @@ export default function PreviewPage() {
                           disabled={exporting === "pdf"}
                         >
                           <span className="flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                              />
                             </svg>
                             <span>Download PDF</span>
                           </span>
                           {exporting === "pdf" ? (
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                           ) : (
-                            <span className="text-xs opacity-70 group-hover:opacity-100">↓</span>
+                            <span className="text-xs opacity-70 group-hover:opacity-100">
+                              ↓
+                            </span>
                           )}
                         </button>
                       )}
@@ -1279,15 +1301,27 @@ export default function PreviewPage() {
                           disabled={exporting === "docx"}
                         >
                           <span className="flex items-center gap-2">
-                            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            <svg
+                              className="w-4 h-4 text-gray-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
                             </svg>
                             <span>Download Word</span>
                           </span>
                           {exporting === "docx" ? (
                             <div className="w-4 h-4 border-2 border-gray-700 border-t-transparent rounded-full animate-spin"></div>
                           ) : (
-                            <span className="text-xs text-gray-400 group-hover:text-[#04477E]">↓</span>
+                            <span className="text-xs text-gray-400 group-hover:text-[#04477E]">
+                              ↓
+                            </span>
                           )}
                         </button>
                       )}
@@ -1296,47 +1330,96 @@ export default function PreviewPage() {
                       {showComparison && (
                         <>
                           <div className="pt-2">
-                            <p className="text-xs text-gray-500 mb-2">Export {selectedVersion === 'original' ? 'Original' : 'AI Enhanced'} Version:</p>
+                            <p className="text-xs text-gray-500 mb-2">
+                              Export{" "}
+                              {selectedVersion === "original"
+                                ? "Original"
+                                : "AI Enhanced"}{" "}
+                              Version:
+                            </p>
                           </div>
                           <button
-                            onClick={() => handleEnhancedExport("pdf", selectedVersion)}
+                            onClick={() =>
+                              handleEnhancedExport("pdf", selectedVersion)
+                            }
                             disabled={exporting === "pdf"}
                             className="w-full px-4 py-3 bg-[#04477E] text-white rounded-xl hover:shadow-lg transition-all flex items-center justify-between gap-2 text-sm font-medium group disabled:opacity-70 disabled:cursor-not-allowed"
                           >
                             <span className="flex items-center gap-2">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                />
                               </svg>
-                              <span>Download {selectedVersion === 'original' ? 'Original' : 'AI Enhanced'} PDF</span>
+                              <span>
+                                Download{" "}
+                                {selectedVersion === "original"
+                                  ? "Original"
+                                  : "AI Enhanced"}{" "}
+                                PDF
+                              </span>
                             </span>
                             {exporting === "pdf" ? (
                               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                             ) : (
-                              <span className="text-xs opacity-70 group-hover:opacity-100">↓</span>
+                              <span className="text-xs opacity-70 group-hover:opacity-100">
+                                ↓
+                              </span>
                             )}
                           </button>
 
                           <button
-                            onClick={() => handleEnhancedExport("docx", selectedVersion)}
+                            onClick={() =>
+                              handleEnhancedExport("docx", selectedVersion)
+                            }
                             disabled={exporting === "docx"}
                             className="w-full px-4 py-3 bg-white border-2 border-[#04477E] text-[#04477E] rounded-xl hover:shadow-lg transition-all flex items-center justify-between gap-2 text-sm font-medium group disabled:opacity-70 disabled:cursor-not-allowed"
                           >
                             <span className="flex items-center gap-2">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                />
                               </svg>
-                              <span>Download {selectedVersion === 'original' ? 'Original' : 'AI Enhanced'} Word</span>
+                              <span>
+                                Download{" "}
+                                {selectedVersion === "original"
+                                  ? "Original"
+                                  : "AI Enhanced"}{" "}
+                                Word
+                              </span>
                             </span>
                             {exporting === "docx" ? (
                               <div className="w-4 h-4 border-2 border-[#04477E] border-t-transparent rounded-full animate-spin"></div>
                             ) : (
-                              <span className="text-xs text-[#04477E] group-hover:text-[#04477E]/80">↓</span>
+                              <span className="text-xs text-[#04477E] group-hover:text-[#04477E]/80">
+                                ↓
+                              </span>
                             )}
                           </button>
                         </>
                       )}
 
-                      {(resume?.isDownloadPaid || resume?.isAiPaid || resume?.isDownloaded || resume?.isAiEnhanced) && (
+                      {(resume?.isDownloadPaid ||
+                        resume?.isAiPaid ||
+                        resume?.isDownloaded ||
+                        resume?.isAiEnhanced) && (
                         <button
                           onClick={handleDownloadInvoice}
                           className="w-full px-4 py-3 bg-white border border-[#04477E] text-[#04477E] rounded-xl hover:bg-[#04477E]/5 hover:shadow-md transition-all flex items-center justify-between gap-2 text-sm font-medium group disabled:opacity-70 disabled:cursor-not-allowed"
@@ -1349,7 +1432,9 @@ export default function PreviewPage() {
                           {downloadingInvoice ? (
                             <div className="w-4 h-4 border-2 border-[#04477E] border-t-transparent rounded-full animate-spin"></div>
                           ) : (
-                            <span className="text-xs opacity-70 group-hover:opacity-100">↓</span>
+                            <span className="text-xs opacity-70 group-hover:opacity-100">
+                              ↓
+                            </span>
                           )}
                         </button>
                       )}
@@ -1361,8 +1446,18 @@ export default function PreviewPage() {
                       onClick={handleLogout}
                       className="w-full px-4 py-3 bg-slate-50 text-slate-700 rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center gap-2.5 text-sm font-medium group"
                     >
-                      <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      <svg
+                        className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                        />
                       </svg>
                       Sign Out
                     </button>
@@ -1397,8 +1492,8 @@ export default function PreviewPage() {
                             idx === enhancementStep
                               ? "text-[#04477E] scale-105 font-medium"
                               : idx < enhancementStep
-                              ? "text-green-600"
-                              : "text-gray-400"
+                                ? "text-green-600"
+                                : "text-gray-400"
                           }`}
                         >
                           <div
@@ -1406,11 +1501,15 @@ export default function PreviewPage() {
                               idx < enhancementStep
                                 ? "bg-green-100 text-green-600"
                                 : idx === enhancementStep
-                                ? "bg-[#04477E] text-white"
-                                : "bg-gray-100 text-gray-400"
+                                  ? "bg-[#04477E] text-white"
+                                  : "bg-gray-100 text-gray-400"
                             }`}
                           >
-                            {idx < enhancementStep ? <Check size={18} /> : step.icon}
+                            {idx < enhancementStep ? (
+                              <Check size={18} />
+                            ) : (
+                              step.icon
+                            )}
                           </div>
                           <span className="text-sm text-left">{step.text}</span>
                         </div>
@@ -1429,7 +1528,11 @@ export default function PreviewPage() {
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fadeIn">
                   <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center animate-scaleIn">
                     <div className="w-20 h-20 mx-auto mb-4">
-                      <img src="/like.gif" alt="Success" className="w-full h-full object-contain" />
+                      <img
+                        src="/like.gif"
+                        alt="Success"
+                        className="w-full h-full object-contain"
+                      />
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">
                       Resume Enhanced!
@@ -1442,32 +1545,30 @@ export default function PreviewPage() {
               )}
 
               {/* Loading overlay - Solid white to hide all transitional blinking */}
-            
+
               {(rendering || iframeLoading || exporting) && !enhancing && (
-             <div className="absolute inset-0 z-[60] bg-white rounded-xl">
-              <div className="flex flex-col items-center pt-56 ">
-      
-             {/* Loading Spinner */}
-           <div className="relative inline-block scale-110">
-           <div className="w-14 h-14 border-4 border-gray-100 rounded-full"></div>
-           <div className="w-14 h-14 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
-          </div>
+                <div className="absolute inset-0 z-[60] bg-white rounded-xl">
+                  <div className="flex flex-col items-center pt-56 ">
+                    {/* Loading Spinner */}
+                    <div className="relative inline-block scale-110">
+                      <div className="w-14 h-14 border-4 border-gray-100 rounded-full"></div>
+                      <div className="w-14 h-14 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+                    </div>
 
-            {/* Text */}
-           <div className="flex flex-col items-center gap-1.5 mt-5">
-           <h3 className="text-lg font-bold text-gray-900">
-           {exporting ? "Finalizing File..." : "Updating Design"}
-            </h3>
-            <p className="text-sm text-gray-400 font-medium animate-pulse">
-             {exporting
-              ? `Your ${exporting.toUpperCase()} is almost ready`
-             : "Applying your changes..."}
-           </p>
-          </div>
-
-        </div>
-     </div>
-      )}
+                    {/* Text */}
+                    <div className="flex flex-col items-center gap-1.5 mt-5">
+                      <h3 className="text-lg font-bold text-gray-900">
+                        {exporting ? "Finalizing File..." : "Updating Design"}
+                      </h3>
+                      <p className="text-sm text-gray-400 font-medium animate-pulse">
+                        {exporting
+                          ? `Your ${exporting.toUpperCase()} is almost ready`
+                          : "Applying your changes..."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Iframe */}
               {previewUrl && (
@@ -1490,7 +1591,9 @@ export default function PreviewPage() {
                       onLoad={() => {
                         setIframeLoading(false);
                         if (mainPreviewIframeRef.current) {
-                          injectSectionDetectionScript(mainPreviewIframeRef.current);
+                          injectSectionDetectionScript(
+                            mainPreviewIframeRef.current,
+                          );
                         }
                       }}
                     />
@@ -1506,7 +1609,9 @@ export default function PreviewPage() {
                       <div className="w-12 h-12 border-4 border-gray-200 rounded-full"></div>
                       <div className="w-12 h-12 border-4 border-[#04477E] border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
                     </div>
-                    <p className="text-gray-600 mt-4 text-sm">Loading preview...</p>
+                    <p className="text-gray-600 mt-4 text-sm">
+                      Loading preview...
+                    </p>
                   </div>
                 </div>
               )}
@@ -1541,8 +1646,8 @@ export default function PreviewPage() {
                                       theme: palette,
                                       fontFamily: selectedFontFamily,
                                       fontSize: bodyFontSize,
-                                      bodyFontSize: bodyFontSize
-                                    }
+                                      bodyFontSize: bodyFontSize,
+                                    },
                                   } as any);
                                 } catch (e) {
                                   console.error("Failed to save theme:", e);
@@ -1579,24 +1684,36 @@ export default function PreviewPage() {
                             </p>
                           </div>
                         ) : (
-                          <div className={templateView === "grid" ? "grid grid-cols-2 gap-3" : "space-y-2"}>
+                          <div
+                            className={
+                              templateView === "grid"
+                                ? "grid grid-cols-2 gap-3"
+                                : "space-y-2"
+                            }
+                          >
                             {templates.map((templateOption: any) => (
                               <button
                                 key={templateOption.id}
                                 onClick={async () => {
                                   if (template === templateOption.id) return;
-                                  
+
                                   try {
                                     // 1. Prepare defaults
-                                    const defaultFont = templateOption.defaultFontFamily || "Arial, sans-serif";
-                                    const defaultSize = templateOption.defaultFontSize || 14;
-                                    const defaultTheme = (templateOption as any).defaultColor 
-                                      ? { 
-                                          name: 'Default', 
-                                          primary: (templateOption as any).defaultColor, 
-                                          secondary: (templateOption as any).defaultColor, 
-                                          background: '#ffffff', 
-                                          category: 'custom' 
+                                    const defaultFont =
+                                      templateOption.defaultFontFamily ||
+                                      "Arial, sans-serif";
+                                    const defaultSize =
+                                      templateOption.defaultFontSize || 14;
+                                    const defaultTheme = (templateOption as any)
+                                      .defaultColor
+                                      ? {
+                                          name: "Default",
+                                          primary: (templateOption as any)
+                                            .defaultColor,
+                                          secondary: (templateOption as any)
+                                            .defaultColor,
+                                          background: "#ffffff",
+                                          category: "custom",
                                         }
                                       : colorPalettes[0];
 
@@ -1617,10 +1734,14 @@ export default function PreviewPage() {
                                         bodyFontSize: defaultSize,
                                       },
                                     } as any);
-
                                   } catch (error) {
-                                    console.error("Failed to update template:", error);
-                                    toast.error("Failed to update template. Please try again.");
+                                    console.error(
+                                      "Failed to update template:",
+                                      error,
+                                    );
+                                    toast.error(
+                                      "Failed to update template. Please try again.",
+                                    );
                                   }
                                 }}
                                 className={`
@@ -1639,7 +1760,11 @@ export default function PreviewPage() {
                                       {templatePreviews[templateOption.id] ? (
                                         <div className="w-full h-full relative">
                                           <iframe
-                                            srcDoc={templatePreviews[templateOption.id]}
+                                            srcDoc={
+                                              templatePreviews[
+                                                templateOption.id
+                                              ]
+                                            }
                                             className="absolute inset-0 w-full h-full pointer-events-none"
                                             style={{
                                               transform: "scale(0.25)",
@@ -1733,22 +1858,32 @@ export default function PreviewPage() {
       {showComparison && (
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-[#d8a23b] rounded-xl shadow-2xl border border-purple-200 p-4 flex items-center gap-6 animate-fadeIn">
           <div className="flex items-center gap-3">
-            <span className={`text-sm font-medium ${selectedVersion === "original" ? "text-white" : "text-white"}`}>
+            <span
+              className={`text-sm font-medium ${selectedVersion === "original" ? "text-white" : "text-white"}`}
+            >
               Original
             </span>
             <button
-              onClick={() => setSelectedVersion((prev) => prev === "original" ? "enhanced" : "original")}
+              onClick={() =>
+                setSelectedVersion((prev) =>
+                  prev === "original" ? "enhanced" : "original",
+                )
+              }
               className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#04477E] focus:ring-offset-2 ${
                 selectedVersion === "enhanced" ? "bg-[#04477E]" : "bg-gray-300"
               }`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  selectedVersion === "enhanced" ? "translate-x-6" : "translate-x-1"
+                  selectedVersion === "enhanced"
+                    ? "translate-x-6"
+                    : "translate-x-1"
                 }`}
               />
             </button>
-            <span className={`text-sm font-medium ${selectedVersion === "enhanced" ? "text-white" : "text-white"}`}>
+            <span
+              className={`text-sm font-medium ${selectedVersion === "enhanced" ? "text-white" : "text-white"}`}
+            >
               AI Enhanced
             </span>
           </div>
@@ -1772,15 +1907,23 @@ export default function PreviewPage() {
       {/* Filename Modal */}
       {showFilenameModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-scaleIn" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-scaleIn"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center gap-3 mb-5">
               <div className="p-2.5 bg-[#04477E]/10 rounded-xl">
                 <Download className="w-5 h-5 text-[#04477E]" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 text-base">Name your file</h3>
+                <h3 className="font-semibold text-gray-900 text-base">
+                  Name your file
+                </h3>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Downloading as <span className="font-medium text-[#04477E]">.{pendingFilenameFormat?.toUpperCase()}</span>
+                  Downloading as{" "}
+                  <span className="font-medium text-[#04477E]">
+                    .{pendingFilenameFormat?.toUpperCase()}
+                  </span>
                 </p>
               </div>
             </div>
@@ -1807,11 +1950,23 @@ export default function PreviewPage() {
             </div>
 
             <div className="flex items-center gap-2 mb-5 px-3 py-2.5 bg-gray-50 rounded-lg border border-gray-100">
-              <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              <svg
+                className="w-4 h-4 text-gray-400 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
               </svg>
               <span className="text-xs text-gray-500 truncate">
-                <span className="font-medium text-gray-700">{customFilename.trim() || "resume"}</span>
+                <span className="font-medium text-gray-700">
+                  {customFilename.trim() || "resume"}
+                </span>
                 <span className="text-gray-400">.{pendingFilenameFormat}</span>
               </span>
             </div>
@@ -1839,9 +1994,11 @@ export default function PreviewPage() {
         </div>
       )}
 
-      
-
-      <PricingPopup isOpen={showPricingPopup} onClose={() => setShowPricingPopup(false)} resumeId={id} />
+      <PricingPopup
+        isOpen={showPricingPopup}
+        onClose={() => setShowPricingPopup(false)}
+        resumeId={id}
+      />
 
       <PaymentModal
         open={paymentOpen}
