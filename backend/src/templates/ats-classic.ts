@@ -99,7 +99,7 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
     }
 
     if (skillsArray.length === 0) return "";
-    return `<div class="skills-inline">${skillsArray.join(' &nbsp;|&nbsp; ')}</div>`;
+    return `<div class="skills-inline">${skillsArray.join('   •   ')}</div>`;
   };
 
   const renderInlinePills = (items: any[], labelKey: string = "language", profKey: string = "proficiency"): string => {
@@ -113,7 +113,7 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
       return String(item);
     }).filter(Boolean);
     if (displayItems.length === 0) return "";
-    return `<div class="skills-inline">${displayItems.join(' &nbsp;|&nbsp; ')}</div>`;
+    return `<div class="skills-inline">${displayItems.join('   •   ')}</div>`;
   };
 
   const renderDescription = (description: string): string => {
@@ -226,6 +226,7 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
           text-transform: uppercase;
           letter-spacing: 0.5px;
           margin-bottom: 4px;
+          border-bottom: 3px solid ${primaryColor};
         }
 
         .job-title {
@@ -265,7 +266,6 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
 
         .section {
           margin-bottom: 22px;
-          page-break-inside: avoid;
         }
 
         .section-title {
@@ -289,7 +289,6 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
 
         .entry {
           margin-bottom: 14px;
-          page-break-inside: avoid;
         }
 
         .entry-header {
