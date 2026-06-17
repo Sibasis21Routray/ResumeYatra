@@ -474,7 +474,7 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     <!-- CAREER OBJECTIVE / SUMMARY SECTION -->
     ${summary || careerObjective ? `
     <div class="section-divider" id="section-careerObjective-divider" data-section="careerObjective-divider">
-      <span class="section-title">Career Objective</span>
+      <span class="section-title">Professional Summary</span>
     </div>
     <p class="summary-text" id="section-careerObjective" data-section="careerObjective">
       ${summary || careerObjective}
@@ -1211,14 +1211,24 @@ export function buildFormalIndianCvTemplate(data: any, theme?: any): string {
     ` : ""}
 
     <!-- CERTIFICATIONS SECTION -->
-    ${nonEmptyCertifications.length > 0 ? `
-    <div class="section-divider" id="section-certifications-divider" data-section="certifications-divider">
-      <span class="section-title">Certifications</span>
-    </div>
-    <div class="summary-text" id="section-certifications" data-section="certifications">
-      ${nonEmptyCertifications.map((cert, idx) => `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10pt;">${cert.name || cert.title || ''}${cert.issuer ? ` – ${cert.issuer}` : ''}${cert.date ? ` (${cert.date})` : ''}</span>`).join("")}
-    </div>
-    ` : ""}
+   ${nonEmptyCertifications.length > 0 ? `
+  <div class="section-divider" id="section-certifications-divider" data-section="certifications-divider">
+    <span class="section-title">Certifications</span>
+  </div>
+  <div class="summary-text" id="section-certifications" data-section="certifications">
+    ${nonEmptyCertifications.map((cert, idx) => {
+      const certUrl = cert.url || cert.credentialUrl || cert.link || cert.certificateUrl || '';
+      return `<span style="display: inline-block; background: #f0f0f0; padding: 2px 8px; margin: 3px; border-radius: 4px; font-size: 10pt;">
+        ${certUrl 
+          ? `<a href="${certUrl}" target="_blank" style="color: ${currentTheme.primary}; text-decoration: none;">${cert.name || cert.title || ''}</a>`
+          : `${cert.name || cert.title || ''}`
+        }
+        ${cert.issuer ? ` – ${cert.issuer}` : ''}
+        ${cert.date ? ` (${cert.date})` : ''}
+      </span>`;
+    }).join("")}
+  </div>
+` : ""}
 
     <!-- EDUCATION TABULAR GRID -->
     ${educationList.length > 0 ? `
