@@ -192,9 +192,6 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
   const linkedinProfile = socialProfiles?.find((p: any) => String(p.network || p.platform).toLowerCase().includes("linkedin") || String(p.url).toLowerCase().includes("linkedin"));
   const linkedinUrl = linkedinProfile?.url || linkedinProfile?.username || "";
   const cleanLinkedinLabel = linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "");
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>",fullAddress,)
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>",locationStr)
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>",countryStr)
   return `
     <!DOCTYPE html>
     <html lang="en">

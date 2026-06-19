@@ -168,7 +168,7 @@ export function buildModernSidebarTemplate(data: any, theme?: any): string {
 
   // Format address properly
   const fullAddress = personal.fullAddress || "";
-  const locationParts = [personal.location, personal.pinCode].filter(Boolean);
+  const locationParts = [personal.location].filter(Boolean);
   const locationStr = locationParts.length > 0 ? locationParts.join(", ") : "";
   const countryStr = personal.country || "";
   const addressString = [fullAddress, locationStr, countryStr].filter(Boolean).join(", ");
