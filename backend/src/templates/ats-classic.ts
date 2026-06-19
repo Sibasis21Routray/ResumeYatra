@@ -184,7 +184,7 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
   const nonEmptyProjects = getNonEmptyItems(projects);
 
   const fullAddress = personal.fullAddress || "";
-  const locationParts = [personal.location, personal.pinCode].filter(Boolean);
+  const locationParts = [personal.location].filter(Boolean);
   const locationStr = locationParts.length > 0 ? locationParts.join(", ") : "";
   const countryStr = personal.country || "";
   const addressString = [fullAddress, locationStr, countryStr].filter(Boolean).join(", ");
@@ -192,7 +192,9 @@ export function buildAtsClassicTemplate(data: any, theme?: any): string {
   const linkedinProfile = socialProfiles?.find((p: any) => String(p.network || p.platform).toLowerCase().includes("linkedin") || String(p.url).toLowerCase().includes("linkedin"));
   const linkedinUrl = linkedinProfile?.url || linkedinProfile?.username || "";
   const cleanLinkedinLabel = linkedinUrl.replace(/^(https?:\/\/)?(www\.)?/, "");
-
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>",fullAddress,)
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>",locationStr)
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>",countryStr)
   return `
     <!DOCTYPE html>
     <html lang="en">
