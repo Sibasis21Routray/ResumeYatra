@@ -282,3 +282,15 @@ export async function logout(req: Request, res: Response) {
   });
   res.json({ message: 'Logged out successfully' });
 }
+
+export async function checkEmail(req: Request, res: Response) {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email is required' });
+    const existing = await User.findOne({ email });
+    res.json({ exists: !!existing });
+  } catch (err: any) {
+    console.error('checkEmail error:', err);
+    res.status(500).json({ error: 'Internal error' });
+  }
+}

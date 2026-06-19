@@ -102,6 +102,7 @@ export const authAPI = {
   me: () => api.get("/auth/me"),
   forgotPassword: (email: string) => api.post("/auth/forgot-password", { email }),
   resetPassword: (password: string, token: string) => api.post(`/auth/reset-password/${token}`, { password }),
+  checkEmail: (email: string) => api.post("/auth/check-email", { email }),
 };
 
 // Resume endpoints

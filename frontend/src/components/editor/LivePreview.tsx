@@ -323,21 +323,19 @@ const response = await resumeAPI.preview(
   }, []);
 
   // ========== Loading State ==========
-  if (loading) {
-    return (
-      <div className="flex-1 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-6">
-        <div className="text-center">
-          <div className="relative">
-            <div className="w-12 h-12 border-4 border-gray-200 dark:border-gray-700 rounded-full"></div>
-            <div className="absolute top-0 left-0 w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-          <p className="mt-4 text-sm font-medium text-gray-600 dark:text-gray-300">
-            Generating your preview...
-          </p>
-        </div>
+ if (loading) {
+  return (
+    <div className="flex-1 h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex justify-center p-6">
+      {/* Changed 'my-auto' to 'pt-32' to manually push it down from the top */}
+      <div className="text-center pt-60"> 
+        
+        <p className="mt-4 text-sm font-medium text-gray-600 dark:text-gray-300">
+          Generating your preview...
+        </p>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   // ========== Error State ==========
   if (error) {

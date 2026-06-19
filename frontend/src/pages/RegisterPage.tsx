@@ -237,6 +237,15 @@ export default function RegisterPage({ onSuccess }: { onSuccess: () => void }) {
   const subscriptionType = `subscription_${selectedPlan}`;
 
   try {
+    // ✅ Check if email already exists BEFORE opening Razorpay
+    // This prevents charging a user whose email is already registered.
+    const { data: emailCheck } = await authAPI.checkEmail(email);
+    if (emailCheck.exists) {
+      toast.error("This email is already registered. Please log in instead.");
+      setLoading(false);
+      return;
+    }
+
     const loaded = await loadRazorpay();
     if (!loaded) {
       toast.error("Failed to load payment gateway. Please try again.");

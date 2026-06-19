@@ -121,7 +121,7 @@ function fixMalformedJSON(text: string): string {
   return cleaned;
 }
 
-// ---------- POST-PROCESSING FUNCTIONS (Preserved from original) ----------
+// ---------- POST-PROCESSING FUNCTIONS ----------
 function fixSkillsExtraction(data: any): any {
   if (!data) return data;
   if (!data.skills) return data;
@@ -200,24 +200,149 @@ function fixCoreCompetenciesExtraction(data: any): any {
 function fixSummaryFormat(data: any): any {
   if (!data) return data;
 
+  console.log("🔧 Fixing summary/career objective format...");
+
+  // First, extract all possible summary/objective fields
+  let summaryContent = null;
+  let careerObjectiveContent = null;
+
+  // Extract summary content
   if (data.summary) {
     if (typeof data.summary === 'object' && data.summary !== null) {
       if (data.summary.description) {
-        data.careerObjective = data.summary.description;
-        delete data.summary;
+        summaryContent = data.summary.description;
       } else if (data.summary.text) {
-        data.careerObjective = data.summary.text;
-        delete data.summary;
+        summaryContent = data.summary.text;
+      } else if (data.summary.summary) {
+        summaryContent = data.summary.summary;
+      } else {
+        summaryContent = JSON.stringify(data.summary);
       }
     } else if (typeof data.summary === 'string') {
-      data.careerObjective = data.summary;
-      delete data.summary;
+      summaryContent = data.summary;
     }
   }
 
-  if (data.careerObjective && typeof data.careerObjective === 'object') {
-    data.careerObjective = data.careerObjective.description || data.careerObjective.text || data.careerObjective;
+  // Extract careerObjective content
+  if (data.careerObjective) {
+    if (typeof data.careerObjective === 'object' && data.careerObjective !== null) {
+      if (data.careerObjective.description) {
+        careerObjectiveContent = data.careerObjective.description;
+      } else if (data.careerObjective.text) {
+        careerObjectiveContent = data.careerObjective.text;
+      } else if (data.careerObjective.careerObjective) {
+        careerObjectiveContent = data.careerObjective.careerObjective;
+      } else {
+        careerObjectiveContent = JSON.stringify(data.careerObjective);
+      }
+    } else if (typeof data.careerObjective === 'string') {
+      careerObjectiveContent = data.careerObjective;
+    }
   }
+
+  // Handle "objective" field (if AI returned it as "objective")
+  if (data.objective) {
+    if (typeof data.objective === 'string') {
+      if (!careerObjectiveContent) {
+        careerObjectiveContent = data.objective;
+      }
+    } else if (typeof data.objective === 'object') {
+      const objContent = data.objective.description || data.objective.text || JSON.stringify(data.objective);
+      if (!careerObjectiveContent) {
+        careerObjectiveContent = objContent;
+      }
+    }
+    delete data.objective;
+  }
+
+  // Handle "professionalSummary" field
+  if (data.professionalSummary) {
+    if (typeof data.professionalSummary === 'string') {
+      if (!summaryContent) {
+        summaryContent = data.professionalSummary;
+      }
+    } else if (typeof data.professionalSummary === 'object') {
+      const psContent = data.professionalSummary.description || data.professionalSummary.text || JSON.stringify(data.professionalSummary);
+      if (!summaryContent) {
+        summaryContent = psContent;
+      }
+    }
+    delete data.professionalSummary;
+  }
+
+  // CRITICAL: Detect if summary content is actually an objective
+  if (summaryContent && typeof summaryContent === 'string') {
+    const lowerSummary = summaryContent.toLowerCase().trim();
+    // Check if this is actually an objective
+    const isObjective = lowerSummary.includes('objective') || 
+                        lowerSummary.includes('career objective') ||
+                        lowerSummary.includes('career goal') ||
+                        lowerSummary.includes('professional objective') ||
+                        lowerSummary.startsWith('to obtain') ||
+                        lowerSummary.startsWith('seeking a') ||
+                        lowerSummary.startsWith('looking for') ||
+                        lowerSummary.startsWith('to secure') ||
+                        lowerSummary.includes('aim to') ||
+                        lowerSummary.includes('goal is to');
+    
+    if (isObjective && !careerObjectiveContent) {
+      // This is an objective, move to careerObjective
+      careerObjectiveContent = summaryContent;
+      summaryContent = null;
+      console.log("📝 Moved Objective content from summary to careerObjective");
+    }
+  }
+
+  // CRITICAL: Detect if careerObjective content is actually a summary
+  if (careerObjectiveContent && typeof careerObjectiveContent === 'string') {
+    const lowerCareer = careerObjectiveContent.toLowerCase().trim();
+    const isSummary = lowerCareer.includes('summary') || 
+                      lowerCareer.includes('professional summary') ||
+                      lowerCareer.includes('profile') ||
+                      lowerCareer.includes('professional profile') ||
+                      lowerCareer.includes('experienced') ||
+                      lowerCareer.includes('skilled') ||
+                      lowerCareer.includes('proven track record');
+    
+    if (isSummary && !summaryContent) {
+      // This is a summary, move to summary
+      summaryContent = careerObjectiveContent;
+      careerObjectiveContent = null;
+      console.log("📝 Moved Summary content from careerObjective to summary");
+    }
+  }
+
+  // If we have both summary and careerObjective with same content, remove duplicate
+  if (summaryContent && careerObjectiveContent && 
+      typeof summaryContent === 'string' && typeof careerObjectiveContent === 'string') {
+    if (summaryContent.trim() === careerObjectiveContent.trim()) {
+      // Same content, keep only summary
+      careerObjectiveContent = null;
+      console.log("📝 Removed duplicate careerObjective (same as summary)");
+    }
+  }
+
+  // Set the final values
+  if (summaryContent && typeof summaryContent === 'string' && 
+      summaryContent.trim() !== '' && 
+      summaryContent !== 'undefined' && 
+      summaryContent !== 'null') {
+    data.summary = summaryContent.trim();
+  } else {
+    delete data.summary;
+  }
+
+  if (careerObjectiveContent && typeof careerObjectiveContent === 'string' && 
+      careerObjectiveContent.trim() !== '' && 
+      careerObjectiveContent !== 'undefined' && 
+      careerObjectiveContent !== 'null') {
+    data.careerObjective = careerObjectiveContent.trim();
+  } else {
+    delete data.careerObjective;
+  }
+
+  console.log(`📝 Summary: ${data.summary ? 'present (' + data.summary.substring(0, 50) + '...)' : 'absent'}`);
+  console.log(`📝 Career Objective: ${data.careerObjective ? 'present (' + data.careerObjective.substring(0, 50) + '...)' : 'absent'}`);
 
   return data;
 }
@@ -460,6 +585,81 @@ function removeEmptyFields(obj: any): any {
   return cleaned;
 }
 
+function fixAchievementsAttachment(data: any): any {
+  if (!data || !data.experience || !Array.isArray(data.experience)) return data;
+
+  console.log("🔧 Fixing achievements attachment and removing duplicates...");
+
+  // First, identify which job each achievement belongs to
+  // In the resume, achievements appear AFTER the job they belong to
+  // Pattern: Job Title 1 -> Responsibilities -> ACHIEVEMENTS -> Job Title 2
+  // So achievements belong to Job Title 1, not Job Title 2
+
+  // Check if achievements are attached to the wrong job
+  for (let i = 0; i < data.experience.length - 1; i++) {
+    const current = data.experience[i];
+    const next = data.experience[i + 1];
+    
+    // If current job has achievements and next job has no achievements,
+    // but the current job has very few responsibilities (short description)
+    // and the next job has many responsibilities (long description),
+    // the achievements likely belong to the next job
+    if (current.achievements && !next.achievements) {
+      const currentDescLength = (current.description || '').split('\n').filter(line => line.trim().length > 0).length;
+      const nextDescLength = (next.description || '').split('\n').filter(line => line.trim().length > 0).length;
+      
+      // If the next job has significantly more responsibilities, move achievements to it
+      if (nextDescLength > currentDescLength * 1.5 && nextDescLength > 5) {
+        // Move achievements to the next job
+        next.achievements = current.achievements;
+        delete current.achievements;
+        console.log(`📝 Moved achievements from "${current.title}" to "${next.title}" (next job has ${nextDescLength} responsibilities vs ${currentDescLength})`);
+      }
+    }
+  }
+
+  // Now remove duplicates across all jobs
+  const uniqueAchievements = new Set<string>();
+  
+  for (let i = 0; i < data.experience.length; i++) {
+    const exp = data.experience[i];
+    
+    if (exp.achievements && typeof exp.achievements === 'string') {
+      const lines = exp.achievements.split('\n').filter(line => line.trim().length > 0);
+      const uniqueForJob: string[] = [];
+      
+      for (const achievement of lines) {
+        const trimmed = achievement.trim();
+        // Check if this achievement was already seen
+        if (!uniqueAchievements.has(trimmed)) {
+          uniqueAchievements.add(trimmed);
+          uniqueForJob.push(trimmed);
+        } else {
+          console.log(`🗑️ Removing duplicate achievement from "${exp.title}": "${trimmed.substring(0, 50)}..."`);
+        }
+      }
+      
+      // Update the job's achievements with only unique ones
+      if (uniqueForJob.length > 0) {
+        exp.achievements = uniqueForJob.join('\n');
+      } else {
+        delete exp.achievements;
+      }
+    }
+  }
+
+  // If any entry has achievements but no description, remove it
+  data.experience = data.experience.filter((exp: any) => {
+    if (exp.achievements && (!exp.description || exp.description.trim().length < 5)) {
+      console.log(`🗑️ Removing entry "${exp.title}" - it appears to be just an achievements section`);
+      return false;
+    }
+    return true;
+  });
+
+  return data;
+}
+
 function postProcessParsedData(data: any): any {
   if (!data || typeof data !== 'object') return data;
 
@@ -473,12 +673,9 @@ function postProcessParsedData(data: any): any {
   data = cleanupEducation(data);
   data = fixLanguages(data);
   data = fixSocialProfiles(data);
-  // ADD THIS LINE - Clean bullet points but preserve structure
   data = cleanBulletPointsFromDescriptions(data);
-
+  data = fixAchievementsAttachment(data);
   data = removeEmptyFields(data);
-
-
 
   console.log("✅ Post-processing complete");
   return data;
@@ -502,6 +699,10 @@ const fieldMappings: { [key: string]: string } = {
   'preferred_location': 'preferredLocation',
   'career_objective': 'careerObjective',
   'professional_summary': 'summary',
+  'summary': 'summary',
+  'objective': 'careerObjective',
+  'careerObjective': 'careerObjective',
+  'professionalSummary': 'summary',
   'workExperience': 'experience',
   'work_experience': 'experience',
   'start': 'startDate',
@@ -531,11 +732,12 @@ const fieldMappings: { [key: string]: string } = {
 function cleanBulletPointsFromDescriptions(data: any): any {
   if (!data || typeof data !== 'object') return data;
 
-  // Clean experience descriptions
+  // Clean experience descriptions AND achievements separately
   if (data.experience && Array.isArray(data.experience)) {
     console.log("🧹 Cleaning bullet points from experience descriptions...");
 
     data.experience = data.experience.map((exp: any) => {
+      // Clean description
       if (exp.description && typeof exp.description === 'string') {
         // Split into lines while preserving line breaks
         const lines = exp.description.split(/\r?\n/);
@@ -547,12 +749,33 @@ function cleanBulletPointsFromDescriptions(data: any): any {
           cleaned = cleaned.replace(/^[a-zA-Z]\)\s*/, '');   // Remove lettered lists (a), b), etc.)
           cleaned = cleaned.replace(/^[✓✓✔]\s*/, '');       // Remove checkmarks
           cleaned = cleaned.replace(/^[◦▪▸›]\s*/, '');      // Remove other bullet symbols
+          // Remove "Achievements:" label if it appears in description
+          cleaned = cleaned.replace(/^Achievements:\s*/i, '');
+          cleaned = cleaned.replace(/^ACHIEVEMENTS:\s*/i, '');
           return cleaned;
         });
-
         // Join back with newlines to preserve structure
         exp.description = cleanedLines.join('\n');
       }
+      
+      // Clean achievements separately
+      if (exp.achievements && typeof exp.achievements === 'string') {
+        const lines = exp.achievements.split(/\r?\n/);
+        const cleanedLines = lines.map(line => {
+          let cleaned = line.trim();
+          cleaned = cleaned.replace(/^[•\-*]\s*/, '');
+          cleaned = cleaned.replace(/^\d+\.\s*/, '');
+          cleaned = cleaned.replace(/^[a-zA-Z]\)\s*/, '');
+          cleaned = cleaned.replace(/^[✓✓✔]\s*/, '');
+          cleaned = cleaned.replace(/^[◦▪▸›]\s*/, '');
+          // Remove "Achievements:" label if it appears in achievements
+          cleaned = cleaned.replace(/^Achievements:\s*/i, '');
+          cleaned = cleaned.replace(/^ACHIEVEMENTS:\s*/i, '');
+          return cleaned;
+        });
+        exp.achievements = cleanedLines.join('\n');
+      }
+      
       return exp;
     });
   }
@@ -659,9 +882,11 @@ async function extractDataFromText(userId: string | null, text: string, guestId:
 
 ⚠️ CRITICAL RULES (MUST FOLLOW STRICTLY):
 
-1. Hallucinate data a little for better completeness and field mapping.
-2. Use EXACTLY these section keys (camelCase):
-   - personal, careerObjective, summary, skills, coreCompetencies , experience, education,
+1. DO NOT hallucinate or invent any content. Only extract what is explicitly present in the resume text.
+2. DO NOT merge or combine content from different job entries. Each job MUST be completely separate.
+
+3. Use EXACTLY these section keys (camelCase):
+   - personal, careerObjective, summary, skills, coreCompetencies, experience, education,
      internships, trainingPrograms, academicProjects, leadershipPositions,
      coCurricular, extracurricular, languages, certifications, scholarships,
      awards, speakingEngagements, memberships, workshops, professionalContext,
@@ -671,108 +896,73 @@ async function extractDataFromText(userId: string | null, text: string, guestId:
      mentorshipExperience, researchGrants, testScores, publications, patents,
      toolsTechnologies
 
-3. Field Mapping (CRITICAL - Match EXACTLY):
+4. Field Mapping (CRITICAL - Match EXACTLY):
    
    PERSONAL:
    - name, email, phone, alternatePhone, dob, gender, middleName, 
      maritalStatus, fullAddress, location, pinCode, country, image
    - for phone and alternatePhone: extract only digits, remove any formatting or country codes
    
-   EXPERIENCE:
-- title, company, location, startDate, endDate, isCurrent, description, achievements
-- Each job MUST be a separate object
-- NEVER merge responsibilities from different companies
-- Only include content that belongs to that specific company and date range
-- If multiple roles exist, create multiple entries
-- description MUST contain ONLY that job's responsibilities
-- DO NOT combine multiple jobs into one
-- IMPORTANT: 
-  - DO NOT include bullet point symbols (•, -, *, 1., etc.) in the description text
-  - Instead, write each responsibility on a new line
-  - Use line breaks to separate different points
-  - For example, write:
-    "Sourcing candidates from different job portals
-     Screening and shortlisting candidates as per requirements
-     Coordinating with hiring managers for interview scheduling"
-  - The template will handle formatting and add proper bullets
-- If the resume has bullet points, convert them to new lines without symbols
-- If there are no bullet points, preserve the original line breaks
-- If you see separate sections like "Achievements" under a job, include them on new lines
+   SUMMARY / CAREER OBJECTIVE (CRITICAL - MUST DISTINGUISH):
+   - "summary": This is for Professional Summary, Professional Profile, or Profile sections
+     * Look for section headers like: "Professional Summary", "Professional Profile", "Profile", "Summary"
+   - "careerObjective": This is for Career Objective, Objective, or Career Goals sections
+     * Look for section headers like: "Career Objective", "Objective", "Career Goals", "Career Aim"
+   - These are DIFFERENT sections and should NEVER be merged
+   - If you see "Objective" or "Career Objective" in the resume, put it in "careerObjective"
+   - If you see "Professional Summary" or "Summary" in the resume, put it in "summary"
+   - DO NOT put objective content in summary
+   - DO NOT put summary content in careerObjective
+   - Return each as a simple string, NOT an object
+   - IMPORTANT: If the resume has a section that says "Objective:" or "Career Objective:", the content MUST go in "careerObjective", NOT "summary"
+   - If the resume has a section that says "Professional Summary:" or "Summary:", the content MUST go in "summary", NOT "careerObjective"
+   
+   EXPERIENCE (MOST IMPORTANT - MUST FOLLOW EXACTLY):
+   - Each job MUST be a separate object in the "experience" array
+   - For each job, extract:
+     * title: The exact job title
+     * company: The exact company name
+     * location: The location (city/state)
+     * startDate: The start date in the format shown in the resume
+     * endDate: The end date or "Present" if current
+     * isCurrent: true if endDate is "Present"
+     * description: ONLY the bullet points/responsibilities that belong to THAT SPECIFIC job. Preserve line breaks between bullet points.
+     * achievements: ONLY the achievements that belong to THAT SPECIFIC job (if shown separately). Preserve line breaks between achievements.
+   
+   - CRITICAL: DO NOT mix responsibilities or achievements between different jobs
+   - CRITICAL: DO NOT copy content from one job to another
+   - CRITICAL: Each job's description must contain ONLY content that appears under that job's section
+   - If a job has bullet points, extract them as separate lines with \\n between them
+   - If a job has a separate "Achievements:" or "ACHIEVEMENTS:" section, put that in the "achievements" field
+   - Keep each job's content completely separate and distinct
+   - The achievements from one job must NEVER appear under another job
+   - The description from one job must NEVER appear under another job
+   - IMPORTANT: Achievements belong to the job that comes BEFORE the achievements section, NOT the job after it
+   - CRITICAL: If the same achievements appear multiple times in the resume, they belong to the FIRST job they appear under, and should NOT be duplicated in other jobs
 
    EDUCATION:
    - school, location, degree, field, startDate, graduationDate, description, grade
-   - properly extract date for coresponding education
+   - properly extract date for corresponding education
+   - Each education entry MUST be separate
    
-   SKILLS (IMPORTANT - Must be extracted properly):
+   SKILLS:
    - Extract ALL skills as a simple array of strings
-   - Look for bullet points (•, -, *, etc.) or comma-separated lists
+   - Look for bullet points or comma-separated lists
    - Example: "skills": ["React.js", "Node.js", "MongoDB", "AWS"]
-   - DO NOT put skills inside objects, just simple strings
-   - Include ALL technical skills, programming languages, frameworks, tools, etc.
-   - Do not include  speaking languages like English, Spanish, etc. here, they should go in the "languages" section
-   - If you see a "Skills" section with bullet points, extract each bullet point as a separate skill
-   - For skills like "React.js" → extract as "React.js"
-   - For skills like "• React.js" → extract as "React.js" (remove the bullet)
-   - Extract ONLY values that appear under the Skills section.
-- NEVER include Core Competencies values in Skills.
-- If both sections exist, keep them completely separate.
+   - DO NOT include speaking languages here (put in "languages" section)
+   - Extract ONLY values that appear under the Skills section
+   - NEVER include Core Competencies values in Skills
    
-
-   CORE COMPETENCIES (VERY IMPORTANT):
-
-- Core Competencies and Skills are DIFFERENT sections.
-- NEVER merge Core Competencies into Skills.
-- NEVER place Core Competencies values inside the skills array.
-- If the resume contains a section named:
-  "Core Competencies",
-  "Core Competency",
-  "Key Competencies",
-  "Core Strengths"
-  then extract those values ONLY into "coreCompetencies".
-
-Example:
-
-Resume:
-
-Skills:
-- Recruitment
-- BFSI Hiring
-
-Core Competencies:
-- Team Lead
-- Work Management
-
-Output:
-
-{
-  "skills": [
-    "Recruitment",
-    "BFSI Hiring"
-  ],
-  "coreCompetencies": [
-    "Team Lead",
-    "Work Management"
-  ]
-}
-
-- Preserve wording exactly.
-- Do not rewrite.
-- Do not move values between sections.
+   CORE COMPETENCIES:
+   - Core Competencies and Skills are DIFFERENT sections
+   - NEVER merge Core Competencies into Skills
+   - NEVER place Core Competencies values inside the skills array
+   - If the resume contains a section named "Core Competencies", "Core Competency", "Key Competencies", or "Core Strengths", extract those values ONLY into "coreCompetencies"
+   - Preserve wording exactly, do not rewrite
+   - Do not move values between sections
    
    INTERNSHIPS:
    - title, company, description, duration
-   
-   TRAINING PROGRAMS:
-   - name, provider, completionDate, duration, description
-   
-   ACADEMIC PROJECTS:
-   - name, course, institution, duration, description, technologies (array), url
-   
-   LEADERSHIP POSITIONS:
-   - position, organization, startDate, endDate, description
-   
-   CO-CURRICULAR / EXTRA-CURRICULAR:
-   - activity, role, year
    
    LANGUAGES:
    - language, level (Beginner/Intermediate/Advanced), capability (Speak/Read/Write)
@@ -780,96 +970,60 @@ Output:
    CERTIFICATIONS:
    - name, issuer, date, url
    
-   SCHOLARSHIPS:
-   - name, provider, organization, year, description
-   
    AWARDS:
    - title, organization, issueYear, description
-   
-   SPEAKING ENGAGEMENTS:
-   - topic, eventName, date, description
-   
-   MEMBERSHIPS:
-   - membershipName, organizationName, year, description
-   
-   WORKSHOPS:
-   - programTitle, conductedBy, year, description
-   
-   PROFESSIONAL CONTEXT:
-   - totalExperience, teamSize, industry, functionalDomain, geographicScope, revenueResponsibility
-   
-   SECTION VISIBILITY:
-   - personal, summary, experience, projects, education, skills, languages, 
-     hobbies, certifications, awards, speakingEngagements, memberships, 
-     workshops, socialLinks, customSections (all boolean)
-   
-   PORTFOLIO:
-   - name, description, url, type, platform
-   
-   CLIENT PROJECTS:
-   - name, role, description, clientOrganization, duration, toolsTechnologies, projectUrl
-   
-   VOLUNTEERING:
-   - organization, role, description, causeArea, duration
-   
-   MILITARY SERVICE:
-   - branch, rank, description, duration, specialization
-   
-   METHODOLOGIES:
-   - name, certification, experienceDuration
-   
-   INDUSTRY EXPERTISE:
-   - industry, domainArea, experienceDuration
-   
-   REFERENCES:
-   - name, designationRelationship, organization, contactInformation
-   
-   SOCIAL PROFILES:
-   - platform, url
-   
-   AVAILABILITY WORK AUTH:
-   - availabilityNoticePeriod, workAuthorizationStatus, preferredLocation
-   
-   TEACHING EXPERIENCE:
-   - title, institution, description, subjectCourseTaught, duration
-   
-   MENTORSHIP EXPERIENCE:
-   - description, mentorshipArea, organizationPlatform, menteeLevel, duration
-   
-   RESEARCH GRANTS:
-   - title, agency, amount, description, year
-   
-   TEST SCORES:
-   - testName, score, year, percentileRank
-   
-   PUBLICATIONS:
-   - title, journalPublisher, publicationType, year, urlDoi, authors
-   
-   PATENTS:
-   - title, patentNumber, status, issuingAuthority, year
-   
-   TOOLS TECHNOLOGIES:
-   - name, category, proficiency, experienceDuration
 
-4. For EDUCATION dates: ALWAYS split into startDate and graduationDate separately
-5. For SUMMARY/CAREER OBJECTIVE: Return as a simple string, NOT an object
+5. For all dates: Keep the format exactly as shown in the resume
+
 6. For SKILLS: 
-   - ALWAYS return as an array of simple strings.
-   - DO NOT include any spoken languages (e.g., English, Hindi, Spanish, Bengali, French, etc.) in the skills array.
-   - Skills must be technical, professional, or domain-specific (e.g., "BFSI Hiring", "Recruitment", "Client Acquisition", "Team Handling", "Communication").
-   - Spoken/written languages MUST go into the "languages" section only.
-7. For EXPERIENCE (work experience):
-   - Each job MUST be a separate object in the "experience" array.
-   - For each job, the "description" field MUST contain ONLY the bullet points or responsibilities that belong EXCLUSIVELY to that job.
-   - DO NOT merge responsibilities from different jobs into a single description.
-   - DO NOT copy responsibilities from Job A into Job B.
-   - If a job has no bullet points, write a short paragraph describing that role only.
-   - If you see separate sections like "Achievements" under a job, include them as part of that job's description, but clearly separated (e.g., "Achievements: ...").
+   - ALWAYS return as an array of simple strings
+   - DO NOT include any spoken languages (e.g., English, Hindi, Spanish, Bengali, French, etc.) in the skills array
+   - Skills must be technical, professional, or domain-specific
+   - Spoken/written languages MUST go into the "languages" section only
 
-8. Keep dates in original format but split ranges
-9. If a section has no data, OMIT it completely
-10. Return ONLY valid JSON, no explanations
-11. do not return not mentioned , unknown, undefined, null, empty string, or similar values. If a field is not present in the resume, simply omit it from the JSON.
+7. For EXPERIENCE (work experience) - CRITICAL:
+   - Each job MUST be a separate object in the "experience" array
+   - For each job, the "description" field MUST contain ONLY the bullet points or responsibilities that belong EXCLUSIVELY to that job
+   - DO NOT merge responsibilities from different jobs into a single description
+   - DO NOT copy responsibilities from Job A into Job B
+   - If a job has no bullet points, write a short paragraph describing that role only
+   - If you see separate sections like "Achievements:" or "ACHIEVEMENTS:" under a job, include them as a separate "achievements" field for that job
+   - IMPORTANT: The achievements MUST stay with the correct job (the job that comes BEFORE the achievements section)
+   - The "Achievements:" or "ACHIEVEMENTS:" label itself should NOT be included in the achievements field, only the achievement items
+   - Preserve line breaks between achievements using \\n
+   - CRITICAL: Do NOT duplicate achievements across multiple jobs. Each achievement should appear only once, in the job where it was first mentioned.
+
+8. If a section has no data, OMIT it completely
+
+9. Return ONLY valid JSON, no explanations
+
+10. DO NOT return "not mentioned", "unknown", "undefined", null, empty string, or similar values. If a field is not present in the resume, simply omit it from the JSON.
+
+11. IMPORTANT: When you see the resume structure like this:
+    EXPERIENCE
+    Job Title 1
+    Date Range 1
+    Company 1, Location 1
+    • Responsibility 1
+    • Responsibility 2
+    Achievements:
+    • Achievement 1
+    • Achievement 2
+    
+    Job Title 2
+    Date Range 2
+    Company 2, Location 2
+    • Responsibility 3
+    • Responsibility 4
+    
+    You MUST extract:
+    - Job 1: title="Job Title 1", company="Company 1", description="Responsibility 1\nResponsibility 2", achievements="Achievement 1\nAchievement 2"
+    - Job 2: title="Job Title 2", company="Company 2", description="Responsibility 3\nResponsibility 4"
+    
+    DO NOT mix Job 1's responsibilities with Job 2's responsibilities.
+    DO NOT put Job 1's achievements under Job 2.
+
+12. Each job entry must be completely self-contained. No content should appear in more than one job entry.
 
 Now extract and return the structured JSON from the provided resume text:
 

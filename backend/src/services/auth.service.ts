@@ -48,7 +48,12 @@ export async function register(
     resumeId?: string
   }
 ) {
-  // 1. Verify Payment
+  // 1. Check if user already exists FIRST (before payment verification)
+  // This prevents charging a user who already has an account.
+  const existingUser = await User.findOne({ email })
+  if (existingUser) throw new Error('User already exists')
+
+  // 2. Verify Payment
   const {
     razorpay_order_id,
     razorpay_subscription_id,
@@ -82,10 +87,6 @@ export async function register(
   if (expectedSignature !== razorpay_signature) {
     throw new Error('Invalid payment signature');
   }
-
-  // 2. Check if user already exists
-  const existingUser = await User.findOne({ email })
-  if (existingUser) throw new Error('User already exists')
 
   const hashedPassword = await hashPassword(password)
 
